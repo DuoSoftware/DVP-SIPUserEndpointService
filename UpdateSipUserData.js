@@ -18,55 +18,73 @@ var DbConn = require('./DVP-DBModels');
 // post :- done
 function UpdateUacUserData(jobj,callback) {
     // Add all  details of new user
-
+try{
     DbConn.SipUACEndpoint
-        .find({ where: [{ SipUsername: jobj.SipUsername },{CompanyId:jobj.CompanyId},{TenantId:jobj.TenantId}]})
-        .complete(function(err, result) {
+        .find({where: [{SipUsername: jobj.SipUsername}, {CompanyId: jobj.CompanyId}, {TenantId: jobj.TenantId}]})
+        .complete(function (err, result) {
             if (!!err) {
                 console.log('................An error occurred while searching for SIp UAC Record..................', err);
-                callback.end();
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                callback.end(jsonString);
 
             } else if (!result) {
 
 
                 console.log('No user has been found.');
-                callback.end();
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                callback.end(jsonString);
 
             }
-            else
-            {
+            else {
 
+                try {
 
-                DbConn.SipUACEndpoint
-                    .updateAttributes(
-                    {
-                        Password: jobj.Password,
-                        GuRefId: jobj.GuRefId,
-                        ObjClass: jobj.ObjClass,
-                        ObjType: jobj.ObjType,
-                        ObjCategory: jobj.ObjCategory,
-                        ExtraData:jobj.ExtraData
+                    DbConn.SipUACEndpoint
+                        .update(
+                        {
+                            Password: jobj.Password,
+                            GuRefId: jobj.GuRefId,
+                            ObjClass: jobj.ObjClass,
+                            ObjType: jobj.ObjType,
+                            ObjCategory: jobj.ObjCategory,
+                            ExtraData: jobj.ExtraData
 
-                    },
-                    {
-                        where: [{ SipUsername: jobj.SipUsername },{CompanyId:jobj.CompanyId},{TenantId:jobj.TenantId}]
-                    }
-                ).then(function() {
+                        },
+                        {
+                            where: [{SipUsername: jobj.SipUsername}, {CompanyId: jobj.CompanyId}, {TenantId: jobj.TenantId}]
+                        }
+                    ).then(function (result) {
 
-                        console.log(".......................Record updated successfully!....................");
-                        callback.end();
+                            console.log(".......................Record updated successfully!....................");
+                            var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
+                            callback.end(jsonString);
 
-                    }).error(function(err) {
+                        }).error(function (err) {
 
-                        console.log("Project update failed ! "+ err);
-                        callback.end();
-                        //handle error here
+                            console.log("Project update failed ! " + err);
+                            var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                            callback.end(jsonString);
+                            //handle error here
 
-                    });
+                        });
 
+                }
+                catch(ex)
+                {
+                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                    callback.end(jsonString);
+                }
             }
+
+
         });
-    return next();
+    //return next();
+}
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+        callback.end(jsonString);
+    }
 }
 
 

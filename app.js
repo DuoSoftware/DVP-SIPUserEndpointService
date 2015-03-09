@@ -29,6 +29,8 @@ RestServer.use(restify.bodyParser());
 RestServer.use(restify.acceptParser(RestServer.acceptable));
 RestServer.use(restify.queryParser());
 
+
+//Tested :- Done
 //.......................................................................................................................
 
 RestServer.post('/dvp/:version/context_mgmt/save_contextdata',function(req,res,err)
@@ -37,6 +39,7 @@ context.PostFunc(req,res,err);
 
 });
 
+//Tested :- Done
 //.......................................................................................................................
 
 RestServer.post('/dvp/:version/uac_mgmt/save_uac',function(req,res,err)
@@ -45,6 +48,7 @@ RestServer.post('/dvp/:version/uac_mgmt/save_uac',function(req,res,err)
 
 });
 
+//Tested :- Done
 //.......................................................................................................................
 
 RestServer.post('/dvp/:version/uac_mgmt/updt_uac',function(req,res,err)
@@ -53,6 +57,7 @@ UACUpdate.UpdateUacUserData(req.body,res);
 
 });
 
+//Tested :- Done
 //.......................................................................................................................
 
 RestServer.post('/dvp/:version/ext_mgmt/update_extension_st/:ref/:st',function(req,res,err)
@@ -61,7 +66,7 @@ RestServer.post('/dvp/:version/ext_mgmt/update_extension_st/:ref/:st',function(r
 
 
 });
-
+//Tested :- Done
 //.......................................................................................................................
 
 RestServer.post('/dvp/:version/ext_mgmt/add_extension',function(req,res,err)
@@ -70,6 +75,7 @@ RestServer.post('/dvp/:version/ext_mgmt/add_extension',function(req,res,err)
 
 
 });
+//.......................................................................................................................
 
 RestServer.post('/dvp/:version/ext_mgmt/map_extension',function(req,res,err)
 {
@@ -77,6 +83,7 @@ RestServer.post('/dvp/:version/ext_mgmt/map_extension',function(req,res,err)
 
 
 });
+//Tested :- Done
 //.......................................................................................................................
 
 RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/add_sipuser_group',function(req,res,err)
@@ -84,6 +91,7 @@ RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/add_sipuser_group',fun
     group.AddSipUserGroup(req.body,res);
 
 });
+//Tested :- Done
 //.......................................................................................................................
 
 RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/map_extensionid',function(req,res,err)
@@ -91,6 +99,7 @@ RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/map_extensionid',funct
     group.MapExtensionID(req.body,res);
 
 });
+//Tested :- Done
 //.......................................................................................................................
 
 RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/fill_usrgrp',function(req,res,err)
@@ -98,6 +107,7 @@ RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/fill_usrgrp',function(
     group.FillUsrGrp(req.body,res);
 
 });
+//Tested :- Done
 //.......................................................................................................................
 
 RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/update_sipuser_group',function(req,res,err)
@@ -139,6 +149,7 @@ RestServer.post('/dvp/:version/scheduleapi/update_sch_id',function(req,res,err)
 
 */
 
+//Tested :- Done
 //.......................................................................................................................
 
 RestServer.get('/dvp/:version/uac_mgmt/find_context/:cmpid',function(req,res,err)
@@ -148,7 +159,7 @@ RestServer.get('/dvp/:version/uac_mgmt/find_context/:cmpid',function(req,res,err
 
 });
 
-
+//Tested :- Done
 //.......................................................................................................................
 
 RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/get_group_data/:name',function(req,res,err)
