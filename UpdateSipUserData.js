@@ -10,6 +10,7 @@
  * Created by Administrator on 1/27/2015.
  */
 var DbConn = require('./DVP-DBModels');
+var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 //var SaveNewSipUser=function(UContext,UDescription,UCompanyId,UTenantId,UObjClass,UObjType,UObjCategory,UAddUser,UUpdateUser,UAddTime,UUpdateTime,callback)
 
@@ -27,7 +28,7 @@ try{
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                 callback.end(jsonString);
 
-            } else if (!result) {
+            } else if (result.length==0) {
 
 
                 console.log('No user has been found.');

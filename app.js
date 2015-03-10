@@ -10,6 +10,7 @@ var Extmgt=require('./ExtensionManagementAPI.js');
 var UACUpdate=require('./UpdateSipUserData.js');
 //var Schedule=require('./ScheduleApi.js');
 var group=require('./SipUserGroupManagement.js');
+var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 
 

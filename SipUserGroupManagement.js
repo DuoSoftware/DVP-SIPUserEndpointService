@@ -6,6 +6,7 @@ var DbConn = require('./DVP-DBModels');
 var restify = require('restify');
 var stringify=require('stringify');
 var Sequelize=require('sequelize');
+var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 /*
  var RestServer = restify.createServer({
@@ -186,7 +187,7 @@ function FillUsrGrp(obj,res) {
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                     res.end(jsonString);
 
-                } else if (!result) {
+                } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
@@ -205,7 +206,7 @@ function FillUsrGrp(obj,res) {
                                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                                     res.end(jsonString);
 
-                                } else if (!result) {
+                                } else if (result.length==0) {
                                     console.log('No user with the Extension has been found.');
                                     ///logger.info( 'No user found for the requirement. ' );
                                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
@@ -342,7 +343,7 @@ function GetGroupData(obj,res) {
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                     res.end(jsonString);
 
-                } else if (!result) {
+                } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
@@ -382,7 +383,7 @@ function GetGroupEndpoints(obj,res)
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                     res.end(jsonString);
 
-                } else if (!result) {
+                } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
@@ -422,7 +423,7 @@ function EndpointGroupID(obj,res) {
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                     res.end(jsonString);
 
-                } else if (!result) {
+                } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
@@ -463,7 +464,7 @@ function AllRecWithCompany(req,res,err)
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                     res.end(jsonString);
 
-                } else if (!result) {
+                } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
@@ -500,7 +501,7 @@ function GetAllUsersInGroup(req,res,err) {
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                     res.end(jsonString);
 
-                } else if (!result) {
+                } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
@@ -538,7 +539,7 @@ function Testme(req,res,err)
                 //logger.info( 'Error found in searching : '+err );
                 res.end();
 
-            } else if (!result) {
+            } else if (result.length==0) {
                 console.log('No user with the Extension has been found.');
                 ///logger.info( 'No user found for the requirement. ' );
                 res.end();

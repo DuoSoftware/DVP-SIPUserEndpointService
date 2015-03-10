@@ -8,6 +8,7 @@ var DbUpdate=require('./UpdateSipUserData.js');
 var restify = require('restify');
 var strfy = require('stringify');
 var winston=require('winston');
+var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 var logger = new (winston.Logger)({
     transports: [
@@ -67,7 +68,7 @@ function SaveSip(reqz,resz,errz) {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                 resz.end(jsonString);
 
-            } else if (!result) {
+            } else if (result.length==0) {
                 console.log('No user with the Extension ' + obj.SipUsername + ' has been found.');
                 logger.info('No user found for the requirement. ');
                 try {
@@ -97,7 +98,8 @@ function SaveSip(reqz,resz,errz) {
                 console.log('All attributes of Context:', result.values);
                 console.log('Cannot overwrite this record.Check given details........\n');
                 logger.info('Record Found, No updations happen ');
-                resz.end();
+                var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, result);
+                resz.end(jsonString);
 
 
             }
@@ -130,7 +132,7 @@ function SaveUACRec(jobj,callback) {
                 logger.info('Check Context for  Records : ' + jobj.CSDBContextContext);
                 DbConn.Context.find({where: [{Context: jobj.CSDBContextContext}]}).complete(function (err, ContextObject) {
 
-                    if (!err && ContextObject) {
+                    if (!err && ContextObject.length>0) {
                         logger.info(' CSDBContextContext found,No errors ');
                         logger.info(' Creating SipObject ');
                         var SIPObject = DbConn.SipUACEndpoint
@@ -273,18 +275,11 @@ function GetFunc(reqz,resz,errz)
 
                     // res.end();
                 }
-                else {
+                else if(result.length>0){
                     // console.log('Context Found ' + result.Context + '!');
                     //console.log('All attributes of Context:', result.values);
-                    try {
-                        var Jresults = result.map(function (result) {
-                            return result.toJSON()
-                        });
-                    }
-                    catch (ex)
-                    {
-                        console.log("Error in creating json object to return : "+ex);
-                    }
+                    var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
+                    resz.end(jsonString);
                     /*
                      for(var i=result.length;i>=0;i--)
                      {
@@ -294,15 +289,7 @@ function GetFunc(reqz,resz,errz)
 
 
                     // set as Json Object
-                    var jarr = JSON.stringify(Jresults);
 
-                    console.log(jarr);
-
-
-                    resz.write(jarr);
-                    //resz=jarr;
-
-                    resz.end();
 
 
                 }
@@ -330,18 +317,11 @@ function GetFuncRefId(reqz,resz,errz)
 
                     // res.end();
                 }
-                else {
+                else if(result.length>0){
                     // console.log('Context Found ' + result.Context + '!');
                     //console.log('All attributes of Context:', result.values);
-                    try {
-                        var Jresults = result.map(function (result) {
-                            return result.toJSON()
-                        });
-                    }
-                    catch (ex)
-                    {
-                        console.log("Error in creating json object to return : "+ex);
-                    }
+                    var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
+                    resz.end(jsonString);
                     /*
                      for(var i=result.length;i>=0;i--)
                      {

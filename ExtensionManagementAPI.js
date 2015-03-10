@@ -6,6 +6,7 @@ var DbConn = require('./DVP-DBModels');
 var DbSave=require('./SaveSipUserData.js');
 var restify = require('restify');
 var winston=require('winston');
+var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 /*
 
@@ -53,14 +54,14 @@ function ChangeAvailability(reqz,resz,errz) {
         DbConn.Extension.find({where: {ExtRefId: reqz.params.ref}}).complete(function (err, ExtObject) {
             logger.info('Requested RefID: ' + reqz.params.ref);
             // console.log(ExtObject);
-            if (!ExtObject) {
+            if (ExtObject.length==0) {
                 console.log("No record found for the RefId : " + reqz.params.ref);
                 logger.info('No record for  RefID: ' + reqz.params.ref);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
                 resz.end(jsonString);
             }
 
-            else if (!err) {
+            else if (!err && ExtObject.length>0) {
                 logger.info('Updating Availability , RefID :' + reqz.params.ref);
 
                 try{
@@ -146,7 +147,7 @@ function AddExtension(reqz,resz,errz) {
             }
 
 
-            else if (!ExtObject) {
+            else if (ExtObject.length==0) {
                 console.log("No record found for the Extension : " + obj.Extension);
                 logger.info('No record Found. Extension : ' + obj.Extension);
 
@@ -166,7 +167,7 @@ function AddExtension(reqz,resz,errz) {
 
 
             }
-            else if (ExtObject) {
+            else if (ExtObject.length>0) {
                 console.log(" Record is already available for the Extension : " + obj.Extension);
                 var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, ExtObject);
                 resz.end(jsonString);
@@ -209,7 +210,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
             }
 
 
-            else if (!ExtObject) {
+            else if (ExtObject.length==0) {
                 console.log("No record found for the Extension : " + obj.Extensionid);
                 logger.info('No record for Extension : ' + obj.Extensionid);
                 var jsonString = messageFormatter.FormatMessage(null, "EMPTY", false, ExtObject);
@@ -234,7 +235,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
                         }
 
 
-                        else if (!ExtObject) {
+                        else if (SipObject.length==0) {
                             logger.info('SipUACEndpoint not found: ' + obj.UACid);
                             console.log("No record found for the Extension : " + obj.Extension);
                             var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, SipObject);

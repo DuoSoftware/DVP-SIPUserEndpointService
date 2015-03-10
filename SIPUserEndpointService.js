@@ -209,9 +209,10 @@ function GetFunc(reqz,resz,errz)
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                     resz.end(jsonString);
 
-                } else if (!result) {
+                } else if (result.length==0) {
 
-                    resz.end();
+                    var jsonString = messageFormatter.FormatMessage(err, "EMPTY", true, result);
+                    resz.end(jsonString);
                 }
                 else {
 
@@ -220,7 +221,8 @@ function GetFunc(reqz,resz,errz)
 
                         var Jresults = JSON.stringify(result);
 
-                        resz.end(Jresults);
+                        var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
+                        resz.end(jsonString);
 
                     }
                     catch (ex)
