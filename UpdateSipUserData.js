@@ -32,7 +32,7 @@ try{
 
 
                 console.log('No user has been found.');
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                var jsonString = messageFormatter.FormatMessage(err, "EMPTY", true, result);
                 callback.end(jsonString);
 
             }

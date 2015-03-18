@@ -190,29 +190,29 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
         var obj = reqz.body;
     }
     catch (ex) {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception in creating object", false, null);
         resz.end(jsonString);
     }
     logger.info('Request body json converts as object : ' + obj.values);
 
     try
     {
-        DbConn.Extension.find({where: [{id: obj.Extensionid}]}).complete(function (err, ExtObject) {
+        DbConn.Extension.find({where: [{id: obj.ExtensionId}]}).complete(function (err, ExtObject) {
 
 
 
             // console.log(ExtObject);
             if (!!err) {
-                console.log("An error occurred in searching Extension : " + obj.Extensionid);
-                logger.info('Error occurred in Searching Extension : ' + obj.Extensionid + ' Error : ' + err);
+                console.log("An error occurred in searching Extension : " + obj.ExtensionId);
+                logger.info('Error occurred in Searching Extension : ' + obj.ExtensionId + ' Error : ' + err);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
                 resz.end(jsonString);
             }
 
 
             else if (ExtObject.length==0) {
-                console.log("No record found for the Extension : " + obj.Extensionid);
-                logger.info('No record for Extension : ' + obj.Extensionid);
+                console.log("No record found for the Extension : " + obj.ExtensionId);
+                logger.info('No record for Extension : ' + obj.ExtensionId);
                 var jsonString = messageFormatter.FormatMessage(null, "EMPTY", false, ExtObject);
                 resz.end(jsonString);
 
@@ -237,49 +237,86 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
 
                         else if (SipObject.length==0) {
                             logger.info('SipUACEndpoint not found: ' + obj.UACid);
-                            console.log("No record found for the Extension : " + obj.Extension);
+                            console.log("No record found for the Extension : " + obj.SipExtension);
                             var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, SipObject);
                             resz.end(jsonString);
 
                         }
                         else {
-                            logger.info('Both SipUAC : ' + obj.UACid + ' and Extension : ' + obj.Extensionid + ' found.');
+                            logger.info('SIPUAC found : '+obj.UACid);
                             /*  ExtObject.addSipUACEndpoint(SipObject).complete(function (errx, CloudEndInstancex)
                              {
                              console.log("...........................Mapping is succeeded ...................");
                              });
                              */
                             try{
-                                DbConn.SipUACEndpoint
-                                    .update(
-                                    {
-                                        ExtensionId: obj.ExtensionId
+                                DbConn.SipUACEndpoint.find({where: [{SipExtension: obj.SipExtension}]}).complete(function (err, SipExtObject) {
 
-
-                                    },
-                                    {
-                                        where: [{id: obj.id}]
+                                    if (!!err) {
+                                        logger.info('Error Found : '+err);
+                                        var jsonString = messageFormatter.FormatMessage(err, "An error occurred in searching Extension", false, SipExtObject);
+                                        resz.end(jsonString);
                                     }
-                                ).then(function (result) {
-                                        logger.info('Successfully Mapped. ');
-                                        console.log(".......................mapping is succeeded ....................");
-                                        var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
-                                        resz.end(jsonString);
 
-                                    }).error(function (err) {
-                                        logger.info('mapping error found in saving. : ' + err);
-                                        console.log("mapping failed ! " + err);
-                                        //handle error here
-                                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                                        resz.end(jsonString);
 
-                                    });
+                                    else if (SipExtObject==null) {
+
+                                        logger.info('No extension: '+obj.SipExtension);
+
+                                        try{
+                                            DbConn.SipUACEndpoint
+                                                .update(
+                                                {
+                                                    ExtensionId: obj.ExtensionId,
+                                                    SipExtension:obj.SipExtension
+
+                                                },
+                                                {
+                                                    where: [{id: obj.UACid}]
+                                                }
+                                            ).then(function (result) {
+                                                    logger.info('Successfully Mapped. ');
+                                                    console.log(".......................Mapping is succeeded ....................");
+                                                    var jsonString = messageFormatter.FormatMessage(err, "Mapping is succeeded", true, result);
+                                                    resz.end(jsonString);
+
+                                                }).error(function (err) {
+                                                    logger.info('mapping error found in saving. : ' + err);
+                                                    console.log("mapping failed ! " + err);
+                                                    //handle error here
+                                                    var jsonString = messageFormatter.FormatMessage(err, "Mapping error found in saving", false, null);
+                                                    resz.end(jsonString);
+
+                                                });
+                                        }
+                                        catch(ex)
+                                        {
+                                            var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                                            resz.end(jsonString);
+                                        }
+
+                                    }
+                                    else if(SipExtObject!=null)
+                                    {
+                                        var jsonString = messageFormatter.FormatMessage(err, "Cannot insert, Already taken", false, null);
+                                        resz.end(jsonString);
+                                    }
+                                    else
+                                    {
+                                        var jsonString = messageFormatter.FormatMessage(err, "Error in searchiing", false, null);
+                                        resz.end(jsonString);
+                                    }
+
+                                });
                             }
                             catch(ex)
                             {
                                 var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
                                 resz.end(jsonString);
                             }
+
+
+
                         }
 
                     });
@@ -299,7 +336,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
         resz.end(jsonString);
     }
 
-    return next();
+    //return next();
 }
 
 
