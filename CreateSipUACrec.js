@@ -22,9 +22,6 @@ var logger = new (winston.Logger)({
 });
 
 
-
-
-
 function SaveSip(reqz,resz,errz) {
     logger.info('Start Saving new SipUAC');
     try {
@@ -40,77 +37,103 @@ function SaveSip(reqz,resz,errz) {
     }
 
 
-    function SaveSt(error, st) {
+   /* function SaveSt(error, st) {
         try {
-            if (st && error == null) {
+            if (st >0 && error == null) {
                 console.log("New Record is Added Successfully");
+                var jsonString = messageFormatter.FormatMessage(ex, "Success", true, null);
+                resz.end(jsonString);
             }
             else {
                 console.log("New Record Saving Error " + error);
+                var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                resz.end(jsonString);
             }
         }
 
         catch (ex) {
             Console.log("Error found in Save status return : " + ex);
+            var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+            resz.end(jsonString);
         }
 
-    };
+    };*/
 
     logger.info('Search in db for record : ' + obj.SipUsername + ' , ' + obj.CompanyId + ' , ' + obj.TenantId);
 
-    try{
-    DbConn.SipUACEndpoint
-        .find({where: [{SipUsername: obj.SipUsername}, {CompanyId: obj.CompanyId}, {TenantId: obj.TenantId}]})
-        .complete(function (err, result) {
-            if (!!err) {
-                console.log('An error occurred while searching for Extension:', err);
-                logger.info('Error found in searching : ' + err);
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                resz.end(jsonString);
 
-            } else if (result.length==0) {
-                console.log('No user with the Extension ' + obj.SipUsername + ' has been found.');
-                logger.info('No user found for the requirement. ');
-                try {
+        try {
+            DbConn.SipUACEndpoint
+                .find({where: [{SipUsername: obj.SipUsername}, {CompanyId: obj.CompanyId}, {TenantId: obj.TenantId}]})
+                .complete(function (err, result) {
+                    if (!!err) {
+                        console.log('An error occurred while searching for SipUAC record:');
+                        logger.info('Error found in searching : ' + err);
+                        var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for SipUAC record", false, result);
+                        resz.end(jsonString);
 
-
-                    //call external save function, params = Json object and callback function
-
-                    console.log('................................. New SIP User is creating ..................................');
-
-                    SaveUACRec(obj, SaveSt);
+                    } else if (result == null) {
+                        console.log('No user with the Extension ' + obj.SipUsername + ' has been found.');
+                        logger.info('No user found for the requirement. ');
+                        try {
 
 
-                }
-                catch (ex) {
-                    console.log("An error occurred in data saving process ");
-                    logger.info('Error found in saving process ');
+                            //call external save function, params = Json object and callback function
 
-                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                    resz.end(jsonString);
+                            console.log('................................. New SIP User is creating ..................................');
+
+                            SaveUACRec(obj, function (error, st) {
+                                try {
+                                    if (st > 0 && error == null) {
+                                        console.log("New Record is Added Successfully");
+                                        var jsonString = messageFormatter.FormatMessage(null, "SuccessFully stated", true, null);
+                                        resz.end(jsonString);
+                                    }
+                                    else {
+                                        console.log("New Record Saving Error " + error);
+                                        var jsonString = messageFormatter.FormatMessage(error, "ERROR in state", false, null);
+                                        resz.end(jsonString);
+                                    }
+                                }
+
+                                catch (ex) {
+                                    console.log("Error found in Save status return : " + ex);
+                                    var jsonString = messageFormatter.FormatMessage(ex, "Exception in state", false, null);
+                                    resz.end(jsonString);
+                                }
+
+                            });
 
 
-                }
+                        }
+                        catch (ex) {
+                            console.log("An error occurred in data saving process ");
+                            logger.info('Error found in saving process ');
+
+                            var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                            resz.end(jsonString);
 
 
-            } else {
-                console.log('............................Context Found ' + result.SipUsername + '! ................................');
-                console.log('All attributes of Context:', result.values);
-                console.log('Cannot overwrite this record.Check given details........\n');
-                logger.info('Record Found, No updations happen ');
-                var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, result);
-                resz.end(jsonString);
+                        }
 
 
-            }
-        });
+                    } else {
+                        console.log('............................Context Found ' + result.SipUsername + '! ................................');
+                        console.log('All attributes of Context:', result.values);
+                        console.log('Cannot overwrite this record.Check given details........\n');
+                        logger.info('Record Found, No updations happen ');
+                        var jsonString = messageFormatter.FormatMessage(null, "Cannot overwrite this record.Check given details........\n", false, result);
+                        resz.end(jsonString);
 
-}
-    catch(ex)
-    {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        resz.end(jsonString);
-    }
+
+                    }
+                });
+
+        }
+        catch (ex) {
+            var jsonString = messageFormatter.FormatMessage(ex, "Exception in Saving sip", false, null);
+            resz.end(jsonString);
+        }
 
 
 //return next();
@@ -132,7 +155,7 @@ function SaveUACRec(jobj,callback) {
                 logger.info('Check Context for  Records : ' + jobj.CSDBContextContext);
                 DbConn.Context.find({where: [{Context: jobj.CSDBContextContext}]}).complete(function (err, ContextObject) {
 
-                    if (!err && ContextObject.length>0) {
+                    if (!err && ContextObject) {
                         logger.info(' CSDBContextContext found,No errors ');
                         logger.info(' Creating SipObject ');
                         var SIPObject = DbConn.SipUACEndpoint
@@ -161,16 +184,16 @@ function SaveUACRec(jobj,callback) {
 
                         SIPObject.save().complete(function (err) {
                             if (!err) {
-
+                                //var status = 0;
                                 logger.info(' SipObject created : ' + SIPObject);
 
                                 cloudEndObject.addSipUACEndpoint(SIPObject).complete(function (errx, CloudEndInstancex) {
                                     logger.info(' CSDBCloudEndUserId filled  ' + cloudEndObject);
-                                    var status = 1;
+                                   // status++;
 
                                     ContextObject.addSipUACEndpoint(SIPObject).complete(function (errx, ContextInstancex) {
                                         logger.info(' CSDBContextContext filled  ' + ContextObject);
-                                        status = status++;
+                                       // status = status++;
                                     });
                                     // res.write(status.toString());
                                     // res.end();
@@ -178,12 +201,14 @@ function SaveUACRec(jobj,callback) {
 
                                 console.log("..................... Saved Successfully ....................................");
                                 logger.info('Save Succeeded');
+                                callback(null,1);
                             }
                             else {
                                 console.log(err + " found");
                                 console.log("..................... Error found in saving....................................");
                                 logger.info('Error found in saving');
                                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                                callback(err,0);
 
 
                             }

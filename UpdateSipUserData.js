@@ -28,11 +28,11 @@ try{
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                 callback.end(jsonString);
 
-            } else if (result.length==0) {
+            } else if (result==null) {
 
 
                 console.log('No user has been found.');
-                var jsonString = messageFormatter.FormatMessage(err, "EMPTY", true, result);
+                var jsonString = messageFormatter.FormatMessage(err, "No record found", false, null);
                 callback.end(jsonString);
 
             }
@@ -57,13 +57,13 @@ try{
                     ).then(function (result) {
 
                             console.log(".......................Record updated successfully!....................");
-                            var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
+                            var jsonString = messageFormatter.FormatMessage(err, "Record updated successfully", true, result);
                             callback.end(jsonString);
 
                         }).error(function (err) {
 
                             console.log("Project update failed ! " + err);
-                            var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                            var jsonString = messageFormatter.FormatMessage(err, "SipUAC rec update failed", false, result);
                             callback.end(jsonString);
                             //handle error here
 
@@ -72,7 +72,7 @@ try{
                 }
                 catch(ex)
                 {
-                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                    var jsonString = messageFormatter.FormatMessage(ex, "Exception in updation", false, null);
                     callback.end(jsonString);
                 }
             }
@@ -83,7 +83,7 @@ try{
 }
     catch(ex)
     {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception in function starts", false, null);
         callback.end(jsonString);
     }
 }

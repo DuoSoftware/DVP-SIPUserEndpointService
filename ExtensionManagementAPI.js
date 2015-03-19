@@ -54,25 +54,25 @@ function ChangeAvailability(reqz,resz,errz) {
         DbConn.Extension.find({where: {ExtRefId: reqz.params.ref}}).complete(function (err, ExtObject) {
             logger.info('Requested RefID: ' + reqz.params.ref);
             // console.log(ExtObject);
-            if (ExtObject.length==0) {
+            if (ExtObject==null) {
                 console.log("No record found for the RefId : " + reqz.params.ref);
                 logger.info('No record for  RefID: ' + reqz.params.ref);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
                 resz.end(jsonString);
             }
 
-            else if (!err && ExtObject.length>0) {
+            else if (!err && ExtObject!=null) {
                 logger.info('Updating Availability , RefID :' + reqz.params.ref);
-
+/*
                 try{
                     ExtObject.updateAttributes({
 
                         Enabled: reqz.params.st
 
-                    }).success(function (err) {
+                    }).then(function (result) {
                         if (err) {
-                            console.log("Extension update false ->", err);
-                            logger.info('Error found in Updating : ' + err);
+                            console.log("Extension update false ->");
+                            logger.info('Error found in Updating : ' + result);
                             var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
                             resz.end(jsonString);
                         } else {
@@ -105,6 +105,36 @@ function ChangeAvailability(reqz,resz,errz) {
                     var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
                     resz.end(jsonString);
                 }
+*/
+                try{
+                    ExtObject.update(
+                        {
+                            Enabled: reqz.params.st
+
+                        }
+                    ).then(function (result) {
+                        status = 1;
+                        console.log("Extension updated successfully");
+                        logger.info(' Updated Successfully');
+                            var jsonString = messageFormatter.FormatMessage(null, "Availability changed successfully", true, result);
+                            resz.end(jsonString);
+
+                        }).error(function (err) {
+                        console.log("Extension update false ->");
+                        logger.info('Error found in Updating : ' + result);
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                        resz.end(jsonString);
+
+                        });
+                }
+                catch(ex)
+                {
+                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                    resz.end(jsonString);
+                }
+
+
+
             }
             else {
                 resz.send(status);
@@ -126,6 +156,7 @@ function AddExtension(reqz,resz,errz) {
     logger.info('Starting new Extension creation .');
     try {
         var obj = reqz.body;
+        console.log("object size :" +Object.keys(obj).length);
 
     }
     catch (ex) {
@@ -133,54 +164,54 @@ function AddExtension(reqz,resz,errz) {
         resz.end(jsonString);
     }
     logger.info('Request json body  is converted as object : ' + obj);
-    try{
-        DbConn.Extension.find({where: [{Extension: obj.Extension}, {CompanyId: obj.CompanyId}, {TenantId: obj.TenantId}]}).complete(function (err, ExtObject) {
-
-            logger.info('Searching Extension : ' + obj.Extension + ' CompanyID : ' + obj.CompanyId + ' TenentID : ' + obj.TenantId);
-
-            // console.log(ExtObject);
-            if (!!err) {
-                console.log("An error occurred in searching Extension : " + obj.Extension);
-                logger.info('Saving error. ');
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
-                resz.end(jsonString);
-            }
 
 
-            else if (ExtObject.length==0) {
-                console.log("No record found for the Extension : " + obj.Extension);
-                logger.info('No record Found. Extension : ' + obj.Extension);
+        try {
+            DbConn.Extension.find({where: [{Extension: obj.Extension}, {CompanyId: obj.CompanyId}]}).complete(function (err, ExtObject) {
 
-                var result=CreateExtension(obj);
-                if(result==1)
-                {
-                    var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
-                    resz.end(jsonString);
-                }
-                else
-                {
-                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                logger.info('Searching Extension : ' + obj.Extension + ' CompanyID : ' + obj.CompanyId + ' TenentID : ' + obj.TenantId);
+
+                // console.log(ExtObject);
+                if (!!err) {
+                    console.log("An error occurred in searching Extension : " + obj.Extension);
+                    logger.info('Saving error. ');
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
                     resz.end(jsonString);
                 }
 
 
+                else if (ExtObject == null) {
+                    console.log("No record found for the Extension : " + obj.Extension);
+                    logger.info('No record Found. Extension : ' + obj.Extension);
+
+                    CreateExtension(obj, function (res) {
+                        if (res == 1) {
+                            var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, res);
+                            resz.end(jsonString);
+                        }
+                        else {
+                            var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, res);
+                            resz.end(jsonString);
+                        }
+                    });
 
 
-            }
-            else if (ExtObject.length>0) {
-                console.log(" Record is already available for the Extension : " + obj.Extension);
-                var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, ExtObject);
-                resz.end(jsonString);
-            }
+                }
+                else if (ExtObject != null) {
+                    console.log(" Record is already available for the Extension : " + obj.Extension);
+                    var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, ExtObject);
+                    resz.end(jsonString);
+                }
 
-        });
+            });
 
-    }
-    catch (ex)
-    {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        resz.end(jsonString);
-    }
+        }
+        catch (ex) {
+            var jsonString = messageFormatter.FormatMessage(ex, "Exception in searching Extension", false, null);
+            resz.end(jsonString);
+        }
+
+
 }
 
 function MapWithSipUacEndpoint(reqz,resz,errz) {
@@ -210,10 +241,10 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
             }
 
 
-            else if (ExtObject.length==0) {
+            else if (ExtObject==null) {
                 console.log("No record found for the Extension : " + obj.ExtensionId);
                 logger.info('No record for Extension : ' + obj.ExtensionId);
-                var jsonString = messageFormatter.FormatMessage(null, "EMPTY", false, ExtObject);
+                var jsonString = messageFormatter.FormatMessage(null, "EMPTY object returns", false, ExtObject);
                 resz.end(jsonString);
 
 
@@ -340,7 +371,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
 }
 
 
-function CreateExtension(jobj,result)
+function CreateExtension(jobj,callback)
 {
     logger.info( 'Saving new Extension.. ');
     try{
@@ -370,7 +401,7 @@ function CreateExtension(jobj,result)
                 if (err == null) {
                     console.log("New User Found and Inserted (Extension : " + jobj.Extension + ")");
                     logger.info( 'Extension is created. values : '+jobj);
-                    result=1;
+                   callback(1);
 
                     //callback(err, true);
                     // pass null and true
@@ -380,20 +411,20 @@ function CreateExtension(jobj,result)
                 else {
                     console.log("Error in saving  (Extension :" + jobj.Extension + ")" + err);
                     logger.info( 'Error Found in Saving  : '+err);
-                    result=0;
+                    callback(0);
                     // callback(err, false);
                     //pass error and false
                 }
             });
-        return result;
+
 
     }
     catch (ex)
     {
         console.log("Error found in saving data : "+ex);
         logger.info( 'Exception Found in Saving  : '+ex);
-        result=0;
-        return result;
+
+        callback(0);
 
     }
 

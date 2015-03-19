@@ -32,7 +32,7 @@ var logger = new (winston.Logger)({
 //Request comes as body
 
 //post :- done
-function PostFunc(reqz,resz,errz) {
+function AddOrUpdateContext(reqz,resz,errz) {
     logger.info('Context Management is Starting.');
 
 
@@ -43,7 +43,7 @@ function PostFunc(reqz,resz,errz) {
         //Add other vars to object
 
         obj.CompanyId = 1;
-        obj.TenantId = 2;
+        obj.TenantId = 5;
         obj.AddUser = "NAddUser";
         obj.UpdateUser = "NUpdateUser";
         obj.AddTime = new Date(2013, 01, 13);
@@ -61,9 +61,8 @@ function PostFunc(reqz,resz,errz) {
 
     logger.info('Searching for record , Context :' + obj.Context);
 
-
-    try
-    {
+if(obj.Context!=null) {
+    try {
         DbConn.Context
             .find({where: {Context: obj.Context}})
             .complete(function (err, result) {
@@ -86,7 +85,7 @@ function PostFunc(reqz,resz,errz) {
                             {
                                 Context: obj.Context,
                                 Description: obj.Description,
-                                // ContextCat: Sequelize.STRING,
+                                ContextCat: obj.ContextCat,
                                 CompanyId: obj.CompanyId,
                                 TenantId: obj.TenantId,
                                 ObjClass: obj.ObjClass,
@@ -144,7 +143,7 @@ function PostFunc(reqz,resz,errz) {
                             .update(
                             {
                                 Description: obj.Description,
-                                // ContextCat: Sequelize.STRING,
+                                ContextCat: obj.ContextCat,
                                 CompanyId: obj.CompanyId,
                                 TenantId: obj.TenantId,
                                 ObjClass: obj.ObjClass,
@@ -166,14 +165,14 @@ function PostFunc(reqz,resz,errz) {
 
                                 console.log("Updated successfully!");
                                 logger.info('Record Updated Successfully');
-                                var jsonString = messageFormatter.FormatMessage(ex, null, true, results);
+                                var jsonString = messageFormatter.FormatMessage(null, "Successfully Updated", true, results);
                                 resz.end(jsonString);
 
                             }).error(function (err) {
 
                                 console.log("Project update failed !");
                                 logger.info('Record Updation failed : ' + err);
-                                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, results);
+                                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
                                 resz.end(jsonString);
                                 //handle error here
 
@@ -188,16 +187,20 @@ function PostFunc(reqz,resz,errz) {
             });
 
     }
-    catch(ex)
-    {
+    catch (ex) {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
         resz.end(jsonString);
     }
-
+}
+    else
+{
+    var jsonString = messageFormatter.FormatMessage(null, "Null value passed for Context", false, obj);
+    resz.end(jsonString);
+}
 }
 
 //get :- done
-function GetFunc(reqz,resz,errz)
+function GetContextDetails(reqz,resz,errz)
 {
     try {
 
@@ -208,12 +211,12 @@ function GetFunc(reqz,resz,errz)
 
                 if (!!err) {
                     console.log('An error occurred while searching for Context:', err);
-                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                    var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for Context for Company :" +reqz, false, result);
                     resz.end(jsonString);
 
-                } else if (result.length==0) {
+                } else if (result==null) {
 
-                    var jsonString = messageFormatter.FormatMessage(err, "EMPTY", true, result);
+                    var jsonString = messageFormatter.FormatMessage(err, "No context for company :"+reqz, true, result);
                     resz.end(jsonString);
                 }
                 else {
@@ -223,14 +226,14 @@ function GetFunc(reqz,resz,errz)
 
                         var Jresults = JSON.stringify(result);
 
-                        var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
+                        var jsonString = messageFormatter.FormatMessage(err, "Successfully json returned", true, result);
                         resz.end(jsonString);
 
                     }
                     catch (ex)
                     {
                         console.log("Error in creating json object to return : "+ex);
-                        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, result);
+                        var jsonString = messageFormatter.FormatMessage(ex, "Exception found in json creating .", false, result);
                         resz.end(jsonString);
                     }
 
@@ -242,7 +245,7 @@ function GetFunc(reqz,resz,errz)
     catch (ex)
     {
         console.log("Error in searching data : "+ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception in calling function", false, null);
         resz.end(jsonString);
 
     }
@@ -251,6 +254,6 @@ function GetFunc(reqz,resz,errz)
 
 
 
-module.exports.PostFunc = PostFunc;
-module.exports.GetFunc = GetFunc;
+module.exports.AddOrUpdateContext = AddOrUpdateContext;
+module.exports.GetContextDetails = GetContextDetails;
 

@@ -36,7 +36,7 @@ RestServer.use(restify.queryParser());
 
 RestServer.post('/dvp/:version/context_mgmt/save_contextdata',function(req,res,err)
 {
-context.PostFunc(req,res,err);
+context.AddOrUpdateContext(req,res,err);
 
 });
 
@@ -155,7 +155,7 @@ RestServer.post('/dvp/:version/scheduleapi/update_sch_id',function(req,res,err)
 
 RestServer.get('/dvp/:version/uac_mgmt/find_context/:cmpid',function(req,res,err)
 {
-    context.GetFunc(req.params.cmpid,res,err);
+    context.GetContextDetails(req.params.cmpid,res,err);
 
 
 });
