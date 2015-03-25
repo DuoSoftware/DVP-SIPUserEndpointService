@@ -22,7 +22,7 @@ var logger = new (winston.Logger)({
 });
 
 
-function SaveSip(reqz,resz,errz) {
+function SaveSip(reqz,callback) {
     logger.info('Start Saving new SipUAC');
     try {
         var obj = reqz.body;//
@@ -33,7 +33,7 @@ function SaveSip(reqz,resz,errz) {
         console.log("Error in adding new items to object created using request body");
         logger.info('Exception found : ' + ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        resz.end(jsonString);
+        callback(null,jsonString);
     }
 
 
@@ -70,7 +70,7 @@ function SaveSip(reqz,resz,errz) {
                         console.log('An error occurred while searching for SipUAC record:');
                         logger.info('Error found in searching : ' + err);
                         var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for SipUAC record", false, result);
-                        resz.end(jsonString);
+                        callback(null,jsonString);
 
                     } else if (result == null) {
                         console.log('No user with the Extension ' + obj.SipUsername + ' has been found.');
@@ -87,19 +87,19 @@ function SaveSip(reqz,resz,errz) {
                                     if (st > 0 && error == null) {
                                         console.log("New Record is Added Successfully");
                                         var jsonString = messageFormatter.FormatMessage(null, "SuccessFully stated", true, null);
-                                        resz.end(jsonString);
+                                        callback(null,jsonString);
                                     }
                                     else {
                                         console.log("New Record Saving Error " + error);
                                         var jsonString = messageFormatter.FormatMessage(error, "ERROR in state", false, null);
-                                        resz.end(jsonString);
+                                        callback(null,jsonString);
                                     }
                                 }
 
                                 catch (ex) {
                                     console.log("Error found in Save status return : " + ex);
                                     var jsonString = messageFormatter.FormatMessage(ex, "Exception in state", false, null);
-                                    resz.end(jsonString);
+                                    callback(null,jsonString);
                                 }
 
                             });
@@ -111,7 +111,7 @@ function SaveSip(reqz,resz,errz) {
                             logger.info('Error found in saving process ');
 
                             var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                            resz.end(jsonString);
+                            callback(null,jsonString);
 
 
                         }
@@ -123,7 +123,7 @@ function SaveSip(reqz,resz,errz) {
                         console.log('Cannot overwrite this record.Check given details........\n');
                         logger.info('Record Found, No updations happen ');
                         var jsonString = messageFormatter.FormatMessage(null, "Cannot overwrite this record.Check given details........\n", false, result);
-                        resz.end(jsonString);
+                        callback(null,jsonString);
 
 
                     }
@@ -132,7 +132,7 @@ function SaveSip(reqz,resz,errz) {
         }
         catch (ex) {
             var jsonString = messageFormatter.FormatMessage(ex, "Exception in Saving sip", false, null);
-            resz.end(jsonString);
+            callback(null,jsonString);
         }
 
 

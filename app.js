@@ -34,86 +34,183 @@ RestServer.use(restify.queryParser());
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/:version/context_mgmt/save_contextdata',function(req,res,err)
+RestServer.post('/dvp/:version/context_mgmt/save_contextdata',function(req,res,next)
 {
-context.AddOrUpdateContext(req,res,err);
+    try {
+        context.AddOrUpdateContext(req, function (err, resz) {
+            res.end(resz);
+
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
 
 });
 
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/:version/uac_mgmt/save_uac',function(req,res,err)
+RestServer.post('/dvp/:version/uac_mgmt/save_uac',function(req,res,next)
+{try {
+    UACCreate.SaveSip(req, function (err, resz) {
+        res.end(resz);
+    });
+}
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+return next();
+});
+
+//Tested :- Done
+//.......................................................................................................................
+
+RestServer.post('/dvp/:version/uac_mgmt/updt_uac',function(req,res,next)
 {
-    UACCreate.SaveSip(req,res,err);
+    try {
+        UACUpdate.UpdateUacUserData(req.body, function (err, res) {
+            res.end(resz);
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
 
 });
 
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/:version/uac_mgmt/updt_uac',function(req,res,err)
+RestServer.post('/dvp/:version/ext_mgmt/update_extension_st/:ref/:st',function(req,res,next)
 {
-UACUpdate.UpdateUacUserData(req.body,res);
+    try {
+        Extmgt.ChangeAvailability(req, function (err, resz) {
+            res.end(resz);
 
-});
-
-//Tested :- Done
-//.......................................................................................................................
-
-RestServer.post('/dvp/:version/ext_mgmt/update_extension_st/:ref/:st',function(req,res,err)
-{
-    Extmgt.ChangeAvailability(req,res,err);
-
-
-});
-//Tested :- Done
-//.......................................................................................................................
-
-RestServer.post('/dvp/:version/ext_mgmt/add_extension',function(req,res,err)
-{
-    Extmgt.AddExtension(req,res,err);
-
-
-});
-//.......................................................................................................................
-
-RestServer.post('/dvp/:version/ext_mgmt/map_extension',function(req,res,err)
-{
-    Extmgt.MapWithSipUacEndpoint(req,res,err);
-
-
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
 });
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/add_sipuser_group',function(req,res,err)
+RestServer.post('/dvp/:version/ext_mgmt/add_extension',function(req,res,next)
 {
-    group.AddSipUserGroup(req.body,res);
+    try {
+        Extmgt.AddExtension(req, function (err, resz) {
+            res.end(resz);
+
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
 
 });
-//Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/map_extensionid',function(req,res,err)
+RestServer.post('/dvp/:version/ext_mgmt/map_extension',function(req,res,next)
 {
-    group.MapExtensionID(req.body,res);
+    try {
+        Extmgt.MapWithSipUacEndpoint(req, function (err, resz) {
+            res.end(resz);
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
 
-});
-//Tested :- Done
-//.......................................................................................................................
-
-RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/fill_usrgrp',function(req,res,err)
-{
-    group.FillUsrGrp(req.body,res);
 
 });
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/update_sipuser_group',function(req,res,err)
+RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/add_sipuser_group',function(req,res,next)
+{try {
+    group.AddSipUserGroup(req.body, function (err, resz) {
+        res.end(resz);
+    });
+}
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+//Tested :- Done
+//.......................................................................................................................
+
+RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/map_extensionid',function(req,res,next)
 {
-    group.UpdateSipUserGroup(req.body,res);
+    try {
+        group.MapExtensionID(req.body, function (err, res) {
+            res.end(resz);
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+//Tested :- Done
+//.......................................................................................................................
+
+RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/fill_usrgrp',function(req,res)
+{
+    try {
+        group.FillUsrGrp(req.body, function (err, resz) {
+            res.end(resz);
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+//Tested :- Done
+//.......................................................................................................................
+
+RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/update_sipuser_group',function(req,res,next)
+{
+    try {
+        group.UpdateSipUserGroup(req.body, function (err, res) {
+            res.end(resz);
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
 
 });
 
@@ -153,9 +250,18 @@ RestServer.post('/dvp/:version/scheduleapi/update_sch_id',function(req,res,err)
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.get('/dvp/:version/uac_mgmt/find_context/:cmpid',function(req,res,err)
-{
-    context.GetContextDetails(req.params.cmpid,res,err);
+RestServer.get('/dvp/:version/uac_mgmt/find_context/:cmpid',function(req,res,next)
+{try {
+    context.GetContextDetails(req.params.cmpid, function (err, resz) {
+        res.end(resz);
+    });
+}
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
 
 
 });
@@ -163,45 +269,90 @@ RestServer.get('/dvp/:version/uac_mgmt/find_context/:cmpid',function(req,res,err
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/get_group_data/:name',function(req,res,err)
+RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/get_group_data/:name',function(req,res,next)
 {
-    group.GetGroupData(req.params.name,res);
+    try {
+        group.GetGroupData(req.params.name, function (err, resz) {
+            res.end(resz);
+        });
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
     return next();
 
 
 });
 //.......................................................................................................................
 
-RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/get_group_endpoints',function(req,res,err)
+RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/get_group_endpoints',function(req,res,next)
 {
-    group.GetGroupEndpoints(req.body,res);
+    try {
+        group.GetGroupEndpoints(req.body, function (err, resz) {
+            res.end(resz);
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
 
 });
 
 //.......................................................................................................................
 
-RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/endpoint_groupid',function(req,res,err)
+RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/endpoint_groupid',function(req,res,next)
 {
-    group.EndpointGroupID(req.body,res);
+    try {
+        group.EndpointGroupID(req.body, function (err, resz) {
+            res.end(resz);
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
     return next();
 });
 
 //.......................................................................................................................
 
-RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/AllRecWithCompany/:CompanyId',function(req,res,err)
-{
-    group.AllRecWithCompany(req.params.CompanyId,res,err);
-
+RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/AllRecWithCompany/:CompanyId',function(req,res,next)
+{try {
+    group.AllRecWithCompany(req.params.CompanyId, function (err, res) {
+        res.end(resz);
+    });
+}
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
 
 
 });
 //.......................................................................................................................
 
-RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/get_all_users_in_group/:companyid',function(req,res,err)
+RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/get_all_users_in_group/:companyid',function(req,res,next)
 {
-
-    group.GetAllUsersInGroup(req.params.companyid, res, err);
-
+try {
+    group.GetAllUsersInGroup(req.params.companyid, function (err, resz) {
+        res.end(resz);
+    });
+}
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
 
 
 });

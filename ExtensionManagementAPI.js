@@ -47,7 +47,7 @@ var logger = new (winston.Logger)({
 
 
 //post:-done
-function ChangeAvailability(reqz,resz,errz) {
+function ChangeAvailability(reqz,callback) {
     logger.info('Start of Extension availability changing ');
     var status = 0;
     try {
@@ -58,7 +58,7 @@ function ChangeAvailability(reqz,resz,errz) {
                 console.log("No record found for the RefId : " + reqz.params.ref);
                 logger.info('No record for  RefID: ' + reqz.params.ref);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
-                resz.end(jsonString);
+                callback(null,jsonString);
             }
 
             else if (!err && ExtObject!=null) {
@@ -117,29 +117,28 @@ function ChangeAvailability(reqz,resz,errz) {
                         console.log("Extension updated successfully");
                         logger.info(' Updated Successfully');
                             var jsonString = messageFormatter.FormatMessage(null, "Availability changed successfully", true, result);
-                            resz.end(jsonString);
+                            callback(null,jsonString);
 
                         }).error(function (err) {
                         console.log("Extension update false ->");
                         logger.info('Error found in Updating : ' + result);
                         var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
-                        resz.end(jsonString);
+                            callback(null,jsonString);
 
                         });
                 }
                 catch(ex)
                 {
                     var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                    resz.end(jsonString);
+                    callback(null,jsonString);
                 }
 
 
 
             }
             else {
-                resz.send(status);
-                resz.end();
-
+                var jsonString = messageFormatter.FormatMessage(null, "ERROR", false, null);
+                callback(null,jsonString);
             }
 
         });
@@ -147,12 +146,12 @@ function ChangeAvailability(reqz,resz,errz) {
     catch(ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        resz.end(jsonString);
+        callback(null,jsonString);
     }
     //  return next();
 }
 
-function AddExtension(reqz,resz,errz) {
+function AddExtension(reqz,callback) {
     logger.info('Starting new Extension creation .');
     try {
         var obj = reqz.body;
@@ -161,7 +160,7 @@ function AddExtension(reqz,resz,errz) {
     }
     catch (ex) {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        resz.end(jsonString);
+        callback(null,jsonString);
     }
     logger.info('Request json body  is converted as object : ' + obj);
 
@@ -176,7 +175,7 @@ function AddExtension(reqz,resz,errz) {
                     console.log("An error occurred in searching Extension : " + obj.Extension);
                     logger.info('Saving error. ');
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
-                    resz.end(jsonString);
+                    callback(null,jsonString);
                 }
 
 
@@ -187,11 +186,11 @@ function AddExtension(reqz,resz,errz) {
                     CreateExtension(obj, function (res) {
                         if (res == 1) {
                             var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, res);
-                            resz.end(jsonString);
+                            callback(null,jsonString);
                         }
                         else {
                             var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, res);
-                            resz.end(jsonString);
+                            callback(null,jsonString);
                         }
                     });
 
@@ -200,7 +199,7 @@ function AddExtension(reqz,resz,errz) {
                 else if (ExtObject != null) {
                     console.log(" Record is already available for the Extension : " + obj.Extension);
                     var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, ExtObject);
-                    resz.end(jsonString);
+                    callback(null,jsonString);
                 }
 
             });
@@ -208,13 +207,13 @@ function AddExtension(reqz,resz,errz) {
         }
         catch (ex) {
             var jsonString = messageFormatter.FormatMessage(ex, "Exception in searching Extension", false, null);
-            resz.end(jsonString);
+            callback(null,jsonString);
         }
 
 
 }
 
-function MapWithSipUacEndpoint(reqz,resz,errz) {
+function MapWithSipUacEndpoint(reqz,callback) {
 
     logger.info('Starting mapping.(SipUAC Endpoint and Extension.)');
     try {
@@ -222,7 +221,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
     }
     catch (ex) {
         var jsonString = messageFormatter.FormatMessage(ex, "Exception in creating object", false, null);
-        resz.end(jsonString);
+        callback(null,jsonString);
     }
     logger.info('Request body json converts as object : ' + obj.values);
 
@@ -237,7 +236,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
                 console.log("An error occurred in searching Extension : " + obj.ExtensionId);
                 logger.info('Error occurred in Searching Extension : ' + obj.ExtensionId + ' Error : ' + err);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
-                resz.end(jsonString);
+                callback(null,jsonString);
             }
 
 
@@ -245,7 +244,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
                 console.log("No record found for the Extension : " + obj.ExtensionId);
                 logger.info('No record for Extension : ' + obj.ExtensionId);
                 var jsonString = messageFormatter.FormatMessage(null, "EMPTY object returns", false, ExtObject);
-                resz.end(jsonString);
+                callback(null,jsonString);
 
 
             }
@@ -262,7 +261,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
                             logger.info('Error in Searching for SipUACEndpoint : ' + obj.UACid);
                             console.log("An error occurred in searching Extension : " + obj.Extension + ' error : ' + err);
                             var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, SipObject);
-                            resz.end(jsonString);
+                            callback(null,jsonString);
                         }
 
 
@@ -270,7 +269,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
                             logger.info('SipUACEndpoint not found: ' + obj.UACid);
                             console.log("No record found for the Extension : " + obj.SipExtension);
                             var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, SipObject);
-                            resz.end(jsonString);
+                            callback(null,jsonString);
 
                         }
                         else {
@@ -286,7 +285,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
                                     if (!!err) {
                                         logger.info('Error Found : '+err);
                                         var jsonString = messageFormatter.FormatMessage(err, "An error occurred in searching Extension", false, SipExtObject);
-                                        resz.end(jsonString);
+                                        callback(null,jsonString);
                                     }
 
 
@@ -309,33 +308,33 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
                                                     logger.info('Successfully Mapped. ');
                                                     console.log(".......................Mapping is succeeded ....................");
                                                     var jsonString = messageFormatter.FormatMessage(err, "Mapping is succeeded", true, result);
-                                                    resz.end(jsonString);
+                                                    callback(null,jsonString);
 
                                                 }).error(function (err) {
                                                     logger.info('mapping error found in saving. : ' + err);
                                                     console.log("mapping failed ! " + err);
                                                     //handle error here
                                                     var jsonString = messageFormatter.FormatMessage(err, "Mapping error found in saving", false, null);
-                                                    resz.end(jsonString);
+                                                    callback(null,jsonString);
 
                                                 });
                                         }
                                         catch(ex)
                                         {
                                             var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                                            resz.end(jsonString);
+                                            callback(null,jsonString);
                                         }
 
                                     }
                                     else if(SipExtObject!=null)
                                     {
                                         var jsonString = messageFormatter.FormatMessage(err, "Cannot insert, Already taken", false, null);
-                                        resz.end(jsonString);
+                                        callback(null,jsonString);
                                     }
                                     else
                                     {
                                         var jsonString = messageFormatter.FormatMessage(err, "Error in searchiing", false, null);
-                                        resz.end(jsonString);
+                                        callback(null,jsonString);
                                     }
 
                                 });
@@ -343,7 +342,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
                             catch(ex)
                             {
                                 var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                                resz.end(jsonString);
+                                callback(null,jsonString);
                             }
 
 
@@ -355,7 +354,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
                 catch(ex)
                 {
                     var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                    resz.end(jsonString);
+                    callback(null,jsonString);
                 }
             }
 
@@ -364,7 +363,7 @@ function MapWithSipUacEndpoint(reqz,resz,errz) {
     catch(ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        resz.end(jsonString);
+        callback(null,jsonString);
     }
 
     //return next();

@@ -41,7 +41,7 @@ var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessag
 
 
 //post :-done
-function AddSipUserGroup(objNum,res)
+function AddSipUserGroup(objNum,callback)
 {
     try {
         var obj = null;
@@ -58,7 +58,7 @@ function AddSipUserGroup(objNum,res)
     catch(ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        res.end(jsonString);
+        callback(null,jsonString);
     }
 
     try {
@@ -92,28 +92,28 @@ function AddSipUserGroup(objNum,res)
 
 
                 var jsonString = messageFormatter.FormatMessage(ex, "SUCCESS", true, obj);
-                res.end(jsonString);
+                callback(null,jsonString);
 
 
             }
             else {
                 console.log("..................... Error found in saving.................................... : " + err);
                 var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
-                res.end(jsonString);
+                callback(null,jsonString);
 
             }
 
-            return next();
+
         });
     }
     catch (ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        res.end(jsonString);
+        callback(null,jsonString);
     }
 }
 //post :-done
-function MapExtensionID(obj,res)
+function MapExtensionID(obj,callback)
 {
     try {
 
@@ -132,7 +132,7 @@ function MapExtensionID(obj,res)
                             console.log('mapping group and sip done.................');
                             // res.write(status.toString());
                             var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, groupObject);
-                            res.end(jsonString);
+                            callback(null,jsonString);
 
 
                         });
@@ -142,7 +142,7 @@ function MapExtensionID(obj,res)
                     else {
 
                         var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, groupObject);
-                        res.end(jsonString);
+                        callback(null,jsonString);
 
                     }
 
@@ -153,7 +153,7 @@ function MapExtensionID(obj,res)
             else {
 
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, sipObject);
-                res.end(jsonString);
+                callback(null,jsonString);
 
             }
 
@@ -164,14 +164,14 @@ function MapExtensionID(obj,res)
     catch (ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
-        res.end(jsonString);
+        callback(null,jsonString);
     }
 
 
 //return next();
 }
 //post :-post
-function FillUsrGrp(obj,res) {
+function FillUsrGrp(obj,callback) {
 
     try{
 
@@ -185,13 +185,13 @@ function FillUsrGrp(obj,res) {
                     console.log('An error occurred while searching for Extension:', err);
                     //logger.info( 'Error found in searching : '+err );
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                 } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
                 } else {
                     try{
                         DbConn.UserGroup
@@ -204,13 +204,13 @@ function FillUsrGrp(obj,res) {
                                     console.log('An error occurred while searching for Extension:', err);
                                     //logger.info( 'Error found in searching : '+err );
                                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                                    res.end(jsonString);
+                                    callback(null,jsonString);
 
                                 } else if (result.length==0) {
                                     console.log('No user with the Extension has been found.');
                                     ///logger.info( 'No user found for the requirement. ' );
                                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
-                                    res.end(jsonString);
+                                    callback(null,jsonString);
                                 } else {
 
                                     console.log("New Record found...... Inserting.............");
@@ -239,13 +239,13 @@ function FillUsrGrp(obj,res) {
 
                                                 console.log("..................... Saved Successfully ....................................");
                                                 var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
-                                                res.end(jsonString);
+                                                callback(null,jsonString);
 
                                             }
                                             else {
                                                 console.log("..................... Error found in saving.................................... : " + err);
                                                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                                                res.end(jsonString);
+                                                callback(null,jsonString);
 
                                             }
 
@@ -257,7 +257,7 @@ function FillUsrGrp(obj,res) {
                                     catch(ex)
                                     {
                                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                                        res.end(jsonString);
+                                        callback(null,jsonString);
                                     }
 
                                 }
@@ -268,7 +268,7 @@ function FillUsrGrp(obj,res) {
                     catch(ex)
                     {
                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                        res.end(jsonString);
+                        callback(null,jsonString);
                     }
                 }
 
@@ -278,12 +278,12 @@ function FillUsrGrp(obj,res) {
     catch(ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
-        res.end(jsonString);
+        callback(null,jsonString);
     }
-    return next();
+
 }
 //post :-done
-function UpdateSipUserGroup(obj,res) {
+function UpdateSipUserGroup(obj,callback) {
     try{
         DbConn.UserGroup
             .update(
@@ -306,29 +306,29 @@ function UpdateSipUserGroup(obj,res) {
                 logger.info('Successfully Mapped. ');
                 console.log(".......................mapping is succeeded ....................");
                 var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
-                res.end(jsonString);
+                callback(null,jsonString);
 
             }).error(function (err) {
                 logger.info('mapping error found in saving. : ' + err);
                 console.log("Update failed ! " + err);
                 //handle error here
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                res.end(jsonString);
+                callback(null,jsonString);
 
             });
     }
     catch (ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", true, obj);
-        res.end(jsonString);
+        callback(null,jsonString);
     }
-    return next();
+
 }
 
 
 //get :-done
 
-function GetGroupData(obj,res) {
+function GetGroupData(obj,callback) {
 
     try{
         DbConn.UserGroup
@@ -341,18 +341,18 @@ function GetGroupData(obj,res) {
                     console.log('An error occurred while searching for Extension:', err);
                     //logger.info( 'Error found in searching : '+err );
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                 } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                 } else {
 
                     var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                     //console.log(result.Action)
 
@@ -363,12 +363,12 @@ function GetGroupData(obj,res) {
     catch(ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
-        res.end(jsonString);
+        callback(null,jsonString);
     }
 }
 
 //get:-done
-function GetGroupEndpoints(obj,res)
+function GetGroupEndpoints(obj,callback)
 {
     try {
         DbConn.UsrGrp
@@ -381,18 +381,18 @@ function GetGroupEndpoints(obj,res)
                     console.log('An error occurred while searching for Extension:', err);
                     //logger.info( 'Error found in searching : '+err );
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                 } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                 } else {
 
                     var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                     //console.log(result.Action)
 
@@ -403,12 +403,12 @@ function GetGroupEndpoints(obj,res)
     catch(ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, result);
-        res.end(jsonString);
+        callback(null,jsonString);
     }
 }
 
 //get :-done
-function EndpointGroupID(obj,res) {
+function EndpointGroupID(obj,callback) {
 
     try{
         DbConn.UsrGrp
@@ -421,17 +421,17 @@ function EndpointGroupID(obj,res) {
                     console.log('An error occurred while searching for Extension:', err);
                     //logger.info( 'Error found in searching : '+err );
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                 } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
                 } else {
 
                     var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                     //console.log(result.Action)
 
@@ -443,13 +443,13 @@ function EndpointGroupID(obj,res) {
     catch (ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
-        res.end(jsonString);
+        callback(null,jsonString);
     }
 }
 
 //get :-done
 
-function AllRecWithCompany(req,res,err)
+function AllRecWithCompany(req,callback)
 {
     try {
         DbConn.UserGroup
@@ -462,18 +462,18 @@ function AllRecWithCompany(req,res,err)
                     console.log('An error occurred while searching for Extension:', err);
                     //logger.info( 'Error found in searching : '+err );
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                 } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                 } else {
 
                     var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                     //console.log(result.Action)
 
@@ -485,12 +485,12 @@ function AllRecWithCompany(req,res,err)
     catch(ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        res.end(jsonString);
+        callback(null,jsonString);
     }
 }
 
 //get :-done
-function GetAllUsersInGroup(req,res,err) {
+function GetAllUsersInGroup(req,callback) {
 
     try{
         DbConn.UserGroup.findAll({where: {id: req}, include: [{model: DbConn.SipUACEndpoint}]})
@@ -499,18 +499,18 @@ function GetAllUsersInGroup(req,res,err) {
                     console.log('An error occurred while searching for Extension:', err);
                     //logger.info( 'Error found in searching : '+err );
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                 } else if (result.length==0) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
 
                 } else {
 
                     var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
-                    res.end(jsonString);
+                    callback(null,jsonString);
                     //console.log(result.Action)
 
                 }
@@ -520,7 +520,7 @@ function GetAllUsersInGroup(req,res,err) {
     catch(ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        res.end(jsonString);
+        callback(null,jsonString);
     }
 }
 

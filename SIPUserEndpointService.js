@@ -32,7 +32,8 @@ var logger = new (winston.Logger)({
 //Request comes as body
 
 //post :- done
-function AddOrUpdateContext(reqz,resz,errz) {
+
+function AddOrUpdateContext(reqz,callback) {
     logger.info('Context Management is Starting.');
 
 
@@ -53,8 +54,10 @@ function AddOrUpdateContext(reqz,resz,errz) {
     catch (ex) {
         console.log("Error in adding new items to object created using request body");
         logger.info('Exception found in object creation : ' + ex);
-        var jsonString = messageFormatter.FormatMessage(errz, "ERROR", false, null);
-        resz.end(jsonString);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+
+        callback(null,jsonString)
+        //resz.end(jsonString);
 
     }
 
@@ -71,7 +74,7 @@ if(obj.Context!=null) {
 
                     logger.info('Error found in Searching , Context :' + obj.Context + ' Error : ' + err);
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                    resz.end(jsonString);
+                    callback(null,jsonString);
 
                 } else if (!result) {
                     console.log('No user with the Context ' + obj.Context + ' has been found.');
@@ -106,7 +109,7 @@ if(obj.Context!=null) {
                                     console.log("New User Found and Inserted (Context : " + obj.Context + ")");
                                     logger.info('Record inserted');
                                     var jsonString = messageFormatter.FormatMessage(err, null, true, user);
-                                    resz.end(jsonString);
+                                    callback(null,jsonString);
 
                                     // callback(err, true);
                                     // pass null and true
@@ -117,7 +120,7 @@ if(obj.Context!=null) {
                                     console.log("Error in saving  (Context :" + obj.Context + ")" + err);
                                     logger.info('Error in saving , Context :' + obj.Context);
                                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, user);
-                                    resz.end(jsonString);
+                                    callback(null,jsonString);
                                     //   callback(err, false);
                                     //pass error and false
                                 }
@@ -129,7 +132,7 @@ if(obj.Context!=null) {
                         console.log("An error occurred in data saving process ");
                         logger.info('Exception Found in saving , Exception :' + ex);
                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, user);
-                        resz.end(jsonString);
+                        callback(null,jsonString);
 
                     }
 
@@ -166,21 +169,21 @@ if(obj.Context!=null) {
                                 console.log("Updated successfully!");
                                 logger.info('Record Updated Successfully');
                                 var jsonString = messageFormatter.FormatMessage(null, "Successfully Updated", true, results);
-                                resz.end(jsonString);
+                                callback(null,jsonString);
 
                             }).error(function (err) {
 
                                 console.log("Project update failed !");
                                 logger.info('Record Updation failed : ' + err);
                                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
-                                resz.end(jsonString);
+                                callback(null,jsonString);
                                 //handle error here
 
                             });
                     }
                     catch (ex) {
                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
-                        resz.end(jsonString);
+                        callback(null,jsonString);
                     }
 
                 }
@@ -189,18 +192,23 @@ if(obj.Context!=null) {
     }
     catch (ex) {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
-        resz.end(jsonString);
+        callback(null,jsonString);
     }
 }
     else
 {
     var jsonString = messageFormatter.FormatMessage(null, "Null value passed for Context", false, obj);
-    resz.end(jsonString);
+    callback(null,jsonString);
 }
 }
 
+
+
+
+
+
 //get :- done
-function GetContextDetails(reqz,resz,errz)
+function GetContextDetails(reqz,callback)
 {
     try {
 
@@ -212,12 +220,12 @@ function GetContextDetails(reqz,resz,errz)
                 if (!!err) {
                     console.log('An error occurred while searching for Context:', err);
                     var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for Context for Company :" +reqz, false, result);
-                    resz.end(jsonString);
+                    callback(null,jsonString);
 
                 } else if (result==null) {
 
                     var jsonString = messageFormatter.FormatMessage(err, "No context for company :"+reqz, true, result);
-                    resz.end(jsonString);
+                    callback(null,jsonString);
                 }
                 else {
 
@@ -227,14 +235,14 @@ function GetContextDetails(reqz,resz,errz)
                         var Jresults = JSON.stringify(result);
 
                         var jsonString = messageFormatter.FormatMessage(err, "Successfully json returned", true, result);
-                        resz.end(jsonString);
+                        callback(null,jsonString);
 
                     }
                     catch (ex)
                     {
                         console.log("Error in creating json object to return : "+ex);
                         var jsonString = messageFormatter.FormatMessage(ex, "Exception found in json creating .", false, result);
-                        resz.end(jsonString);
+                        callback(null,jsonString);
                     }
 
                     // set as Json Object
@@ -246,7 +254,7 @@ function GetContextDetails(reqz,resz,errz)
     {
         console.log("Error in searching data : "+ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception in calling function", false, null);
-        resz.end(jsonString);
+        callback(null,jsonString);
 
     }
 
