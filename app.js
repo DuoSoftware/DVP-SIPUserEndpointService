@@ -146,7 +146,8 @@ RestServer.post('/dvp/:version/ext_mgmt/map_extension',function(req,res,next)
 //.......................................................................................................................
 
 RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/add_sipuser_group',function(req,res,next)
-{try {
+{
+    try {
     group.AddSipUserGroup(req.body, function (err, resz) {
         res.end(resz);
     });
