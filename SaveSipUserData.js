@@ -34,10 +34,10 @@ try {
         }
     ).complete(function (err, user) {
             /* ... */
-            if (err == null) {
+            if (!err ) {
                 console.log("New User Found and Inserted (Context : " + jobj.Context + ")");
 
-                callback(err, true);
+                callback(undefined, true);
                 // pass null and true
 
 
@@ -53,6 +53,7 @@ try {
     catch (ex)
     {
         console.log("Error found in saving data : "+ex);
+        callback(ex, false);
     }
 };
 

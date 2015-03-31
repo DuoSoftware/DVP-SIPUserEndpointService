@@ -23,17 +23,19 @@ try{
     DbConn.SipUACEndpoint
         .find({where: [{SipUsername: jobj.SipUsername}, {CompanyId: jobj.CompanyId}, {TenantId: jobj.TenantId}]})
         .complete(function (err, result) {
-            if (!!err) {
+            if (err) {
                 console.log('................An error occurred while searching for SIp UAC Record..................', err);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                callback.end(jsonString);
+                callback(err, undefined);
 
-            } else if (result==null) {
+            } else
+            {
+                if (!result) {
 
 
                 console.log('No user has been found.');
                 var jsonString = messageFormatter.FormatMessage(err, "No record found", false, null);
-                callback.end(jsonString);
+                    callback(undefined, undefined);
 
             }
             else {
@@ -54,37 +56,36 @@ try{
                         {
                             where: [{SipUsername: jobj.SipUsername}, {CompanyId: jobj.CompanyId}, {TenantId: jobj.TenantId}]
                         }
-                    ).then(function (result) {
+                    ).then(function (resultz) {
 
                             console.log(".......................Record updated successfully!....................");
                             var jsonString = messageFormatter.FormatMessage(err, "Record updated successfully", true, result);
-                            callback.end(jsonString);
+                            callback(undefined, resultz);
 
-                        }).error(function (err) {
+                        }).error(function (errz) {
 
                             console.log("Project update failed ! " + err);
                             var jsonString = messageFormatter.FormatMessage(err, "SipUAC rec update failed", false, result);
-                            callback.end(jsonString);
+                            callback(errz, undefined);
                             //handle error here
 
                         });
 
                 }
-                catch(ex)
-                {
+                catch (ex) {
                     var jsonString = messageFormatter.FormatMessage(ex, "Exception in updation", false, null);
-                    callback.end(jsonString);
+                    callback(ex, undefined);
                 }
             }
 
-
+        }
         });
     //return next();
 }
     catch(ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "Exception in function starts", false, null);
-        callback.end(jsonString);
+        callback(ex, undefined);
     }
 }
 

@@ -38,7 +38,16 @@ RestServer.post('/dvp/:version/context_mgmt/save_contextdata',function(req,res,n
 {
     try {
         context.AddOrUpdateContext(req, function (err, resz) {
-            res.end(resz);
+
+            if(err)
+            {
+                res.end(err);
+            }
+            else
+            {
+                res.end(resz);
+
+            }
 
         });
     }
@@ -57,7 +66,15 @@ RestServer.post('/dvp/:version/context_mgmt/save_contextdata',function(req,res,n
 RestServer.post('/dvp/:version/uac_mgmt/save_uac',function(req,res,next)
 {try {
     UACCreate.SaveSip(req, function (err, resz) {
-        res.end(resz);
+        if(err)
+        {
+            res.end(err);
+        }
+        else
+        {
+            res.end(resz);
+        }
+
     });
 }
     catch(ex)
@@ -74,8 +91,16 @@ return next();
 RestServer.post('/dvp/:version/uac_mgmt/updt_uac',function(req,res,next)
 {
     try {
-        UACUpdate.UpdateUacUserData(req.body, function (err, res) {
-            res.end(resz);
+        UACUpdate.UpdateUacUserData(req.body, function (err, resz) {
+            if(err)
+            {
+                res.end(err);
+            }
+            else
+            {
+                res.end(resz);
+            }
+
         });
     }
     catch(ex)
@@ -94,7 +119,15 @@ RestServer.post('/dvp/:version/ext_mgmt/update_extension_st/:ref/:st',function(r
 {
     try {
         Extmgt.ChangeAvailability(req, function (err, resz) {
-            res.end(resz);
+            if(err)
+            {
+                res.end(err);
+            }
+            else
+            {
+                res.end(resz);
+            }
+
 
         });
     }
@@ -112,7 +145,15 @@ RestServer.post('/dvp/:version/ext_mgmt/add_extension',function(req,res,next)
 {
     try {
         Extmgt.AddExtension(req, function (err, resz) {
-            res.end(resz);
+            if(err)
+            {
+                res.end(err);
+            }
+            else
+            {
+                res.end(resz);
+            }
+
 
         });
     }
@@ -130,7 +171,14 @@ RestServer.post('/dvp/:version/ext_mgmt/map_extension',function(req,res,next)
 {
     try {
         Extmgt.MapWithSipUacEndpoint(req, function (err, resz) {
-            res.end(resz);
+            if(err)
+            {
+                res.end(err);
+            }
+            else
+            {
+                res.end(resz);
+            }
         });
     }
     catch(ex)
@@ -149,7 +197,14 @@ RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/add_sipuser_group',fun
 {
     try {
     group.AddSipUserGroup(req.body, function (err, resz) {
-        res.end(resz);
+        if(err)
+        {
+            res.end(err);
+        }
+        else
+        {
+            res.end(resz);
+        }
     });
 }
     catch(ex)
@@ -167,7 +222,14 @@ RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/map_extensionid',funct
 {
     try {
         group.MapExtensionID(req.body, function (err, res) {
-            res.end(resz);
+            if(err)
+            {
+                res.end(err);
+            }
+            else
+            {
+                res.end(resz);
+            }
         });
     }
     catch(ex)
@@ -185,7 +247,14 @@ RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/fill_usrgrp',function(
 {
     try {
         group.FillUsrGrp(req.body, function (err, resz) {
-            res.end(resz);
+            if(err)
+            {
+                res.end(err);
+            }
+            else
+            {
+                res.end(resz);
+            }
         });
     }
     catch(ex)
@@ -203,7 +272,14 @@ RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/update_sipuser_group',
 {
     try {
         group.UpdateSipUserGroup(req.body, function (err, res) {
-            res.end(resz);
+            if(err)
+            {
+                res.end(err);
+            }
+            else
+            {
+                res.end(resz);
+            }
         });
     }
     catch(ex)
@@ -254,7 +330,14 @@ RestServer.post('/dvp/:version/scheduleapi/update_sch_id',function(req,res,err)
 RestServer.get('/dvp/:version/uac_mgmt/find_context/:cmpid',function(req,res,next)
 {try {
     context.GetContextDetails(req.params.cmpid, function (err, resz) {
-        res.end(resz);
+        if(err)
+        {
+            res.end(err);
+        }
+        else
+        {
+            res.end(resz);
+        }
     });
 }
     catch(ex)
@@ -274,7 +357,14 @@ RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/get_group_data/:name',f
 {
     try {
         group.GetGroupData(req.params.name, function (err, resz) {
-            res.end(resz);
+            if(err)
+            {
+                res.end(err);
+            }
+            else
+            {
+                res.end(resz);
+            }
         });
 
     }
@@ -293,7 +383,14 @@ RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/get_group_endpoints',fu
 {
     try {
         group.GetGroupEndpoints(req.body, function (err, resz) {
-            res.end(resz);
+            if(err)
+            {
+                res.end(err);
+            }
+            else
+            {
+                res.end(resz);
+            }
         });
     }
     catch(ex)
@@ -311,7 +408,14 @@ RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/endpoint_groupid',funct
 {
     try {
         group.EndpointGroupID(req.body, function (err, resz) {
-            res.end(resz);
+            if(err)
+            {
+                res.end(err);
+            }
+            else
+            {
+                res.end(resz);
+            }
         });
     }
     catch(ex)
@@ -327,7 +431,14 @@ RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/endpoint_groupid',funct
 RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/AllRecWithCompany/:CompanyId',function(req,res,next)
 {try {
     group.AllRecWithCompany(req.params.CompanyId, function (err, res) {
-        res.end(resz);
+        if(err)
+        {
+            res.end(err);
+        }
+        else
+        {
+            res.end(resz);
+        }
     });
 }
     catch(ex)
@@ -345,7 +456,14 @@ RestServer.get('/dvp/:version/sipgroup_mgt/sipuser_group/get_all_users_in_group/
 {
 try {
     group.GetAllUsersInGroup(req.params.companyid, function (err, resz) {
-        res.end(resz);
+        if(err)
+        {
+            res.end(err);
+        }
+        else
+        {
+            res.end(resz);
+        }
     });
 }
     catch(ex)

@@ -37,103 +37,110 @@ function SaveSip(reqz,callback) {
     }
 
 
-   /* function SaveSt(error, st) {
-        try {
-            if (st >0 && error == null) {
-                console.log("New Record is Added Successfully");
-                var jsonString = messageFormatter.FormatMessage(ex, "Success", true, null);
-                resz.end(jsonString);
-            }
-            else {
-                console.log("New Record Saving Error " + error);
-                var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                resz.end(jsonString);
-            }
-        }
+    /* function SaveSt(error, st) {
+     try {
+     if (st >0 && error == null) {
+     console.log("New Record is Added Successfully");
+     var jsonString = messageFormatter.FormatMessage(ex, "Success", true, null);
+     resz.end(jsonString);
+     }
+     else {
+     console.log("New Record Saving Error " + error);
+     var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+     resz.end(jsonString);
+     }
+     }
 
-        catch (ex) {
-            Console.log("Error found in Save status return : " + ex);
-            var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-            resz.end(jsonString);
-        }
+     catch (ex) {
+     Console.log("Error found in Save status return : " + ex);
+     var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+     resz.end(jsonString);
+     }
 
-    };*/
+     };*/
 
     logger.info('Search in db for record : ' + obj.SipUsername + ' , ' + obj.CompanyId + ' , ' + obj.TenantId);
 
 
-        try {
-            DbConn.SipUACEndpoint
-                .find({where: [{SipUsername: obj.SipUsername}, {CompanyId: obj.CompanyId}, {TenantId: obj.TenantId}]})
-                .complete(function (err, result) {
-                    if (!!err) {
-                        console.log('An error occurred while searching for SipUAC record:');
-                        logger.info('Error found in searching : ' + err);
-                        var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for SipUAC record", false, result);
-                        callback(null,jsonString);
+    try {
+        DbConn.SipUACEndpoint
+            .find({where: [{SipUsername: obj.SipUsername}, {CompanyId: obj.CompanyId}, {TenantId: obj.TenantId}]})
+            .complete(function (err, result) {
+                if (!!err) {
+                    console.log('An error occurred while searching for SipUAC record:');
+                    logger.info('Error found in searching : ' + err);
+                    var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for SipUAC record", false, result);
+                    callback(null,jsonString);
 
-                    } else if (result == null) {
-                        console.log('No user with the Extension ' + obj.SipUsername + ' has been found.');
-                        logger.info('No user found for the requirement. ');
-                        try {
+                } else if (result == null) {
+                    console.log('No user with the Extension ' + obj.SipUsername + ' has been found.');
+                    logger.info('No user found for the requirement. ');
+                    try {
 
 
-                            //call external save function, params = Json object and callback function
+                        //call external save function, params = Json object and callback function
 
-                            console.log('................................. New SIP User is creating ..................................');
+                        console.log('................................. New SIP User is creating ..................................');
 
-                            SaveUACRec(obj, function (error, st) {
-                                try {
-                                    if (st > 0 && error == null) {
+                        SaveUACRec(obj, function (error, st) {
+                            try {
+                                if(error)
+                                {
+                                    callback(error,undefined);
+                                }
+                                else {
+
+                                    if (st) {
                                         console.log("New Record is Added Successfully");
                                         var jsonString = messageFormatter.FormatMessage(null, "SuccessFully stated", true, null);
-                                        callback(null,jsonString);
+                                        callback(undefined, jsonString);
                                     }
                                     else {
                                         console.log("New Record Saving Error " + error);
                                         var jsonString = messageFormatter.FormatMessage(error, "ERROR in state", false, null);
-                                        callback(null,jsonString);
+                                        callback("Error returns", undefined);
                                     }
                                 }
+                            }
 
-                                catch (ex) {
-                                    console.log("Error found in Save status return : " + ex);
-                                    var jsonString = messageFormatter.FormatMessage(ex, "Exception in state", false, null);
-                                    callback(null,jsonString);
-                                }
+                            catch (ex) {
+                                console.log("Error found in Save status return : " + ex);
+                                var jsonString = messageFormatter.FormatMessage(ex, "Exception in state", false, null);
+                                callback("Exception found",jsonString);
+                            }
 
-                            });
-
-
-                        }
-                        catch (ex) {
-                            console.log("An error occurred in data saving process ");
-                            logger.info('Error found in saving process ');
-
-                            var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                            callback(null,jsonString);
+                        });
 
 
-                        }
+                    }
+                    catch (ex) {
+                        console.log("An error occurred in data saving process ");
+                        logger.info('Error found in saving process ');
 
-
-                    } else {
-                        console.log('............................Context Found ' + result.SipUsername + '! ................................');
-                        console.log('All attributes of Context:', result.values);
-                        console.log('Cannot overwrite this record.Check given details........\n');
-                        logger.info('Record Found, No updations happen ');
-                        var jsonString = messageFormatter.FormatMessage(null, "Cannot overwrite this record.Check given details........\n", false, result);
+                        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
                         callback(null,jsonString);
 
 
                     }
-                });
 
-        }
-        catch (ex) {
-            var jsonString = messageFormatter.FormatMessage(ex, "Exception in Saving sip", false, null);
-            callback(null,jsonString);
-        }
+
+                } else {
+                    console.log('............................Context Found ' + result.SipUsername + '! ................................');
+                    console.log('All attributes of Context:', result.values);
+                    console.log('Cannot overwrite this record.Check given details........\n');
+                    logger.info('Record Found, No updations happen ');
+                    var jsonString = messageFormatter.FormatMessage(null, "Cannot overwrite this record.Check given details........\n", false, result);
+                    callback(null,jsonString);
+
+
+                }
+            });
+
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception in Saving sip", false, null);
+        callback(null,jsonString);
+    }
 
 
 //return next();
@@ -148,103 +155,135 @@ function SaveUACRec(jobj,callback) {
         logger.info('Check CloudEndUser for  Records : ' + jobj.CSDBCloudEndUserId);
 
         try{
-        DbConn.CloudEndUser.find({where: [{id: jobj.CSDBCloudEndUserId}]}).complete(function (err, cloudEndObject) {
-            if (!err && cloudEndObject) {
-                // console.log(cloudEndObject);
-                logger.info(' CloudEndUserID found,No errors ');
-                logger.info('Check Context for  Records : ' + jobj.CSDBContextContext);
-                DbConn.Context.find({where: [{Context: jobj.CSDBContextContext}]}).complete(function (err, ContextObject) {
+            DbConn.CloudEndUser.find({where: [{id: jobj.CSDBCloudEndUserId}]}).complete(function (err, cloudEndObject) {
 
-                    if (!err && ContextObject) {
-                        logger.info(' CSDBContextContext found,No errors ');
-                        logger.info(' Creating SipObject ');
-                        var SIPObject = DbConn.SipUACEndpoint
-                            .build(
+                if(err)
+                {
+                    callback(err,undefined);
+                }
+                else {
+
+                    if (cloudEndObject) {
+                        // console.log(cloudEndObject);
+                        logger.info(' CloudEndUserID found,No errors ');
+                        logger.info('Check Context for  Records : ' + jobj.CSDBContextContext);
+                        DbConn.Context.find({where: [{Context: jobj.CSDBContextContext}]}).complete(function (errz, ContextObject) {
+
+                            if (errz) {
+                                callback(errz,undefined);
+                            }
+                            else
                             {
-                                SipUsername: jobj.SipUsername,
-                                Password: jobj.Password,
-                                Enabled: jobj.Enabled,
-                                ExtraData: jobj.ExtraData,
-                                EmailAddress: jobj.EmailAddress,
-                                GuRefId: jobj.GuRefId,
-                                CompanyId: jobj.CompanyId,
-                                TenantId: jobj.TenantId,
-                                ObjClass: jobj.ObjClass,
-                                ObjType: jobj.ObjType,
-                                ObjCategory: jobj.ObjCategory,
-                                AddUser: jobj.AddUser,
-                                UpdateUser: jobj.UpdateUser
-                                // AddTime: new Date(2009, 10, 11),
-                                //  UpdateTime: new Date(2009, 10, 12),
-                                // CSDBCloudEndUserId: jobj.CSDBCloudEndUserId
+                                if (ContextObject) {
+                                    logger.info(' CSDBContextContext found,No errors ');
+                                    logger.info(' Creating SipObject ');
+                                    var SIPObject = DbConn.SipUACEndpoint
+                                        .build(
+                                        {
+                                            SipUsername: jobj.SipUsername,
+                                            Password: jobj.Password,
+                                            Enabled: jobj.Enabled,
+                                            ExtraData: jobj.ExtraData,
+                                            EmailAddress: jobj.EmailAddress,
+                                            GuRefId: jobj.GuRefId,
+                                            CompanyId: jobj.CompanyId,
+                                            TenantId: jobj.TenantId,
+                                            ObjClass: jobj.ObjClass,
+                                            ObjType: jobj.ObjType,
+                                            ObjCategory: jobj.ObjCategory,
+                                            AddUser: jobj.AddUser,
+                                            UpdateUser: jobj.UpdateUser
+                                            // AddTime: new Date(2009, 10, 11),
+                                            //  UpdateTime: new Date(2009, 10, 12),
+                                            // CSDBCloudEndUserId: jobj.CSDBCloudEndUserId
 
 
-                            }
-                        )
+                                        }
+                                    )
 
-                        SIPObject.save().complete(function (err) {
-                            if (!err) {
-                                //var status = 0;
-                                logger.info(' SipObject created : ' + SIPObject);
+                                    SIPObject.save().complete(function (errSave) {
+                                        if (!errSave) {
+                                            //var status = 0;
+                                            logger.info(' SipObject created : ' + SIPObject);
 
-                                cloudEndObject.addSipUACEndpoint(SIPObject).complete(function (errx, CloudEndInstancex) {
-                                    logger.info(' CSDBCloudEndUserId filled  ' + cloudEndObject);
-                                   // status++;
+                                            cloudEndObject.addSipUACEndpoint(SIPObject).complete(function (errCloud, CloudEndInstancex) {
+                                                //logger.info(' CSDBCloudEndUserId filled  ' + cloudEndObject);
+                                                // status++;
+                                                if(errCloud)
+                                                {
+                                                    callback('Error in mapping CEU & SipUAC',undefined);
+                                                }
+                                                else
+                                                {
+                                                    ContextObject.addSipUACEndpoint(SIPObject).complete(function (errContext, ContextInstancex) {
+                                                        // logger.info(' CSDBContextContext filled  ' + ContextObject);
 
-                                    ContextObject.addSipUACEndpoint(SIPObject).complete(function (errx, ContextInstancex) {
-                                        logger.info(' CSDBContextContext filled  ' + ContextObject);
-                                       // status = status++;
+                                                        if(errContext)
+                                                        {
+                                                            callback('Error in mapping Context & SipUAC',undefined);
+                                                        }
+                                                        else
+                                                        {
+                                                            callback(undefined,ContextInstancex);
+                                                        }
+
+
+                                                        // status = status++;
+                                                    });
+                                                }
+
+
+                                                // res.write(status.toString());
+                                                // res.end();
+                                            });
+
+                                            console.log("..................... Saved Successfully ....................................");
+                                            logger.info('Save Succeeded');
+                                            callback(null, true);
+                                        }
+                                        else {
+                                            console.log(err + " found");
+                                            console.log("..................... Error found in saving....................................");
+                                            logger.info('Error found in saving');
+                                            var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                                            callback(err, undefined);
+
+
+                                        }
+
                                     });
-                                    // res.write(status.toString());
-                                    // res.end();
-                                });
 
-                                console.log("..................... Saved Successfully ....................................");
-                                logger.info('Save Succeeded');
-                                callback(null,1);
+
+                                }
+                                else  {
+                                    console.log("................................... Given Context is invalid ................................ ");
+                                    logger.info('Given Context is invalid : ' + jobj.CSDBContextContext);
+                                    logger.info('Returned ContextObject : ' + ContextObject);
+                                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ContextObject);
+                                    callback("Error occured",undefined);
+
+
+                                }
                             }
-                            else {
-                                console.log(err + " found");
-                                console.log("..................... Error found in saving....................................");
-                                logger.info('Error found in saving');
-                                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
-                                callback(err,0);
-
-
-                            }
-
                         });
-
-
-
-
                     }
-                    else if (!ContextObject) {
-                        console.log("................................... Given Context is invalid ................................ ");
-                        logger.info('Given Context is invalid : ' + jobj.CSDBContextContext);
-                        logger.info('Returned ContextObject : ' + ContextObject);
-                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ContextObject);
-
-
+                    else  {
+                        console.log("................................... Given Cloud End User is invalid ................................ ");
+                        logger.info('Given cloudEnd is invalid : ' + jobj.CSDBCloudEndUserId);
+                        logger.info('Returned cloudEndObject : ' + cloudEndObject);
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, cloudEndObject);
+                        callback("Error Returns",undefined);
                     }
-                });
-            }
-            else if (!cloudEndObject) {
-                console.log("................................... Given Cloud End User is invalid ................................ ");
-                logger.info('Given cloudEnd is invalid : ' + jobj.CSDBCloudEndUserId);
-                logger.info('Returned cloudEndObject : ' + cloudEndObject);
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, cloudEndObject);
-            }
-            else {
-                console.log("hhghg");
-            }
 
-        });
+                }
 
-    }
+            });
+
+        }
         catch(ex)
         {
             var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+            callback("Exception found",undefined);
 
         }
     }
@@ -254,7 +293,7 @@ function SaveUACRec(jobj,callback) {
         res.end();
         console.log("obj is null in SetExtension");
         logger.info( 'Request object is invalid : '+jobj );
-
+        callback("No object recieved ",undefined);
     }
 }
 

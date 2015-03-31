@@ -56,7 +56,7 @@ function AddOrUpdateContext(reqz,callback) {
         logger.info('Exception found in object creation : ' + ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
 
-        callback(null,jsonString)
+        callback("Exception",undefined)
         //resz.end(jsonString);
 
     }
@@ -64,148 +64,146 @@ function AddOrUpdateContext(reqz,callback) {
 
     logger.info('Searching for record , Context :' + obj.Context);
 
-if(obj.Context!=null) {
-    try {
-        DbConn.Context
-            .find({where: {Context: obj.Context}})
-            .complete(function (err, result) {
-                if (!!err) {
-                    console.log('An error occurred while searching for Context:', err);
+    if(obj.Context) {
+        try {
+            DbConn.Context
+                .find({where: {Context: obj.Context}})
+                .complete(function (err, result) {
+                    if (err) {
+                        console.log('An error occurred while searching for Context:', err);
 
-                    logger.info('Error found in Searching , Context :' + obj.Context + ' Error : ' + err);
-                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                    callback(null,jsonString);
+                        logger.info('Error found in Searching , Context :' + obj.Context + ' Error : ' + err);
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                        callback("Error", undefined);
 
-                } else if (!result) {
-                    console.log('No user with the Context ' + obj.Context + ' has been found.');
-                    logger.info('No record Found , Context :' + obj.Context);
+                    }
 
-                    try {
+                    else
+                    {
+                        if (!result) {
+                            console.log('No user with the Context ' + obj.Context + ' has been found.');
+                            logger.info('No record Found , Context :' + obj.Context);
 
-                        logger.info('Entering new record for Context :' + obj.Context);
-                        DbConn.Context
-                            .create(
-                            {
-                                Context: obj.Context,
-                                Description: obj.Description,
-                                ContextCat: obj.ContextCat,
-                                CompanyId: obj.CompanyId,
-                                TenantId: obj.TenantId,
-                                ObjClass: obj.ObjClass,
-                                ObjType: obj.ObjType,
-                                ObjCategory: obj.ObjCategory,
-                                AddUser: obj.AddUser,
-                                UpdateUser: obj.UpdateUser
-                                // AddTime: jobj.AddTime,
-                                // UpdateTime: jobj.UpdateTime,
-                                //id: 1,
-                                // createdAt: new Date(2009, 10, 11),
-                                // updatedAt: new Date(2009, 10, 12)
+                            try {
+
+                                logger.info('Entering new record for Context :' + obj.Context);
+                                DbConn.Context
+                                    .create(
+                                    {
+                                        Context: obj.Context,
+                                        Description: obj.Description,
+                                        ContextCat: obj.ContextCat,
+                                        CompanyId: obj.CompanyId,
+                                        TenantId: obj.TenantId,
+                                        ObjClass: obj.ObjClass,
+                                        ObjType: obj.ObjType,
+                                        ObjCategory: obj.ObjCategory,
+                                        AddUser: obj.AddUser,
+                                        UpdateUser: obj.UpdateUser
+                                        // AddTime: jobj.AddTime,
+                                        // UpdateTime: jobj.UpdateTime,
+                                        //id: 1,
+                                        // createdAt: new Date(2009, 10, 11),
+                                        // updatedAt: new Date(2009, 10, 12)
+
+                                    }
+                                ).complete(function (err, user) {
+                                        /* ... */
+                                        if (!err ) {
+                                            console.log("New User Found and Inserted (Context : " + obj.Context + ")");
+                                            logger.info('Record inserted');
+                                            var jsonString = messageFormatter.FormatMessage(err, null, true, user);
+                                            callback(undefined, user);
+
+
+                                        }
+                                        else {
+                                            console.log("Error in saving  (Context :" + obj.Context + ")" + err);
+                                            logger.info('Error in saving , Context :' + obj.Context);
+                                            var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, user);
+                                            callback("Error", undefined);
+                                            //   callback(err, false);
+                                            //pass error and false
+                                        }
+                                    });
+
 
                             }
-                        ).complete(function (err, user) {
-                                /* ... */
-                                if (err == null) {
-                                    console.log("New User Found and Inserted (Context : " + obj.Context + ")");
-                                    logger.info('Record inserted');
-                                    var jsonString = messageFormatter.FormatMessage(err, null, true, user);
-                                    callback(null,jsonString);
+                            catch (ex) {
+                                console.log("An error occurred in data saving process ");
+                                logger.info('Exception Found in saving , Exception :' + ex);
+                                var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, user);
+                                callback("Exception", undefined);
 
-                                    // callback(err, true);
-                                    // pass null and true
-
-
-                                }
-                                else {
-                                    console.log("Error in saving  (Context :" + obj.Context + ")" + err);
-                                    logger.info('Error in saving , Context :' + obj.Context);
-                                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, user);
-                                    callback(null,jsonString);
-                                    //   callback(err, false);
-                                    //pass error and false
-                                }
-                            });
-
-
-                    }
-                    catch (ex) {
-                        console.log("An error occurred in data saving process ");
-                        logger.info('Exception Found in saving , Exception :' + ex);
-                        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, user);
-                        callback(null,jsonString);
-
-                    }
-
-                } else {
-                    console.log('Context Found ' + result.Context + '!');
-                    console.log('All attributes of Context:', result.values);
-                    logger.info('Record is already in db  :' + obj.Context);
-
-                    try {
-                        DbConn.Context
-                            .update(
-                            {
-                                Description: obj.Description,
-                                ContextCat: obj.ContextCat,
-                                CompanyId: obj.CompanyId,
-                                TenantId: obj.TenantId,
-                                ObjClass: obj.ObjClass,
-                                ObjType: obj.ObjType,
-                                ObjCategory: obj.ObjCategory,
-                                AddUser: obj.AddUser,
-                                UpdateUser: obj.UpdateUser
-                                //  AddDate:obj.AddTime,
-                                // UpdateDate: obj.UpdateTime,
-                                // createdAt:new Date(2009,10,11),
-                                //updatedAt:new Date(2009,10,12)
-                            },
-                            {
-                                where: {
-                                    Context: obj.Context
-                                }
                             }
-                        ).then(function (results) {
 
-                                console.log("Updated successfully!");
-                                logger.info('Record Updated Successfully');
-                                var jsonString = messageFormatter.FormatMessage(null, "Successfully Updated", true, results);
-                                callback(null,jsonString);
+                        } else {
+                            console.log('Context Found ' + result.Context + '!');
+                            console.log('All attributes of Context:', result.values);
+                            logger.info('Record is already in db  :' + obj.Context);
 
-                            }).error(function (err) {
+                            try {
+                                DbConn.Context
+                                    .update(
+                                    {
+                                        Description: obj.Description,
+                                        ContextCat: obj.ContextCat,
+                                        CompanyId: obj.CompanyId,
+                                        TenantId: obj.TenantId,
+                                        ObjClass: obj.ObjClass,
+                                        ObjType: obj.ObjType,
+                                        ObjCategory: obj.ObjCategory,
+                                        AddUser: obj.AddUser,
+                                        UpdateUser: obj.UpdateUser
+                                        //  AddDate:obj.AddTime,
+                                        // UpdateDate: obj.UpdateTime,
+                                        // createdAt:new Date(2009,10,11),
+                                        //updatedAt:new Date(2009,10,12)
+                                    },
+                                    {
+                                        where: {
+                                            Context: obj.Context
+                                        }
+                                    }
+                                ).then(function (results) {
 
-                                console.log("Project update failed !");
-                                logger.info('Record Updation failed : ' + err);
-                                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
-                                callback(null,jsonString);
-                                //handle error here
+                                        console.log("Updated successfully!");
+                                        logger.info('Record Updated Successfully');
+                                        var jsonString = messageFormatter.FormatMessage(null, "Successfully Updated", true, results);
+                                        callback(undefined, results);
 
-                            });
+                                    }).error(function (err) {
+
+                                        console.log("Project update failed !");
+                                        logger.info('Record Updation failed : ' + err);
+                                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                                        callback("Error", undefined);
+                                        //handle error here
+
+                                    });
+                            }
+                            catch (ex) {
+                                var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
+                                callback("Exception", undefined);
+                            }
+
+                        }
+
                     }
-                    catch (ex) {
-                        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
-                        callback(null,jsonString);
-                    }
+                });
 
-                }
-            });
-
+        }
+        catch (ex) {
+            var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
+            callback("Exception",undefined);
+        }
     }
-    catch (ex) {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
-        callback(null,jsonString);
-    }
-}
     else
-{
-    var jsonString = messageFormatter.FormatMessage(null, "Null value passed for Context", false, obj);
-    callback(null,jsonString);
+    {
+        var jsonString = messageFormatter.FormatMessage(null, "Null value passed for Context", false, obj);
+        callback(undefined,obj.Context);
+    }
 }
-}
-
-
-
-
-
 
 //get :- done
 function GetContextDetails(reqz,callback)
@@ -217,35 +215,39 @@ function GetContextDetails(reqz,callback)
             .findAll({where: {CompanyId: reqz}})
             .complete(function (err, result) {
 
-                if (!!err) {
+                if (err) {
                     console.log('An error occurred while searching for Context:', err);
-                    var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for Context for Company :" +reqz, false, result);
-                    callback(null,jsonString);
+                    var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for Context for Company :" + reqz, false, result);
+                    callback(null, jsonString);
 
-                } else if (result==null) {
+                } else
+                {
 
-                    var jsonString = messageFormatter.FormatMessage(err, "No context for company :"+reqz, true, result);
-                    callback(null,jsonString);
-                }
-                else {
+                    if (!result) {
 
-                    try {
+                        var jsonString = messageFormatter.FormatMessage(err, "No context for company :" + reqz, true, result);
+                        callback(undefined, undefined);
+                    }
+                    else {
+
+                        try {
 
 
-                        var Jresults = JSON.stringify(result);
+                            var Jresults = JSON.stringify(result);
 
-                        var jsonString = messageFormatter.FormatMessage(err, "Successfully json returned", true, result);
-                        callback(null,jsonString);
+                            // var jsonString = messageFormatter.FormatMessage(err, "Successfully json returned", true, result);
+                            callback(undefined, Jresults);
+
+                        }
+                        catch (ex) {
+                            console.log("Error in creating json object to return : " + ex);
+                            var jsonString = messageFormatter.FormatMessage(ex, "Exception found in json creating .", false, result);
+                            callback("Exception", undefined);
+                        }
+
+                        // set as Json Object
 
                     }
-                    catch (ex)
-                    {
-                        console.log("Error in creating json object to return : "+ex);
-                        var jsonString = messageFormatter.FormatMessage(ex, "Exception found in json creating .", false, result);
-                        callback(null,jsonString);
-                    }
-
-                    // set as Json Object
 
                 }
             });
@@ -254,13 +256,11 @@ function GetContextDetails(reqz,callback)
     {
         console.log("Error in searching data : "+ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception in calling function", false, null);
-        callback(null,jsonString);
+        callback("Exception",undefined);
 
     }
 
 }
-
-
 
 module.exports.AddOrUpdateContext = AddOrUpdateContext;
 module.exports.GetContextDetails = GetContextDetails;
