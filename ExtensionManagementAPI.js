@@ -128,7 +128,7 @@ function AddExtension(reqz,callback) {
             // console.log(ExtObject);
             if (err) {
                 console.log("An error occurred in searching Extension : " + obj.Extension);
-                logger.info('Saving error. ');
+                logger.info('Saving error. '+err);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
                 callback("Error Found", undefined);
             }
@@ -155,8 +155,8 @@ function AddExtension(reqz,callback) {
                 }
                 else  {
                     console.log(" Record is already available for the Extension : " + obj.Extension);
-                    var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, ExtObject);
-                    callback(undefined, undefined);
+                    var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", false, ExtObject);
+                    callback("Already In Db", undefined);
                 }
             }
 

@@ -45,7 +45,7 @@ RestServer.post('/dvp/:version/context_mgmt/save_contextdata',function(req,res,n
             }
             else
             {
-                res.end(resz);
+                res.end(resz.Context.toString());
 
             }
 
@@ -151,7 +151,7 @@ RestServer.post('/dvp/:version/ext_mgmt/add_extension',function(req,res,next)
             }
             else
             {
-                res.end(resz);
+                res.end("1");
             }
 
 
@@ -177,7 +177,7 @@ RestServer.post('/dvp/:version/ext_mgmt/map_extension',function(req,res,next)
             }
             else
             {
-                res.end(resz);
+                res.end(JSON.stringify(resz));
             }
         });
     }
@@ -203,7 +203,7 @@ RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/add_sipuser_group',fun
         }
         else
         {
-            res.end(resz);
+            res.end(resz.GroupName.toString());
         }
     });
 }
@@ -221,14 +221,14 @@ RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/add_sipuser_group',fun
 RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/map_extensionid',function(req,res,next)
 {
     try {
-        group.MapExtensionID(req.body, function (err, res) {
+        group.MapExtensionID(req.body, function (err, resz) {
             if(err)
             {
                 res.end(err);
             }
             else
             {
-                res.end(resz);
+                res.end(JSON.stringify(resz));
             }
         });
     }

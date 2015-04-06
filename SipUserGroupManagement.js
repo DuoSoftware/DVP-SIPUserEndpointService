@@ -41,10 +41,10 @@ var messageFormatter = require('./../DVP-LimitHandler/DVP-Common/CommonMessageGe
 
 
 //post :-done
-function AddSipUserGroup(objNum,callback)
+function AddSipUserGroup(obj,callback)
 {
     try {
-        DbConn.UserGroup.find({where: [{GroupName: "Gname" + objNum}]}).complete(function (err, GrpObject) {
+        DbConn.UserGroup.find({where: [{GroupName: obj.GroupName}]}).complete(function (err, GrpObject) {
 
             if (err) {
                 callback(err, undefined);
@@ -52,20 +52,11 @@ function AddSipUserGroup(objNum,callback)
             else
             {
                 if (GrpObject) {
+                    console.log("Already in DB");
                     callback(undefined, GrpObject);
                 }
                 else  {
                     try {
-                        var obj = null;
-                        obj.GroupName = "Gname" + objNum;
-
-                        obj.Domain = "GDomain" + objNum;
-                        obj.ExtraData = "Gextra" + objNum;
-                        obj.ObjClass = "Gclz" + objNum;
-                        obj.ObjType = "Gtyp" + objNum;
-                        obj.ObjCategory = "Gcat" + objNum;
-                        obj.CompanyId = objNum;
-                        obj.TenantId = objNum + 1;
 
                         var UserGroupobj = DbConn.UserGroup
                             .build(
@@ -109,7 +100,7 @@ function AddSipUserGroup(objNum,callback)
                     }
                     catch (ex) {
                         var jsonString = messageFormatter.FormatMessage(ex, "Exception occures", false, null);
-                        callback("Exception", undefined);
+                        callback("Exception : "+ex, undefined);
                     }
                 }
             }
@@ -153,7 +144,7 @@ function MapExtensionID(obj,callback)
                                 console.log(groupObject);
 
                                 try {
-                                    groupObject.addCSDB_SipUACEndpoint(sipObject).complete(function (errx, groupInstancex) {
+                                    groupObject.addSipUACEndpoint(sipObject).complete(function (errx, groupInstancex) {
 
                                         if (errx) {
                                             callback(errx, undefined)

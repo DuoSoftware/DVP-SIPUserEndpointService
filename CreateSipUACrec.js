@@ -150,7 +150,7 @@ function SaveSip(reqz,callback) {
 function SaveUACRec(jobj,callback) {
     // Add all  details of new user
 
-    logger.info( 'Saving UAC Records : '+jobj );
+    logger.info( 'Saving UAC Records : '+JSON.stringify(jobj));
     if (jobj) {
         logger.info('Check CloudEndUser for  Records : ' + jobj.CSDBCloudEndUserId);
 
