@@ -320,6 +320,138 @@ function MapWithSipUacEndpoint(reqz,callback) {
     //return next();
 }
 
+function MapwithGroup(reqz,callback)
+{
+    logger.info('Starting mapping.(Group and Extension.)');
+    try {
+        var obj = reqz;
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception in creating object", false, null);
+        callback(null,jsonString);
+    }
+    logger.info('Request body json converts as object : ' + obj.values);
+
+    try
+    {
+        DbConn.Extension.find({where: [{id: obj.ExtensionId}]}).complete(function (err, ExtObject) {
+
+
+            if (err) {
+                console.log("An error occurred in searching Extension : " + obj.ExtensionId);
+                logger.info('Error occurred in Searching Extension : ' + obj.ExtensionId + ' Error : ' + err);
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
+                callback("Error", undefined);
+            }
+
+
+            else
+            {
+
+                if (!ExtObject ) {
+                    console.log("No record found for the Extension : " + obj.ExtensionId);
+                    logger.info('No record for Extension : ' + obj.ExtensionId);
+                    var jsonString = messageFormatter.FormatMessage(null, "EMPTY object returns", false, ExtObject);
+                    callback(undefined, undefined);
+
+
+                }
+                else {
+                    logger.info('Searching for Group : ' + obj.GroupID);
+                    try {
+                        DbConn.UserGroup.find({where: [{id: obj.GroupID}]}).complete(function (err, GrpObject) {
+
+
+
+                            // console.log(ExtObject);
+                            if (err) {
+                                logger.info('Error in Searching for Group : ' + obj.GroupID);
+                                console.log("An error occurred in searching Extension : " + obj.Extension + ' error : ' + err);
+                                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, GrpObject);
+                                callback("Error", undefined);
+                            }
+
+
+                            else
+                            {
+                                if (!GrpObject) {
+                                    logger.info('Group not found: ' + obj.GroupID);
+                                    //console.log("No record found for the Extension : " + obj.SipExtension);
+                                    var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, GrpObject);
+                                    callback(undefined, undefined);
+
+                                }
+                                else {
+                                    logger.info('Group found : ' + obj.GroupID);
+
+                                    try {
+                                        /*
+                                        GrpObject.addExtension(ExtObject).complete(function (errx, groupInstancex)
+                                        {
+                                            if(errx)
+                                            {
+                                                callback(errx,undefined);
+                                            }
+                                            else
+                                            {
+                                                callback(undefined,groupInstancex);
+                                            }
+                                        });
+                                        */
+
+                                        DbConn.UserGroup
+                                            .update(
+                                            {
+                                                ExtensionId: obj.ExtensionId
+
+
+                                            },
+                                            {
+                                                where: [{id: obj.GroupID}]
+                                            }
+                                        ).then(function (result) {
+                                                //logger.info('Successfully Updated. ');
+                                                //log.info("Extention and Group mapped  : "+result);
+                                                console.log(".......................updation is succeeded ....................");
+                                                //var jsonString = messageFormatter.FormatMessage(null, "Maxlimit successfully updated for : "+req.LimitId, true, result);
+                                                callback(undefined, result);
+
+                                            }).error(function (err) {
+                                                //logger.info('updation error found in saving. : ' + err);
+                                               //log.info("Error in mapping group and extention");
+                                                console.log("updation failed ! " + err);
+                                                //handle error here
+                                                var jsonString = messageFormatter.FormatMessage(err, "updation", false, null);
+                                                callback(err, undefined);
+
+                                            });
+
+                                    }
+                                    catch (ex) {
+                                        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                                        callback("Exception", undefined);
+                                    }
+
+
+                                }
+                            }
+                        });
+                    }
+                    catch (ex) {
+                        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                        callback("Exception", undefined);
+                    }
+                }
+            }
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+        callback("Exception", undefined);
+    }
+
+}
 
 function CreateExtension(jobj,callback)
 {
@@ -384,3 +516,4 @@ function CreateExtension(jobj,callback)
 module.exports.ChangeAvailability = ChangeAvailability;
 module.exports.AddExtension = AddExtension;
 module.exports.MapWithSipUacEndpoint = MapWithSipUacEndpoint;
+module.exports.MapwithGroup = MapwithGroup;

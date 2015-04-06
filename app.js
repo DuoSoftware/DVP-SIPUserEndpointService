@@ -190,6 +190,31 @@ RestServer.post('/dvp/:version/ext_mgmt/map_extension',function(req,res,next)
 
 
 });
+
+RestServer.post('/dvp/:version/ext_mgmt/map_extension_group',function(req,res,next)
+{
+    try {
+        Extmgt.MapwithGroup(req.body, function (err, resz) {
+            if(err)
+            {
+                res.end("err");
+            }
+            else
+            {
+                res.end(JSON.stringify(resz));
+            }
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
+
+
+});
+
 //Tested :- Done
 //.......................................................................................................................
 
@@ -243,7 +268,7 @@ RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/map_extensionid',funct
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/fill_usrgrp',function(req,res)
+RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/fill_usrgrp',function(req,res,next)
 {
     try {
         group.FillUsrGrp(req.body, function (err, resz) {

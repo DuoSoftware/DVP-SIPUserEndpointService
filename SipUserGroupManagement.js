@@ -200,6 +200,82 @@ function MapExtensionID(obj,callback)
 function FillUsrGrp(obj,callback)
 {
     try {
+        DbConn.Extension.find({where: [{id: obj.ExtensionId}]}).complete(function (err, ExtObject) {
+
+            if (err) {
+                callback(err, undefined);
+            }
+
+            else
+            {
+                if (ExtObject) {
+                    console.log(ExtObject);
+
+                    try {
+                        DbConn.UserGroup.find({where: [{id: obj.GroupId}]}).complete(function (errz, groupObject) {
+                            if (errz) {
+                                callback(errz, undefined);
+                            }
+
+                            else if (groupObject) {
+                                console.log(groupObject);
+
+                                try {
+                                    groupObject.addExtension(ExtObject).complete(function (errx, groupInstancex) {
+
+                                        if (errx) {
+                                            callback(errx, undefined)
+                                        }
+                                        else  {
+                                            callback(undefined, groupInstancex)
+                                        }
+
+
+                                        console.log('mapping group and sip done.................');
+
+
+
+                                    });
+                                }
+                                catch (ex) {
+                                    callback(ex, undefined);
+                                }
+
+                            }
+
+                            else {
+                                callback(undefined, undefined);
+                            }
+
+                        })
+
+                    }
+                    catch (ex) {
+                        callback(ex, undefined);
+                    }
+
+
+                }
+                else {
+
+                    callback(err, sipObject);
+
+                }
+            }
+
+        });
+
+
+
+    }
+    catch(ex)
+    {
+        callback(ex,undefined);
+    }
+
+
+/*
+    try {
         DbConn.SipUACEndpoint
             .findAll({
                 where: [{id: obj.CSDBSipUACEndpointId}]
@@ -287,6 +363,7 @@ callback(undefined,undefined);
     {
         callback(ex,undefined);
     }
+    */
 }
 //post :-done
 function UpdateSipUserGroup(obj,callback)
