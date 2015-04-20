@@ -109,7 +109,7 @@ function ChangeAvailability(reqz,callback) {
 function AddExtension(reqz,callback) {
     logger.info('Starting new Extension creation .');
     try {
-        var obj = reqz.body;
+        var obj = reqz;
         console.log("object size :" +Object.keys(obj).length);
 
     }
@@ -175,7 +175,7 @@ function MapWithSipUacEndpoint(reqz,callback) {
 
     logger.info('Starting mapping.(SipUAC Endpoint and Extension.)');
     try {
-        var obj = reqz.body;
+        var obj = reqz;
     }
     catch (ex) {
         var jsonString = messageFormatter.FormatMessage(ex, "Exception in creating object", false, null);
@@ -185,7 +185,7 @@ function MapWithSipUacEndpoint(reqz,callback) {
 
     try
     {
-        DbConn.Extension.find({where: [{id: obj.ExtensionId}]}).complete(function (err, ExtObject) {
+        DbConn.Extension.find({where: [{Extension: obj.Extension},{CompanyId:obj.CompanyId},{ObjType:'USER'}]}).complete(function (err, ExtObject) {
 
 
             if (err) {
@@ -210,7 +210,7 @@ function MapWithSipUacEndpoint(reqz,callback) {
                 else {
                     logger.info('Searching for SipUACEndpoint : ' + obj.UACid);
                     try {
-                        DbConn.SipUACEndpoint.find({where: [{id: obj.UACid}]}).complete(function (err, SipObject) {
+                        DbConn.SipUACEndpoint.find({where: [{id: obj.UACid},{CompanyId:obj.CompanyId}]}).complete(function (err, SipObject) {
 
 
 
@@ -256,7 +256,7 @@ function MapWithSipUacEndpoint(reqz,callback) {
                                                         DbConn.SipUACEndpoint
                                                             .update(
                                                             {
-                                                                ExtensionId: obj.ExtensionId,
+                                                                ExtensionId: ExtObject.id,
                                                                 SipExtension: obj.SipExtension
 
                                                             },
@@ -334,7 +334,7 @@ function MapwithGroup(reqz,callback)
 
     try
     {
-        DbConn.Extension.find({where: [{id: obj.ExtensionId}]}).complete(function (err, ExtObject) {
+        DbConn.Extension.find({where: [{id: obj.ExtensionId},{CompanyId:obj.CompanyId},{ObjType:'GROUP'}]}).complete(function (err, ExtObject) {
 
 
             if (err) {
@@ -359,7 +359,7 @@ function MapwithGroup(reqz,callback)
                 else {
                     logger.info('Searching for Group : ' + obj.GroupID);
                     try {
-                        DbConn.UserGroup.find({where: [{id: obj.GroupID}]}).complete(function (err, GrpObject) {
+                        DbConn.UserGroup.find({where: [{id: obj.GroupID},{CompanyId:obj.CompanyId}]}).complete(function (err, GrpObject) {
 
 
 
@@ -407,7 +407,7 @@ function MapwithGroup(reqz,callback)
 
                                             },
                                             {
-                                                where: [{id: obj.GroupID}]
+                                                where: [{id: obj.GroupID},{CompanyId:obj.CompanyId}]
                                             }
                                         ).then(function (result) {
                                                 //logger.info('Successfully Updated. ');

@@ -125,6 +125,7 @@ function MapExtensionID(obj,callback)
     try {
         DbConn.SipUACEndpoint.find({where: [{id: obj.ExtensionId}]}).complete(function (err, sipObject) {
 
+
             if (err) {
                 callback(err, undefined);
             }
@@ -456,7 +457,7 @@ function GetGroupEndpoints(obj,callback)
     try {
         DbConn.UsrGrp
             .findAll({
-                where: {CSDBUserGroupId: obj.CSDBUserGroupId}
+                where: {CSDBUserGroupId: obj}
             }
         )
             .complete(function (err, result) {
@@ -499,7 +500,7 @@ function EndpointGroupID(obj,callback)
     try {
         DbConn.UsrGrp
             .findAll({
-                where: {CSDBSipUACEndpointId: obj.CSDBSipUACEndpointId}
+                where: {CSDBSipUACEndpointId: obj}
             }
         )
             .complete(function (err, result) {
