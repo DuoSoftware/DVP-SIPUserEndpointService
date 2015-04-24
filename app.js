@@ -11,7 +11,9 @@ var UACUpdate=require('./UpdateSipUserData.js');
 //var Schedule=require('./ScheduleApi.js');
 var group=require('./SipUserGroupManagement.js');
 var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var config = require('config');
 
+var port = config.Host.port || 3000;
 
 
 var RestServer = restify.createServer({
@@ -517,6 +519,6 @@ sre.init(RestServer, {
 );
 
 
-RestServer.listen(8099, function () {
+RestServer.listen(port, function () {
     console.log('%s listening at %s', RestServer.name, RestServer.url);
 });
