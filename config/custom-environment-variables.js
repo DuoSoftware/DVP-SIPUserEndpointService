@@ -18,8 +18,9 @@ module.exports = {
 
     "Host":
     {
-        "domain": "HOST_DOMAIN",
-        "port": "HOST_PORT"
+        "domain": "HOST_IP",
+        "port": "HOST_PORT",
+        "version":"HOST_VERSION"
     }
 };
 

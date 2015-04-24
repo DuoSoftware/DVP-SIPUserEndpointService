@@ -3,12 +3,12 @@
  */
 //C:\DVP\DVP-SIPUsersEndpointService\DVP-Common\CSORMModels\CsDataModel.js
 
-var DbConn = require('./DVP-DBModels');
+var DbConn = require('DVP-DBModels');
 var DbSave=require('./SaveSipUserData.js');
 var restify = require('restify');
 var strfy = require('stringify');
 var winston=require('winston');
-var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 
 var logger = new (winston.Logger)({

@@ -2,13 +2,13 @@
  * Created by pawan on 2/2/2015.
  */
 
-var DbConn = require('./DVP-DBModels');
+var DbConn = require('DVP-DBModels');
 var DbSave=require('./SaveUAC.js');
 var DbUpdate=require('./UpdateSipUserData.js');
 var restify = require('restify');
 var strfy = require('stringify');
 var winston=require('winston');
-var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 var logger = new (winston.Logger)({
     transports: [

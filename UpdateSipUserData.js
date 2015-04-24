@@ -9,8 +9,8 @@
 /**
  * Created by Administrator on 1/27/2015.
  */
-var DbConn = require('./DVP-DBModels');
-var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var DbConn = require('DVP-DBModels');
+var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 //var SaveNewSipUser=function(UContext,UDescription,UCompanyId,UTenantId,UObjClass,UObjType,UObjCategory,UAddUser,UUpdateUser,UAddTime,UUpdateTime,callback)
 
