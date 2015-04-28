@@ -10,14 +10,14 @@ module.exports = {
   "Redis":
   {
     "ip": "192.168.3.200",
-    "port": "6379"
+    "port": 6379
 
   },
 
   "Host":
   {
     "domain": "0.0.0.0",
-    "port": "8085",
+    "port": 8085,
     "version":"6.0"
   }
 };
