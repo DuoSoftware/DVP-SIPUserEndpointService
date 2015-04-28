@@ -13,7 +13,6 @@
     "stringify": "^3.1.0",
     "DVP-Common": "DuoSoftware/DVP-Common",
     "DVP-DBModels": "DuoSoftware/DVP-DBModels",
-    "DVP-DBModels": "^0.0.0",
     "swagger-restify-express": "^0.2.1",
     "winston": "^1.0.0"
   },
