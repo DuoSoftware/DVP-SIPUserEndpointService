@@ -5,15 +5,15 @@
   "main": "app.js",
   "dependencies": {
     "restify": "^3.0.2",
-    "pg-hstore": "^2.3.2",
-    "DVP-DBModels": "^0.0.0",
-    "stringify": "^3.1.0",
-    "swagger-restify-express": "^0.2.1",
     "config": "^1.13.0",
     "pg": "^4.3.0",
-    "DVP-Common": "^0.0.0",
+    "pg-hstore": "^2.3.2",
+    "stringify": "^3.1.0",
+    "swagger-restify-express": "^0.2.1",
     "winston": "^1.0.0",
-    "sequelize": "^2.1.0"
+    "sequelize": "^2.1.0",
+    "DVP-Common": "DuoSoftware/DVP-Common",
+    "DVP-DBModels": "DuoSoftware/DVP-DBModels"
   },
   "devDependencies": {},
   "scripts": {
