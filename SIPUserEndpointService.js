@@ -9,6 +9,7 @@ var restify = require('restify');
 var strfy = require('stringify');
 var winston=require('winston');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 
 var logger = new (winston.Logger)({

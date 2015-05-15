@@ -7,6 +7,7 @@ var restify = require('restify');
 var stringify=require('stringify');
 var Sequelize=require('sequelize');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 /*
  var RestServer = restify.createServer({

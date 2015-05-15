@@ -11,6 +11,7 @@
  */
 var DbConn = require('DVP-DBModels');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 //var SaveNewSipUser=function(UContext,UDescription,UCompanyId,UTenantId,UObjClass,UObjType,UObjCategory,UAddUser,UUpdateUser,UAddTime,UUpdateTime,callback)
 

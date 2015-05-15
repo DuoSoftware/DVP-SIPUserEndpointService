@@ -12,6 +12,7 @@ var UACUpdate=require('./UpdateSipUserData.js');
 var group=require('./SipUserGroupManagement.js');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var config = require('config');
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 var port = config.Host.port || 3000;
 var version=config.Host.version;

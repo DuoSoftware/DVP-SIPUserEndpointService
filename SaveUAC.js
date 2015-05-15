@@ -6,6 +6,7 @@
  * Created by Administrator on 1/27/2015.
  */
 var DbConn = require('DVP-DBModels');
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 //var SaveNewSipUser=function(UContext,UDescription,UCompanyId,UTenantId,UObjClass,UObjType,UObjCategory,UAddUser,UUpdateUser,UAddTime,UUpdateTime,callback)
 
