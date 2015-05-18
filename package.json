@@ -4,16 +4,17 @@
   "description": "DVP-SIPUserEndpointService\r ==========================",
   "main": "app.js",
   "dependencies": {
-    "restify": "^3.0.2",
     "config": "^1.13.0",
+    "DVP-Common": "DuoSoftware/DVP-Common",
+    "DVP-DBModels": "DuoSoftware/DVP-DBModels",
     "pg": "^4.3.0",
     "pg-hstore": "^2.3.2",
+    "restify": "^3.0.2",
+    "sequelize": "^2.1.0",
     "stringify": "^3.1.0",
     "swagger-restify-express": "^0.2.1",
     "winston": "^1.0.0",
-    "sequelize": "^2.1.0",
-    "DVP-Common": "DuoSoftware/DVP-Common",
-    "DVP-DBModels": "DuoSoftware/DVP-DBModels"
+    "node-uuid": "^1.4.3"
   },
   "devDependencies": {},
   "scripts": {

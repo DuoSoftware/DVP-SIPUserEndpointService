@@ -42,18 +42,20 @@ var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 
 //post :-done
-function AddSipUserGroup(obj,callback)
+function AddSipUserGroup(obj,reqId,callback)
 {
     try {
         DbConn.UserGroup.find({where: [{GroupName: obj.GroupName}]}).complete(function (err, GrpObject) {
 
             if (err) {
+                logger.debug('[DVP-LimitHandler.SipUserGroupManagement.NewSipUserGroup] - [%s] - [PGSQL]  - Error in searching Group %s',reqId,obj.GroupName);
                 callback(err, undefined);
             }
             else
             {
                 if (GrpObject) {
-                    console.log("Already in DB");
+                   // console.log("Already in DB");
+                    logger.debug('[DVP-LimitHandler.SipUserGroupManagement.NewSipUserGroup] - [%s] - [PGSQL]  - Already in DB Group %s',reqId,obj.GroupName);
                     callback(undefined, GrpObject);
                 }
                 else  {
@@ -74,7 +76,7 @@ function AddSipUserGroup(obj,callback)
 
 
                             }
-                        )
+                        );
 
                         UserGroupobj.save().complete(function (err, result) {
                             if (!err) {
@@ -84,13 +86,14 @@ function AddSipUserGroup(obj,callback)
                                 // res.write(status.toString());
                                 // res.end();
                                 //});
-
+                                logger.debug('[DVP-LimitHandler.SipUserGroupManagement.NewSipUserGroup] - [%s] - [PGSQL]  - New user group insertion succeeded - Group %s',reqId,JSON.stringify(obj));
                                 console.log("..................... Saved Successfully ....................................");
                                 callback(undefined, result);
 
 
                             }
                             else {
+                                logger.error('[DVP-LimitHandler.SipUserGroupManagement.NewSipUserGroup] - [%s] - [PGSQL]  - New user group insertion failed - Group %s',reqId,JSON.stringify(obj),err);
                                 console.log("..................... Error found in saving.................................... : " + err);
                                 callback("Error", undefined);
 
@@ -100,7 +103,8 @@ function AddSipUserGroup(obj,callback)
                         });
                     }
                     catch (ex) {
-                        var jsonString = messageFormatter.FormatMessage(ex, "Exception occures", false, null);
+                        logger.error('[DVP-LimitHandler.SipUserGroupManagement.NewSipUserGroup] - [%s] - [PGSQL]  - Exception in New user group insertion  - Group %s',reqId,JSON.stringify(obj),ex);
+                        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, null);
                         callback("Exception : "+ex, undefined);
                     }
                 }
@@ -113,6 +117,7 @@ function AddSipUserGroup(obj,callback)
     }
     catch(ex)
     {
+        logger.error('[DVP-LimitHandler.SipUserGroupManagement.NewSipUserGroup] - [%s] - [PGSQL]  - Exception in user group Searching   - Group %s',reqId,JSON.stringify(obj),ex);
         callback("Exception",undefined);
     }
 
@@ -199,53 +204,60 @@ function MapExtensionID(obj,callback)
     }
 }
 //post :-post
-function FillUsrGrp(obj,callback)
+function FillUsrGrp(obj,reqId,callback)
 {
     try {
         DbConn.Extension.find({where: [{id: obj.ExtensionId}]}).complete(function (err, ExtObject) {
 
             if (err) {
+                logger.error('[DVP-LimitHandler.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - Error in searching Extension -  Data - %s',reqId,obj.ExtensionId,err);
                 callback(err, undefined);
             }
 
             else
             {
                 if (ExtObject) {
+                    logger.debug('[DVP-LimitHandler.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - Extension found -  Data - %s',reqId,JSON.stringify(ExtObject));
                     console.log(ExtObject);
 
                     try {
                         DbConn.UserGroup.find({where: [{id: obj.GroupId}]}).complete(function (errz, groupObject) {
                             if (errz) {
+                                logger.error('[DVP-LimitHandler.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - Error in searching UserGroup %s ',reqId,obj.GroupId,errz);
                                 callback(errz, undefined);
                             }
 
                             else if (groupObject) {
-                                console.log(groupObject);
+                                logger.debug('[DVP-LimitHandler.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - UserGroup %s found.Mapping is strating ',reqId,obj.GroupId);
 
                                 try {
                                     groupObject.addExtension(ExtObject).complete(function (errx, groupInstancex) {
 
                                         if (errx) {
+                                            logger.error('[DVP-LimitHandler.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - Error in Mapping Extension %s with Group %s -  Data - %s',reqId,ExtObject.id,groupObject.id,errx);
                                             callback(errx, undefined)
                                         }
                                         else  {
+                                            logger.error('[DVP-LimitHandler.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - Mapping Extension %s with Group %s is succeeded -  Data - %s',reqId,ExtObject.id,groupObject.id);
                                             callback(undefined, groupInstancex)
                                         }
 
 
-                                        console.log('mapping group and sip done.................');
+                                        //console.log('mapping group and sip done.................');
 
 
 
                                     });
                                 }
                                 catch (ex) {
+                                    logger.error('[DVP-LimitHandler.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - Exception in Mapping Extension %s with Group %s -  Data - %s',reqId,ExtObject.id,groupObject.id);
                                     callback(ex, undefined);
                                 }
 
                             }
 
                             else {
+                                logger.error('[DVP-LimitHandler.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - No record found for group %s  ',reqId,obj.GroupId);
                                 callback(undefined, undefined);
                             }
 
@@ -253,13 +265,14 @@ function FillUsrGrp(obj,callback)
 
                     }
                     catch (ex) {
+                        logger.error('[DVP-LimitHandler.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - Exception in searching group %s  ',reqId,obj.GroupId,ex);
                         callback(ex, undefined);
                     }
 
 
                 }
                 else {
-
+                    logger.error('[DVP-LimitHandler.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - No record found for Extension %s  ',reqId,obj.ExtensionId);
                     callback(err, sipObject);
 
                 }
@@ -272,6 +285,7 @@ function FillUsrGrp(obj,callback)
     }
     catch(ex)
     {
+        logger.error('[DVP-LimitHandler.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - Exception in starting method : FillUsrGrp  - Data %s',reqId,JSON.stringify(obj));
         callback(ex,undefined);
     }
 
@@ -368,7 +382,7 @@ callback(undefined,undefined);
     */
 }
 //post :-done
-function UpdateSipUserGroup(obj,callback)
+function UpdateSipUserGroup(obj,reqId,callback)
 {
     try {
         DbConn.UserGroup
@@ -389,12 +403,14 @@ function UpdateSipUserGroup(obj,callback)
                 where: [{id: obj.AID}]
             }
         ).then(function (result) {
-                logger.info('Successfully Mapped. ');
+                //logger.info('Successfully Mapped. ');
+                logger.debug('[DVP-LimitHandler.SipUserGroupManagement.UpdateSipUserGroup] - [%s] - [PGSQL]  - Updation succeeded -  Data - %s',reqId,JSON.stringify(obj));
 
                // var jsonString = messageFormatter.FormatMessage(null, "mapping is succeeded", true, null);
                 callback(undefined,result);
             }).error(function (err) {
                 ////logger.info('mapping error found in saving. : ' + err);
+                logger.error('[DVP-LimitHandler.SipUserGroupManagement.UpdateSipUserGroup] - [%s] - [PGSQL]  - Updation failed -  Data - %s',reqId,JSON.stringify(obj),err);
                 var jsonString = messageFormatter.FormatMessage(err, "Updation failed", false, null);
                 callback(err,undefined);
 
@@ -403,13 +419,14 @@ function UpdateSipUserGroup(obj,callback)
     }
     catch(ex)
     {
+        logger.error('[DVP-LimitHandler.SipUserGroupManagement.UpdateSipUserGroup] - [%s] - [PGSQL]  - Exception in starting method : UpdateSipUserGroup  -  Data - %s',reqId,JSON.stringify(obj),ex);
         callback(ex,undefined);
     }
 }
 
 //get :-done
 
-function GetGroupData(obj,callback)
+function GetGroupData(obj,reqId,callback)
 {
     try {
         DbConn.UserGroup
@@ -421,6 +438,7 @@ function GetGroupData(obj,callback)
                 if (err) {
                     console.log('An error occurred while searching for Extension:', err);
                     //logger.info( 'Error found in searching : '+err );
+                    logger.error('[DVP-LimitHandler.SipUserGroupManagement.GroupData] - [%s] - [PGSQL]  - Error in searching Group %s ',reqId,obj,err);
                     var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for Group:", false, null);
                     callback(err, undefined);
 
@@ -429,12 +447,13 @@ function GetGroupData(obj,callback)
                     if (!result) {
                     console.log('No user with the Extension has been found.');
                     ///logger.info( 'No user found for the requirement. ' );
+                        logger.debug('[DVP-LimitHandler.SipUserGroupManagement.GroupData] - [%s] - [PGSQL]  - No record found for Group %s ',reqId,obj,err);
                     var jsonString = messageFormatter.FormatMessage(null, "Null object returns", false, null);
                     callback(undefined, undefined);
 
                 } else {
 
-
+                        logger.debug('[DVP-LimitHandler.SipUserGroupManagement.GroupData] - [%s] - [PGSQL]  - Record found for Group %s ',reqId,obj);
                     var jsonString = messageFormatter.FormatMessage(result, "Succeeded...", true, result);
                     callback(undefined, result);
                     //console.log(result.Action)
@@ -447,13 +466,14 @@ function GetGroupData(obj,callback)
     }
     catch(ex)
     {
+        logger.debug('[DVP-LimitHandler.SipUserGroupManagement.GroupData] - [%s] - [PGSQL]  - Exception in method starting : GetGroupData ',reqId,obj,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception in get data group", false, null);
         callback(ex,undefined);
     }
 }
 
 //get:-done
-function GetGroupEndpoints(obj,callback)
+function GetGroupEndpoints(obj,reqId,callback)
 {
     try {
         DbConn.UsrGrp
@@ -463,7 +483,8 @@ function GetGroupEndpoints(obj,callback)
         )
             .complete(function (err, result) {
                 if (err) {
-                    console.log('An error occurred while searching for Extension:', err);
+                    //console.log('An error occurred while searching for Extension:', err);
+                    logger.error('[DVP-LimitHandler.SipUserGroupManagement.GroupEndPoints] - [%s] - [PGSQL]  - Error in searching GroupEndpoints of CSDBUserGroupId %s ',reqId,obj,err);
                     //logger.info( 'Error found in searching : '+err );
                     var jsonString = messageFormatter.FormatMessage(err, "Error in get group end point", false, null);
                     callback(err, undefined);
@@ -471,13 +492,14 @@ function GetGroupEndpoints(obj,callback)
                 } else
                 {
                     if (!result) {
-                    console.log('No user with the Extension has been found.');
+                        logger.error('[DVP-LimitHandler.SipUserGroupManagement.GroupEndPoints] - [%s] - [PGSQL]  - No record found for GroupEndpoints of CSDBUserGroupId %s ',reqId,obj);
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "No user found", false, null);
                     callback(undefined, undefined);
 
                 } else {
 
+                        logger.debug('[DVP-LimitHandler.SipUserGroupManagement.GroupEndPoints] - [%s] - [PGSQL]  - Record found for GroupEndpoints of CSDBUserGroupId %s _ result %s',reqId,obj,JSON.stringify(result));
                     var jsonString = messageFormatter.FormatMessage(null, "Suceeded", true, result);
                     callback(undefined, result);
 
@@ -491,12 +513,13 @@ function GetGroupEndpoints(obj,callback)
     catch(ex)
     {
         //var jsonString = messageFormatter.FormatMessage(ex, "Exception found", false, null);
+        logger.error('[DVP-LimitHandler.SipUserGroupManagement.GroupEndPoints] - [%s] - Error in starting method :  GetGroupEndpoints',reqId,obj,ex);
         callback(ex, undefined);
     }
 }
 
 //get :-done
-function EndpointGroupID(obj,callback)
+function EndpointGroupID(obj,reqId,callback)
 {
     try {
         DbConn.UsrGrp
@@ -507,18 +530,20 @@ function EndpointGroupID(obj,callback)
             .complete(function (err, result) {
                 if (err) {
                     console.log('An error occurred while searching for Extension:', err);
+                    logger.error('[DVP-LimitHandler.SipUserGroupManagement.EndpointGroupID] - [%s] - [PGSQL]  - Error in searching UsrGrp records of SipUACEndpoint %s ',reqId,obj,err);
                     //logger.info( 'Error found in searching : '+err );
                     var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for UserGroup", false, null);
                     callback(err, undefined);
 
                 } else {
                     if (!result) {
-                        console.log('No user with the Extension has been found.');
+                        logger.error('[DVP-LimitHandler.SipUserGroupManagement.EndpointGroupID] - [%s] - [PGSQL]  - No records for SipUACEndpoint %s ',reqId,obj);
                         ///logger.info( 'No user found for the requirement. ' );
                         var jsonString = messageFormatter.FormatMessage(err, "No user with the Extension has been found.", false, null);
                         callback(undefined, undefined);
 
                     } else {
+                        logger.debug('[DVP-LimitHandler.SipUserGroupManagement.EndpointGroupID] - [%s] - [PGSQL]  - Records for SipUACEndpoint %s ',reqId,obj);
                         var jsonString = messageFormatter.FormatMessage(null, "Success ", true, result);
                         callback(undefined, result);
 
@@ -532,6 +557,7 @@ function EndpointGroupID(obj,callback)
     }
     catch(ex)
     {
+        logger.error('[DVP-LimitHandler.SipUserGroupManagement.EndpointGroupID] - [%s] - [PGSQL]  - Error in Method starting : EndpointGroupID  %S ',reqId,obj,ex);
         callback(ex,undefined);
     }
 
@@ -539,7 +565,7 @@ function EndpointGroupID(obj,callback)
 
 //get :-done
 
-function AllRecWithCompany(req,callback)
+function AllRecWithCompany(req,reqId,callback)
 {
     try{
     DbConn.UserGroup
@@ -550,13 +576,14 @@ function AllRecWithCompany(req,callback)
             if (err) {
                 console.log('', err);
                 //logger.info( 'Error found in searching : '+err );
+                logger.error('[DVP-LimitHandler.SipUserGroupManagement.AllRecWithCompany] - [%s] - [PGSQL]  - Error in searching Group records of company %s ',reqId,req,err);
                 var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for user Group", false, null);
                 callback(err, undefined);
 
             } else
             {
                 if (!result) {
-                console.log('No user with the Extension has been found.');
+                    logger.error('[DVP-LimitHandler.SipUserGroupManagement.AllRecWithCompany] - [%s] - [PGSQL]  - No Group records found for company %s ',reqId,req);
                 ///logger.info( 'No user found for the requirement. ' );
                 var jsonString = messageFormatter.FormatMessage(err, "No user with the user group has been found.", false, null);
                     callback(undefined, undefined);
@@ -564,6 +591,7 @@ function AllRecWithCompany(req,callback)
             } else {
 
                 //var jsonString = messageFormatter.FormatMessage(null, "No user with the user group has been found.", true, result);
+                    logger.debug('[DVP-LimitHandler.SipUserGroupManagement.AllRecWithCompany] - [%s] - [PGSQL]  - Records found for company %s ',reqId,req);
                     callback(undefined, result);
                 //console.log(result.Action)
 
@@ -575,6 +603,7 @@ function AllRecWithCompany(req,callback)
 }
     catch(ex)
     {
+        logger.error('[DVP-LimitHandler.SipUserGroupManagement.AllRecWithCompany] - [%s] - [PGSQL]  - Exception on method starts : AllRecWithCompany - Data %s',reqId,req,ex);
         callback(ex, undefined);
     }
 }
@@ -587,7 +616,8 @@ function GetAllUsersInGroup(req,callback)
         DbConn.UserGroup.findAll({where: {id: req}, include: [{model: DbConn.SipUACEndpoint}]})
             .complete(function (err, result) {
                 if (err) {
-                    console.log('An error occurred while searching for Extension:', err);
+                   // console.log('An error occurred while searching for Extension:', err);
+                    logger.error('[DVP-LimitHandler.SipUserGroupManagement.AllUsersInGroup] - [%s] - [PGSQL]  - Error in searching Users of Group %s ',reqId,req,err);
                     //logger.info( 'Error found in searching : '+err );
                     var jsonString = messageFormatter.FormatMessage(err, "error in searching", false, null);
                     callback(err, undefined);
@@ -595,13 +625,14 @@ function GetAllUsersInGroup(req,callback)
                 } else
                 {
                     if (!result) {
-                    console.log('');
+                        logger.error('[DVP-LimitHandler.SipUserGroupManagement.AllUsersInGroup] - [%s] - [PGSQL]  - No User record found for Group %s ',reqId,req);
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "No user with the group has been found.", false, null);
                         callback(undefined, undefined);
 
                 } else {
 
+                        logger.debug('[DVP-LimitHandler.SipUserGroupManagement.AllUsersInGroup] - [%s] - [PGSQL]  - Record found for Group %s ',reqId,req);
                     var jsonString = messageFormatter.FormatMessage(null, "success.", true, result);
                         callback(undefined, result);
 
@@ -614,6 +645,7 @@ function GetAllUsersInGroup(req,callback)
     }
     catch(ex)
     {
+        logger.error('[DVP-LimitHandler.SipUserGroupManagement.AllUsersInGroup] - [%s] - [PGSQL]  - Exception occurred on start : GetAllUsersInGroup %s ',reqId,req,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "exception has been found.", false, null);
         callback(ex, undefined);
 

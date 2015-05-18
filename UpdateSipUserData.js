@@ -18,14 +18,15 @@ var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 // Save function , 2 params, object from caller and this functions callback
 
 // post :- done
-function UpdateUacUserData(jobj,callback) {
+function UpdateUacUserData(jobj,reqId,callback) {
     // Add all  details of new user
 try{
     DbConn.SipUACEndpoint
         .find({where: [{SipUsername: jobj.SipUsername}, {CompanyId: jobj.CompanyId}, {TenantId: jobj.TenantId}]})
         .complete(function (err, result) {
             if (err) {
-                console.log('................An error occurred while searching for SIp UAC Record..................', err);
+                //console.log('................An error occurred while searching for SIp UAC Record..................', err);
+                logger.error('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,jobj.SipUsername,err);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                 callback(err, undefined);
 
@@ -35,6 +36,7 @@ try{
 
 
                 console.log('No user has been found.');
+                    logger.error('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,jobj.SipUsername);
                 var jsonString = messageFormatter.FormatMessage(err, "No record found", false, null);
                     callback(undefined, undefined);
 
@@ -59,13 +61,15 @@ try{
                         }
                     ).then(function (resultz) {
 
-                            console.log(".......................Record updated successfully!....................");
+                            //console.log(".......................Record updated successfully!....................");
+                            logger.debug('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Updating records of SipUser %s is succeeded ',reqId,jobj.SipUsername);
                             var jsonString = messageFormatter.FormatMessage(err, "Record updated successfully", true, result);
                             callback(undefined, resultz);
 
                         }).error(function (errz) {
 
-                            console.log("Project update failed ! " + err);
+                            console.log("Project update failed ! " + errz);
+                            logger.error('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Updating records of SipUser %s is failed - Data %s ',reqId,jobj.SipUsername,JSON.stringify(jobj),errz);
                             var jsonString = messageFormatter.FormatMessage(err, "SipUAC rec update failed", false, result);
                             callback(errz, undefined);
                             //handle error here
@@ -74,6 +78,7 @@ try{
 
                 }
                 catch (ex) {
+                    logger.error('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Exception in updating SipUser %s ',reqId,jobj.SipUsername,ex);
                     var jsonString = messageFormatter.FormatMessage(ex, "Exception in updation", false, null);
                     callback(ex, undefined);
                 }
@@ -85,6 +90,7 @@ try{
 }
     catch(ex)
     {
+        logger.error('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Exception in Method starts : UpdateUacUserData ',reqId,jobj.SipUsername,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception in function starts", false, null);
         callback(ex, undefined);
     }

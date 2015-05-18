@@ -34,13 +34,14 @@ var logger = new (winston.Logger)({
 
 //post :- done
 
-function AddOrUpdateContext(reqz,callback) {
-    logger.info('Context Management is Starting.');
+function AddOrUpdateContext(reqz,reqId,callback) {
+   // logger.info('Context Management is Starting.');
 
 
     try {
         var obj = reqz.body;
-        logger.info('Request : ' + obj);
+        //logger.info('Request : ' + obj);
+
 
         //Add other vars to object
 
@@ -50,11 +51,12 @@ function AddOrUpdateContext(reqz,callback) {
         obj.UpdateUser = "NUpdateUser";
         obj.AddTime = new Date(2013, 01, 13);
         obj.UpdateTime = new Date(2013, 01, 28);
-        logger.info('After Object updation : ' + obj);
+        //logger.info('After Object updation : ' + obj);
     }
     catch (ex) {
-        console.log("Error in adding new items to object created using request body");
-        logger.info('Exception found in object creation : ' + ex);
+        //console.log("Error in adding new items to object created using request body");
+        //logger.info('Exception found in object creation : ' + ex);
+
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
 
         callback("Exception",undefined)
@@ -63,7 +65,7 @@ function AddOrUpdateContext(reqz,callback) {
     }
 
 
-    logger.info('Searching for record , Context :' + obj.Context);
+    //logger.info('Searching for record , Context :' + obj.Context);
 
     if(obj.Context) {
         try {
@@ -73,7 +75,8 @@ function AddOrUpdateContext(reqz,callback) {
                     if (err) {
                         console.log('An error occurred while searching for Context:', err);
 
-                        logger.info('Error found in Searching , Context :' + obj.Context + ' Error : ' + err);
+                       // logger.info('Error found in Searching , Context :' + obj.Context + ' Error : ' + err);
+                        logger.error('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s] - [PGSQL] - Error occurred while searching Context %s ',reqId,obj.Context,err);
                         var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                         callback("Error", undefined);
 
@@ -83,11 +86,11 @@ function AddOrUpdateContext(reqz,callback) {
                     {
                         if (!result) {
                             console.log('No user with the Context ' + obj.Context + ' has been found.');
-                            logger.info('No record Found , Context :' + obj.Context);
+                            logger.debug('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s] - [PGSQL] - No record found for Context %s ',reqId,obj.Context);
 
                             try {
 
-                                logger.info('Entering new record for Context :' + obj.Context);
+                                logger.debug('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s] - [PGSQL] - Creating new record of Context %s ',reqId,obj.Context);
                                 DbConn.Context
                                     .create(
                                     {
@@ -112,7 +115,8 @@ function AddOrUpdateContext(reqz,callback) {
                                         /* ... */
                                         if (!err ) {
                                             console.log("New User Found and Inserted (Context : " + obj.Context + ")");
-                                            logger.info('Record inserted');
+                                            //logger.info('Record inserted');
+                                            logger.debug('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s] - [PGSQL] - Context %s inserted successfully - Data %s',reqId,obj.Context,JSON.stringify(obj));
                                             var jsonString = messageFormatter.FormatMessage(err, null, true, user);
                                             callback(undefined, user);
 
@@ -120,7 +124,7 @@ function AddOrUpdateContext(reqz,callback) {
                                         }
                                         else {
                                             console.log("Error in saving  (Context :" + obj.Context + ")" + err);
-                                            logger.info('Error in saving , Context :' + obj.Context);
+                                            logger.error('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s] - [PGSQL] - Context %s insertion  failed - Data %s',reqId,obj.Context,JSON.stringify(obj),err);
                                             var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, user);
                                             callback("Error", undefined);
                                             //   callback(err, false);
@@ -132,7 +136,7 @@ function AddOrUpdateContext(reqz,callback) {
                             }
                             catch (ex) {
                                 console.log("An error occurred in data saving process ");
-                                logger.info('Exception Found in saving , Exception :' + ex);
+                                logger.error('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s]  - Exception in detail creation of Context %s',reqId,obj.Context,ex);
                                 var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, user);
                                 callback("Exception", undefined);
 
@@ -141,9 +145,10 @@ function AddOrUpdateContext(reqz,callback) {
                         } else {
                             console.log('Context Found ' + result.Context + '!');
                             console.log('All attributes of Context:', result.values);
-                            logger.info('Record is already in db  :' + obj.Context);
+                            logger.debug('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s]  - Context found',reqId,JSON.stringify(result));
 
                             try {
+                                logger.debug('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s]  - Updating picked Context data %s to %s',reqId,JSON.stringify(result),JSON.stringify(obj));
                                 DbConn.Context
                                     .update(
                                     {
@@ -169,14 +174,14 @@ function AddOrUpdateContext(reqz,callback) {
                                 ).then(function (results) {
 
                                         console.log("Updated successfully!");
-                                        logger.info('Record Updated Successfully');
+                                        logger.debug('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s] - [PGSQL] - Context %s Updated successfully',reqId,obj.Context);
                                         var jsonString = messageFormatter.FormatMessage(null, "Successfully Updated", true, results);
                                         callback(undefined, results);
 
                                     }).error(function (err) {
 
                                         console.log("Project update failed !");
-                                        logger.info('Record Updation failed : ' + err);
+                                        logger.error('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s] - [PGSQL] - Context %s Updation failed',reqId,obj.Context,err);
                                         var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
                                         callback("Error", undefined);
                                         //handle error here
@@ -184,6 +189,7 @@ function AddOrUpdateContext(reqz,callback) {
                                     });
                             }
                             catch (ex) {
+                                logger.error('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s] - [PGSQL] - Exception in updating context %s',reqId,obj.Context,ex);
                                 var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
                                 callback("Exception", undefined);
                             }
@@ -195,19 +201,21 @@ function AddOrUpdateContext(reqz,callback) {
 
         }
         catch (ex) {
+            logger.error('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s] - [PGSQL] - Exception in Searching context %s',reqId,obj.Context,ex);
             var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
             callback("Exception",undefined);
         }
     }
     else
     {
+        logger.error('[DVP-LimitHandler.ContextManagement.NewContextData] - [%s] - [PGSQL] - Recieved Context id is invalid',reqId);
         var jsonString = messageFormatter.FormatMessage(null, "Null value passed for Context", false, obj);
         callback(undefined,obj.Context);
     }
 }
 
 //get :- done
-function GetContextDetails(reqz,callback)
+function GetContextDetails(reqz,reqId,callback)
 {
     try {
 
@@ -217,7 +225,8 @@ function GetContextDetails(reqz,callback)
             .complete(function (err, result) {
 
                 if (err) {
-                    console.log('An error occurred while searching for Context:', err);
+                    //console.log('An error occurred while searching for Context:', err);
+                    logger.error('[DVP-LimitHandler.UACManagement.FindContextByCompany] - [%s] - [PGSQL]  - Error in searching Context %s ',reqId,reqz,err);
                     var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for Context for Company :" + reqz, false, result);
                     callback(null, jsonString);
 
@@ -226,6 +235,7 @@ function GetContextDetails(reqz,callback)
 
                     if (!result) {
 
+                        logger.error('[DVP-LimitHandler.UACManagement.FindContextByCompany] - [%s] - [PGSQL]  - No record found for Context %s ',reqId,reqz);
                         var jsonString = messageFormatter.FormatMessage(err, "No context for company :" + reqz, true, result);
                         callback(undefined, undefined);
                     }
@@ -236,12 +246,15 @@ function GetContextDetails(reqz,callback)
 
                             var Jresults = JSON.stringify(result);
 
+                            logger.debug('[DVP-LimitHandler.UACManagement.FindContextByCompany] - [%s] - [PGSQL]  - Record found for Context %s Data %s',reqId,reqz,Jresults);
                             // var jsonString = messageFormatter.FormatMessage(err, "Successfully json returned", true, result);
                             callback(undefined, Jresults);
 
                         }
                         catch (ex) {
-                            console.log("Error in creating json object to return : " + ex);
+                            //console.log("Error in creating json object to return : " + ex);
+                           // logger.error('[DVP-LimitHandler.UACManagement.FindContextByCompany] - [%s] - [PGSQL]  - Exception in Record found for Context %s Data %s',reqId,reqz,Jresults);
+                           // logger.debug('[DVP-LimitHandler.UACManagement.FindContextByCompany] - [%s] - [PGSQL]  - Record found for Context %s Data %s',reqId,reqz,Jresults);
                             var jsonString = messageFormatter.FormatMessage(ex, "Exception found in json creating .", false, result);
                             callback("Exception", undefined);
                         }
@@ -255,7 +268,7 @@ function GetContextDetails(reqz,callback)
     }
     catch (ex)
     {
-        console.log("Error in searching data : "+ex);
+        logger.debug('[DVP-LimitHandler.UACManagement.FindContextByCompany] - [%s] - Exception in starting method : GetContextDetails  Context %s ',reqId,reqz);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception in calling function", false, null);
         callback("Exception",undefined);
 
