@@ -37,7 +37,7 @@ RestServer.listen(port, function () {
 //.......................................................................................................................
 
 //RestServer.post('/dvp/'+version+'/context_mgmt/save_contextdata',function(req,res,next)
-RestServer.post('/DVP/'+version+'/ContextManagement/NewContextData',function(req,res,next)
+RestServer.post('/DVP/'+version+'/ContextManagement/Context',function(req,res,next)
 {
     var reqId='';
 
@@ -83,7 +83,9 @@ RestServer.post('/DVP/'+version+'/ContextManagement/NewContextData',function(req
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/'+version+'/uac_mgmt/save_uac',function(req,res,next)
+//RestServer.post('/dvp/'+version+'/uac_mgmt/save_uac',function(req,res,next)
+//check body cmp tent
+RestServer.post('/DVP/'+version+'/UACManagement/UAC',function(req,res,next)
 {
     var reqId='';
 
@@ -126,7 +128,9 @@ RestServer.post('/dvp/'+version+'/uac_mgmt/save_uac',function(req,res,next)
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/'+version+'/uac_mgmt/updt_uac',function(req,res,next)
+//RestServer.post('/dvp/'+version+'/uac_mgmt/updt_uac',function(req,res,next)
+//check body cmp tent
+RestServer.post('/DVP/'+version+'/UACManagement/UAC/:Username',function(req,res,next)
 {
     var reqId='';
 
@@ -143,9 +147,9 @@ RestServer.post('/dvp/'+version+'/uac_mgmt/updt_uac',function(req,res,next)
 
     try {
 
-        logger.debug('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId,JSON.stringify(req.body));
+        logger.debug('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [HTTP]  - Request received -  Data - Username %s Body %s ',reqId,req.params.Username,JSON.stringify(req.body));
 
-        UACUpdate.UpdateUacUserData(req.body,reqId,function (err, resz) {
+        UACUpdate.UpdateUacUserData(req.params.Username,req.body,reqId,function (err, resz) {
             if(err)
             {
                 res.end(err.toString());
@@ -159,7 +163,7 @@ RestServer.post('/dvp/'+version+'/uac_mgmt/updt_uac',function(req,res,next)
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [HTTP]  - Exception in Request -  Data - %s ',reqId,JSON.stringify(req.body),ex);
+        logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [HTTP]  - Exception in Request -  Data - Username %s Body %s ',reqId,req.params.Username,JSON.stringify(req.body),ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
         res.end(jsonString);
     }
@@ -170,7 +174,8 @@ RestServer.post('/dvp/'+version+'/uac_mgmt/updt_uac',function(req,res,next)
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/'+version+'/ext_mgmt/update_extension_st/:ref/:st',function(req,res,next)
+//RestServer.post('/dvp/'+version+'/ext_mgmt/update_extension_st/:ref/:st',function(req,res,next)
+RestServer.post('/DVP/'+version+'/ExtensionManagement/ExtensionStatus/:ref/:st',function(req,res,next)
 {
     var reqId='';
 
@@ -213,7 +218,8 @@ RestServer.post('/dvp/'+version+'/ext_mgmt/update_extension_st/:ref/:st',functio
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/'+version+'/ext_mgmt/add_extension',function(req,res,next)
+//RestServer.post('/dvp/'+version+'/ext_mgmt/add_extension',function(req,res,next)
+RestServer.post('/DVP/'+version+'/ExtensionManagement/Extension',function(req,res,next)
 {
     var reqId='';
 
@@ -264,7 +270,10 @@ RestServer.post('/dvp/'+version+'/ext_mgmt/add_extension',function(req,res,next)
 
 
 //RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension',function(req,res,next)
-RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_with_UAC',function(req,res,next)
+//RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_with_UAC',function(req,res,next)
+
+//check
+RestServer.post('/DVP/'+version+'/ExtensionManagement/:Ext/MapToUAC/:UAC',function(req,res,next)
 {
     var reqId='';
 
@@ -281,9 +290,9 @@ RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_with_UAC',function(req,
 
     try {
 
-        logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req.body));
+        logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [HTTP]  - Request received -  Data - Ext %s UAC %s Data %s',reqId,req.params.Ext,req.params.UAC,JSON.stringify(req.body));
 
-        Extmgt.MapWithSipUacEndpoint(req.body,reqId,function (err, resz) {
+        Extmgt.MapWithSipUacEndpoint(req.params.Ext,req.params.UAC,req.body,reqId,function (err, resz) {
             if(err)
             {
                 res.end(err.toString());
@@ -296,7 +305,7 @@ RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_with_UAC',function(req,
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [HTTP]  - Exception in Request  -  Data - %s',reqId,JSON.stringify(req.body),ex);
+        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [HTTP]  - Exception in Request  -  Ext %s UAC %s Data %s',reqId,req.params.Ext,req.params.UAC,JSON.stringify(req.body),ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
         res.end(jsonString);
     }
@@ -311,8 +320,13 @@ RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_with_UAC',function(req,
 
 
 
-RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_group',function(req,res,next)
+//RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_group',function(req,res,next)
+//check
+RestServer.post('/DVP/'+version+'/ExtensionManagement/:Ext/MapToGroup/:Grp',function(req,res,next)
 {
+
+    //Updated
+    /*
     var reqId='';
 
     try
@@ -328,9 +342,9 @@ RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_group',function(req,res
 
     try {
 
-        logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req.body));
+        logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [HTTP]  - Request received -  Data - Extension %s Group Data %s',reqId,req.params.Ext,req.params.Grp,JSON.stringify(req.body));
 
-        Extmgt.MapwithGroup(req.body,reqId,function (err, resz) {
+        Extmgt.MapwithGroup(req.params.Ext,req.params.Grp,req.body,reqId,function (err, resz) {
             if(err)
             {
                 res.end("err");
@@ -343,19 +357,55 @@ RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_group',function(req,res
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [HTTP]  - Exception in Request -  Data - %s',reqId,JSON.stringify(req.body),ex);
+        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [HTTP]  - Exception in Request -  Extension %s Group Data %s',reqId,req.params.Ext,req.params.Grp,JSON.stringify(req.body),ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
         res.end(jsonString);
     }
     return next();
+*/
+    var reqId='';
 
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [HTTP]  - Request received -  Extension %s Group %',reqId,req.params.Ext,req.params.Grp);
+
+        Extmgt.MapwithGroup(req.params.Ext,req.params.Grp,reqId,function (err, resz) {
+            if(err)
+            {
+                res.end(err.toString());
+            }
+            else
+            {
+                res.end(JSON.stringify(resz));
+            }
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [HTTP]  - Exception in Request -  Extension %s Group % Other %s',reqId,req.params.Ext,req.params.Grp,JSON.stringify(req),ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+    return next();
 
 });
 
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/add_sipuser_group',function(req,res,next)
+//RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/add_sipuser_group',function(req,res,next)
+RestServer.post('/dvp/'+version+'/SIPUserGroupManagemnt/SIPUserGroup',function(req,res,next)
 {
     var reqId='';
 
@@ -430,7 +480,10 @@ RestServer.post('/dvp/:version/sipgroup_mgt/sipuser_group/map_extensionid',funct
 
 
 
-RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/fill_usrgrp',function(req,res,next)
+//RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/fill_usrgrp',function(req,res,next)
+
+// No need
+RestServer.post('/DVP/'+version+'/SIPUserGroupManagemnt/fill_usrgrp',function(req,res,next)
 {
     var reqId='';
 
@@ -476,7 +529,9 @@ RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/fill_usrgrp',functi
 
 
 
-RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/update_sipuser_group',function(req,res,next)
+//RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/update_sipuser_group',function(req,res,next)
+//check
+RestServer.post('/DVP/'+version+'/SIPUserGroupManagemnt/SIPUserGroup/:id',function(req,res,next)
 {
     var reqId='';
 
@@ -493,9 +548,9 @@ RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/update_sipuser_grou
 
     try {
 
-        logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req.body));
+        logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [HTTP]  - Request received -  Data - ID %s Other %s',reqId,req.params.id,JSON.stringify(req.body));
 
-        group.UpdateSipUserGroup(req.body,reqId,function (err, res) {
+        group.UpdateSipUserGroup(req.params.id,req.body,reqId,function (err, res) {
             if(err)
             {
                 res.end(err.toString());
@@ -508,7 +563,7 @@ RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/update_sipuser_grou
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [HTTP]  - Exception in Request  -  Data - %s',reqId,JSON.stringify(req.body),ex);
+        logger.error('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [HTTP]  - Exception in Request  - Data - ID %s Other %s',reqId,req.params.id,JSON.stringify(req.body),ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
         res.end(jsonString);
     }
@@ -555,7 +610,9 @@ RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/update_sipuser_grou
 
 
 
-RestServer.get('/dvp/'+version+'/uac_mgmt/find_context/:cmpid',function(req,res,next)
+//RestServer.get('/dvp/'+version+'/uac_mgmt/find_context/:cmpid',function(req,res,next)
+//check
+RestServer.get('/DVP/'+version+'/UACManagement/Context/:cmpid',function(req,res,next)
 {
     var reqId='';
 
@@ -601,7 +658,8 @@ RestServer.get('/dvp/'+version+'/uac_mgmt/find_context/:cmpid',function(req,res,
 //Tested :- Done
 //.......................................................................................................................
 
-RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_group_data/:name',function(req,res,next)
+//RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_group_data/:name',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/Group/:name',function(req,res,next)
 {
     var reqId='';
 
@@ -646,7 +704,8 @@ RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_group_data/:name
 
 
 
-RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_group_endpoints/:GID',function(req,res,next)
+//RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_group_endpoints/:GID',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/GroupEndPoints/:GID',function(req,res,next)
 {
     var reqId='';
 
@@ -690,7 +749,8 @@ RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_group_endpoints/
 
 
 
-RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/endpoint_groupid/:EID',function(req,res,next)
+//RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/endpoint_groupid/:EID',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/EndPointGroupId/:EID',function(req,res,next)
 {
 
     var reqId='';
@@ -734,7 +794,8 @@ RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/endpoint_groupid/:EI
 
 
 
-RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/AllRecWithCompany/:CompanyId',function(req,res,next)
+//RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/AllRecWithCompany/:CompanyId',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/GroupsOfCompany/:CompanyId',function(req,res,next)
 {
     var reqId='';
 
@@ -776,7 +837,8 @@ RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/AllRecWithCompany/:C
 });
 //.......................................................................................................................
 
-RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_all_users_in_group/:companyid',function(req,res,next)
+//RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_all_users_in_group/:companyid',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/UsersInGroup/:Grp',function(req,res,next)
 {
     var reqId='';
 
@@ -793,9 +855,9 @@ RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_all_users_in_gro
 
     try {
 
-        logger.debug('[DVP-SIPUserEndpointService.AllUsersInGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.companyid);
+        logger.debug('[DVP-SIPUserEndpointService.AllUsersInGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.Grp);
 
-        group.GetAllUsersInGroup(req.params.companyid,reqId,function (err, resz) {
+        group.GetAllUsersInGroup(req.params.Grp,reqId,function (err, resz) {
             if(err)
             {
                 res.end(err.toString());
@@ -808,7 +870,7 @@ RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_all_users_in_gro
     }
     catch(ex)
     {
-        logger.debug('[DVP-SIPUserEndpointService.AllUsersInGroup] - [%s] - [HTTP]  - Error in Request -  Data - %s',reqId,req.params.companyid,ex);
+        logger.debug('[DVP-SIPUserEndpointService.AllUsersInGroup] - [%s] - [HTTP]  - Error in Request -  Data - %s',reqId,req.params.Grp,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
         res.end(jsonString);
     }

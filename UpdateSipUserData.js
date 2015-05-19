@@ -18,11 +18,11 @@ var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 // Save function , 2 params, object from caller and this functions callback
 
 // post :- done
-function UpdateUacUserData(jobj,reqId,callback) {
+function UpdateUacUserData(Username,jobj,reqId,callback) {
     // Add all  details of new user
 try{
     DbConn.SipUACEndpoint
-        .find({where: [{SipUsername: jobj.SipUsername}, {CompanyId: jobj.CompanyId}, {TenantId: jobj.TenantId}]})
+        .find({where: [{SipUsername: Username}, {CompanyId: 1}, {TenantId: 1}]})
         .complete(function (err, result) {
             if (err) {
                 //console.log('................An error occurred while searching for SIp UAC Record..................', err);
@@ -57,7 +57,7 @@ try{
 
                         },
                         {
-                            where: [{SipUsername: jobj.SipUsername}, {CompanyId: jobj.CompanyId}, {TenantId: jobj.TenantId}]
+                            where: [{SipUsername: Username}, {CompanyId: jobj.CompanyId}, {TenantId: jobj.TenantId}]
                         }
                     ).then(function (resultz) {
 

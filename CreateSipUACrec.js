@@ -56,7 +56,7 @@ function SaveSip(reqz,callback) {
 
     try {
         DbConn.SipUACEndpoint
-            .find({where: [{SipUsername: obj.SipUsername}, {CompanyId: obj.CompanyId}, {TenantId: obj.TenantId}]})
+            .find({where: [{SipUsername: obj.SipUsername}, {CompanyId: 1}, {TenantId: 1}]})
             .complete(function (err, result) {
                 if (err) {
                     //console.log('An error occurred while searching for SipUAC record:');
@@ -178,8 +178,8 @@ function SaveUACRec(jobj,reqId,callback) {
                                             ExtraData: jobj.ExtraData,
                                             EmailAddress: jobj.EmailAddress,
                                             GuRefId: jobj.GuRefId,
-                                            CompanyId: jobj.CompanyId,
-                                            TenantId: jobj.TenantId,
+                                            CompanyId: 1,
+                                            TenantId: 1,
                                             ObjClass: jobj.ObjClass,
                                             ObjType: jobj.ObjType,
                                             ObjCategory: jobj.ObjCategory,

@@ -382,7 +382,7 @@ callback(undefined,undefined);
     */
 }
 //post :-done
-function UpdateSipUserGroup(obj,reqId,callback)
+function UpdateSipUserGroup(AID,obj,reqId,callback)
 {
     try {
         DbConn.UserGroup
@@ -400,7 +400,7 @@ function UpdateSipUserGroup(obj,reqId,callback)
 
             },
             {
-                where: [{id: obj.AID}]
+                where: [{id: AID}]
             }
         ).then(function (result) {
                 //logger.info('Successfully Mapped. ');
