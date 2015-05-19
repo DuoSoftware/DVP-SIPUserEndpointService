@@ -11,16 +11,7 @@ var winston=require('winston');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
-var logger = new (winston.Logger)({
-    transports: [
-        new winston.transports.Console(),
-        new winston.transports.File({ filename: './SipUACMgtLog.log' })
 
-    ],
-    exceptionHandlers: [
-        new winston.transports.File({ filename: './SipUACMgtLog.log' })
-    ]
-});
 
 
 function SaveSip(reqz,callback) {
@@ -68,13 +59,13 @@ function SaveSip(reqz,callback) {
             .find({where: [{SipUsername: obj.SipUsername}, {CompanyId: obj.CompanyId}, {TenantId: obj.TenantId}]})
             .complete(function (err, result) {
                 if (err) {
-                    console.log('An error occurred while searching for SipUAC record:');
+                    //console.log('An error occurred while searching for SipUAC record:');
                     logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,obj.SipUsername,err);
                     var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for SipUAC record", false, result);
                     callback(null,jsonString);
 
                 } else if (result == null) {
-                    console.log('No user with the Extension ' + obj.SipUsername + ' has been found.');
+                    //console.log('No user with the Extension ' + obj.SipUsername + ' has been found.');
                     logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - No record found for SipUACEndPoint %s ',reqId,obj.SipUsername);
                     try {
 
@@ -110,7 +101,7 @@ function SaveSip(reqz,callback) {
 
                     }
                     catch (ex) {
-                        console.log("An error occurred in data saving process ");
+                        //console.log("An error occurred in data saving process ");
                         logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Exception in saving UAC recs',reqId,ex);
 
                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
@@ -150,13 +141,13 @@ function SaveUACRec(jobj,reqId,callback) {
     //logger.info( 'Saving UAC Records : '+JSON.stringify(jobj));
     if (jobj) {
         //logger.info('Check CloudEndUser for  Records : ' + jobj.CSDBCloudEndUserId);
-        logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s]  - Searching Records of CloudEndUser %s ',reqId,jobj.CSDBCloudEndUserId);
+        logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s]  - Searching Records of CloudEndUser %s ',reqId,jobj.CSDBCloudEndUserId);
         try{
             DbConn.CloudEndUser.find({where: [{id: jobj.CSDBCloudEndUserId}]}).complete(function (err, cloudEndObject) {
 
                 if(err)
                 {
-                    logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Error in Searching Records of CloudEndUser %s ',reqId,jobj.CSDBCloudEndUserId,err);
+                    logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Error in Searching Records of CloudEndUser %s ',reqId,jobj.CSDBCloudEndUserId,err);
                     callback(err,undefined);
                 }
                 else {
@@ -165,11 +156,11 @@ function SaveUACRec(jobj,reqId,callback) {
                         // console.log(cloudEndObject);
                         //logger.info(' CloudEndUserID found,No errors ');
                         //logger.info('Check Context for  Records : ' + jobj.CSDBContextContext);
-                        logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Record found for CloudEndUser %s and searching for Context %s',reqId,jobj.CSDBCloudEndUserId,jobj.CSDBContextContext);
+                        logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Record found for CloudEndUser %s and searching for Context %s',reqId,jobj.CSDBCloudEndUserId,jobj.CSDBContextContext);
                         DbConn.Context.find({where: [{Context: jobj.CSDBContextContext}]}).complete(function (errz, ContextObject) {
 
                             if (errz) {
-                                logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Error in Searching Records of Context %s ',reqId,jobj.CSDBContextContext,errz);
+                                logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Error in Searching Records of Context %s ',reqId,jobj.CSDBContextContext,errz);
                                 callback(errz,undefined);
                             }
                             else
@@ -177,7 +168,7 @@ function SaveUACRec(jobj,reqId,callback) {
                                 if (ContextObject) {
                                     //logger.info(' CSDBContextContext found,No errors ');
                                     //logger.info(' Creating SipObject ');
-                                    logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Record found for Context %s and saving SipUser',reqId,jobj.CSDBContextContext);
+                                    logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s] - Record found for Context %s and saving SipUser',reqId,jobj.CSDBContextContext);
                                     var SIPObject = DbConn.SipUACEndpoint
                                         .build(
                                         {
@@ -206,30 +197,30 @@ function SaveUACRec(jobj,reqId,callback) {
                                         if (!errSave) {
                                             //var status = 0;
                                             //logger.info(' SipObject created : ' + SIPObject);
-                                            logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - SipUser record added successfully',reqId);
+                                            logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - SipUser record added successfully',reqId);
 
                                             cloudEndObject.addSipUACEndpoint(SIPObject).complete(function (errCloud, CloudEndInstancex) {
                                                 //logger.info(' CSDBCloudEndUserId filled  ' + cloudEndObject);
                                                 // status++;
                                                 if(errCloud)
                                                 {
-                                                    logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Error in mapping cloud %s and SipUser %s',reqId,JSON.stringify(cloudEndObject),JSON.stringify(SIPObject),errCloud);
+                                                    logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Error in mapping cloud %s and SipUser %s',reqId,JSON.stringify(cloudEndObject),JSON.stringify(SIPObject),errCloud);
                                                     callback('Error in mapping CEU & SipUAC',undefined);
                                                 }
                                                 else
                                                 {
-                                                    logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] -Successfully Mapping cloud %s and SipUser %s',reqId,JSON.stringify(cloudEndObject),JSON.stringify(SIPObject));
+                                                    logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] -Successfully Mapping cloud %s and SipUser %s',reqId,JSON.stringify(cloudEndObject),JSON.stringify(SIPObject));
                                                     ContextObject.addSipUACEndpoint(SIPObject).complete(function (errContext, ContextInstancex) {
                                                         // logger.info(' CSDBContextContext filled  ' + ContextObject);
 
                                                         if(errContext)
                                                         {
-                                                            logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] -Error in Mapping context %s and SipUser %s',reqId,JSON.stringify(ContextObject),JSON.stringify(SIPObject),errContext);
+                                                            logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] -Error in Mapping context %s and SipUser %s',reqId,JSON.stringify(ContextObject),JSON.stringify(SIPObject),errContext);
                                                             callback('Error in mapping Context & SipUAC',undefined);
                                                         }
                                                         else
                                                         {
-                                                            logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] -Successfully Mapping context %s and SipUser %s',reqId,JSON.stringify(ContextObject),JSON.stringify(SIPObject));
+                                                            logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] -Successfully Mapping context %s and SipUser %s',reqId,JSON.stringify(ContextObject),JSON.stringify(SIPObject));
                                                             callback(undefined,ContextInstancex);
                                                         }
 
@@ -243,14 +234,12 @@ function SaveUACRec(jobj,reqId,callback) {
                                                 // res.end();
                                             });
 
-                                            console.log("..................... Saved Successfully ....................................");
+
                                             //ogger.info('Save Succeeded');
                                             callback(null, true);
                                         }
                                         else {
-                                            console.log(err + " found");
-                                            console.log("..................... Error found in saving....................................");
-                                            logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] -Error in inserting Sip user records %s',reqId,JSON.stringify(jobj),errSave);
+                                            logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] -Error in inserting Sip user records %s',reqId,JSON.stringify(jobj),errSave);
                                             var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
                                             callback(err, undefined);
 
@@ -262,10 +251,10 @@ function SaveUACRec(jobj,reqId,callback) {
 
                                 }
                                 else  {
-                                    console.log("................................... Given Context is invalid ................................ ");
+
                                     //logger.info('Given Context is invalid : ' + jobj.CSDBContextContext);
                                    // logger.info('Returned ContextObject : ' + ContextObject);
-                                    logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - No record found for context %s',reqId,jobj.CSDBContextContext);
+                                    logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - No record found for context %s',reqId,jobj.CSDBContextContext);
                                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ContextObject);
                                     callback("Error occured",undefined);
 
@@ -275,10 +264,10 @@ function SaveUACRec(jobj,reqId,callback) {
                         });
                     }
                     else  {
-                        console.log("................................... Given Cloud End User is invalid ................................ ");
+
                         //logger.info('Given cloudEnd is invalid : ' + jobj.CSDBCloudEndUserId);
                         //logger.info('Returned cloudEndObject : ' + cloudEndObject);
-                        logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - No record found for cloudEnduser %s',reqId,jobj.CSDBCloudEndUserId);
+                        logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - No record found for cloudEnduser %s',reqId,jobj.CSDBCloudEndUserId);
                         var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, cloudEndObject);
                         callback("Error Returns",undefined);
                     }
@@ -290,7 +279,7 @@ function SaveUACRec(jobj,reqId,callback) {
         }
         catch(ex)
         {
-            logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Exception in searching cloudEnduser %s',reqId,jobj.CSDBCloudEndUserId,ex);
+            logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Exception in searching cloudEnduser %s',reqId,jobj.CSDBCloudEndUserId,ex);
             var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
             callback("Exception found",undefined);
 
@@ -302,7 +291,7 @@ function SaveUACRec(jobj,reqId,callback) {
         //res.end();
         //console.log("obj is null in SetExtension");
         //ogger.info( 'Request object is invalid : '+jobj );
-        logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Invalid object received at the start : SaveUACRec %s',reqId,JSON.stringify(jobj),ex);
+        logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Invalid object received at the start : SaveUACRec %s',reqId,JSON.stringify(jobj),ex);
         callback("No object recieved ",undefined);
     }
 }
@@ -342,7 +331,7 @@ function GetFunc(reqz,resz,errz)
             .findAll({where: {CompanyId: reqz.params.cmpid}})
             .complete(function (err, result) {
                 if (!!err) {
-                    console.log('An error occurred while searching for Context:', err)
+                    //console.log('An error occurred while searching for Context:', err)
                     // res.end();
                 } else if (!result) {
                     //console.log('No user with the Context '+reqz.params.context+' has been found.');
@@ -371,7 +360,7 @@ function GetFunc(reqz,resz,errz)
     }
     catch (ex)
     {
-        console.log("Error in searching data : "+ex);
+        //console.log("Error in searching data : "+ex);
     }
 }
 
@@ -384,7 +373,7 @@ function GetFuncRefId(reqz,resz,errz)
             .findAll({where: {ExtRefId: reqz.params.refid}})
             .complete(function (err, result) {
                 if (!!err) {
-                    console.log('An error occurred while searching for Context:', err)
+                   // console.log('An error occurred while searching for Context:', err)
                     // res.end();
                 } else if (!result) {
                     //console.log('No user with the Context '+reqz.params.context+' has been found.');
@@ -407,7 +396,7 @@ function GetFuncRefId(reqz,resz,errz)
                     // set as Json Object
                     var jarr = JSON.stringify(Jresults);
 
-                    console.log(jarr);
+                    //console.log(jarr);
 
 
                     resz.write(jarr);
@@ -421,7 +410,7 @@ function GetFuncRefId(reqz,resz,errz)
     }
     catch (ex)
     {
-        console.log("Error in searching data : "+ex);
+        //console.log("Error in searching data : "+ex);
     }
     resz.end();
 }

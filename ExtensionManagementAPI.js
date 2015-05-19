@@ -37,7 +37,7 @@ function ChangeAvailability(ref,st,reqId,callback) {
             // console.log(ExtObject);
             if (err) {
 
-                logger.debug('[DVP-LimitHandler.ExtensionManagement.UpdateExtensionStatus] - [%s] - [PGSQL]  - Error in searching ExtensionRefId %s ',reqId,ref,err);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Error in searching ExtensionRefId %s ',reqId,ref,err);
                 callback("Error Returns", undefined);
             }
             else
@@ -45,7 +45,7 @@ function ChangeAvailability(ref,st,reqId,callback) {
 
                 if (ExtObject) {
                     //logger.info('Updating Availability , RefID :' + reqz.params.ref);
-                    logger.debug('[DVP-LimitHandler.ExtensionManagement.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s ',reqId,st,ref);
+                    logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s ',reqId,st,ref);
 
                     try {
                         ExtObject.update(
@@ -56,20 +56,20 @@ function ChangeAvailability(ref,st,reqId,callback) {
                         ).then(function (result) {
                                 status = 1;
                                // console.log("Extension updated successfully");
-                                logger.debug('[DVP-LimitHandler.ExtensionManagement.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s is succeeded ',reqId,st,ref);
+                                logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s is succeeded ',reqId,st,ref);
                                 var jsonString = messageFormatter.FormatMessage(null, "Availability changed successfully", true, result);
                                 callback(undefined, result);
 
                             }).error(function (err) {
                                 console.log("Extension update false ->");
-                                logger.error('[DVP-LimitHandler.ExtensionManagement.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s is failed ',reqId,st,ref,err);
+                                logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s is failed ',reqId,st,ref,err);
                                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
                                 callback("Error Found",undefined);
 
                             });
                     }
                     catch (ex) {
-                        logger.error('[DVP-LimitHandler.ExtensionManagement.UpdateExtensionStatus] - [%s] - [PGSQL]  - Exception in Updating status to %s of ExtensionRefId %s',reqId,st,ref,ex);
+                        logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Exception in Updating status to %s of ExtensionRefId %s',reqId,st,ref,ex);
                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
                         callback("Exception found", undefined);
                     }
@@ -77,7 +77,7 @@ function ChangeAvailability(ref,st,reqId,callback) {
 
                 }
                 else {
-                    logger.debug('[DVP-LimitHandler.ExtensionManagement.UpdateExtensionStatus] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,ref);
+                    logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,ref);
                     var jsonString = messageFormatter.FormatMessage(null, "ERROR", false, null);
                     callback("Error Occured", undefined);
                 }
@@ -86,7 +86,7 @@ function ChangeAvailability(ref,st,reqId,callback) {
     }
     catch(ex)
     {
-        logger.error('[DVP-LimitHandler.ExtensionManagement.UpdateExtensionStatus] - [%s] - [PGSQL]  - Exception in searching Extension %s',reqId,ref,ex);
+        logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Exception in searching Extension %s',reqId,ref,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
         callback("Exception found",undefined);
     }
@@ -115,7 +115,7 @@ function AddExtension(reqz,reqId,callback) {
             // console.log(ExtObject);
             if (err) {
                 console.log("An error occurred in searching Extension : " + obj.Extension);
-                logger.error('[DVP-LimitHandler.ExtensionManagement.NewExtension] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,obj.Extension,err);
+                logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,obj.Extension,err);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
                 callback("Error Found", undefined);
             }
@@ -125,7 +125,7 @@ function AddExtension(reqz,reqId,callback) {
             {
                 if (!ExtObject) {
                     console.log("No record found for the Extension : " + obj.Extension);
-                    logger.error('[DVP-LimitHandler.ExtensionManagement.NewExtension] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,obj.Extension);
+                    logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,obj.Extension);
 
                     CreateExtension(obj,reqId,function (res) {
                         if (res == 1) {
@@ -177,7 +177,7 @@ function MapWithSipUacEndpoint(reqz,reqId,callback) {
 
             if (err) {
                 console.log("An error occurred in searching Extension : " + obj.ExtensionId);
-                logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithUAC] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,obj.Extension,ex);
+                logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,obj.Extension,ex);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
                 callback("Error", undefined);
             }
@@ -188,14 +188,14 @@ function MapWithSipUacEndpoint(reqz,reqId,callback) {
 
                 if (!ExtObject ) {
                     console.log("No record found for the Extension : " + obj.ExtensionId);
-                    logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithUAC] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,obj.Extension);
+                    logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,obj.Extension);
                     var jsonString = messageFormatter.FormatMessage(null, "EMPTY object returns", false, ExtObject);
                     callback(undefined, undefined);
 
 
                 }
                 else {
-                    logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithUAC] - [%s] - [PGSQL]  - Record found for Extension %s and Searching for SipUser %s ',reqId,obj.Extension,obj.UACid);
+                    logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [PGSQL]  - Record found for Extension %s and Searching for SipUser %s ',reqId,obj.Extension,obj.UACid);
                     try {
                         DbConn.SipUACEndpoint.find({where: [{id: obj.UACid},{CompanyId:obj.CompanyId}]}).complete(function (err, SipObject) {
 
@@ -294,7 +294,7 @@ function MapWithSipUacEndpoint(reqz,reqId,callback) {
                         });
                     }
                     catch (ex) {
-                        logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithUAC] - [%s] - [PGSQL]  - Exception in searching SipUACEndpoints ID %s ',reqId,obj.UACid,ex);
+                        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [PGSQL]  - Exception in searching SipUACEndpoints ID %s ',reqId,obj.UACid,ex);
                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
                         callback("Exception", undefined);
                     }
@@ -304,7 +304,7 @@ function MapWithSipUacEndpoint(reqz,reqId,callback) {
     }
     catch(ex)
     {
-        logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithUAC] - [%s] - [PGSQL]  - Exception in searching Extension %s ',reqId,obj.Extension,ex);
+        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [PGSQL]  - Exception in searching Extension %s ',reqId,obj.Extension,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
         callback("Exception", undefined);
     }
@@ -331,7 +331,7 @@ function MapwithGroup(reqz,reqId,callback)
 
             if (err) {
                 console.log("An error occurred in searching Extension : " + obj.ExtensionId);
-                logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithGroup] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,obj.ExtensionId,err);
+                logger.error('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,obj.ExtensionId,err);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
                 callback("Error", undefined);
             }
@@ -342,14 +342,14 @@ function MapwithGroup(reqz,reqId,callback)
 
                 if (!ExtObject ) {
                     console.log("No record found for the Extension : " + obj.ExtensionId);
-                    logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithGroup] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,obj.ExtensionId);
+                    logger.error('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,obj.ExtensionId);
                     var jsonString = messageFormatter.FormatMessage(null, "EMPTY object returns", false, ExtObject);
                     callback(undefined, undefined);
 
 
                 }
                 else {
-                    logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithGroup] - [%s] - [PGSQL]  - Record found for Extension %s and searching for UserGroup %s',reqId,obj.ExtensionId,obj.GroupID);
+                    logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [PGSQL]  - Record found for Extension %s and searching for UserGroup %s',reqId,obj.ExtensionId,obj.GroupID);
                     try {
                         DbConn.UserGroup.find({where: [{id: obj.GroupID},{CompanyId:obj.CompanyId}]}).complete(function (err, GrpObject) {
 
@@ -357,7 +357,7 @@ function MapwithGroup(reqz,reqId,callback)
 
                             // console.log(ExtObject);
                             if (err) {
-                                logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithGroup] - [%s] - [PGSQL]  - Error in searching for UserGroup %s',reqId,obj.GroupID,err);
+                                logger.error('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [PGSQL]  - Error in searching for UserGroup %s',reqId,obj.GroupID,err);
                                 console.log("An error occurred in searching Extension : " + obj.Extension + ' error : ' + err);
                                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, GrpObject);
                                 callback("Error", undefined);
@@ -367,7 +367,7 @@ function MapwithGroup(reqz,reqId,callback)
                             else
                             {
                                 if (!GrpObject) {
-                                    logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithGroup] - [%s] - [PGSQL]  - No record found for UserGroup %s',reqId,obj.GroupID);
+                                    logger.error('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [PGSQL]  - No record found for UserGroup %s',reqId,obj.GroupID);
                                     //console.log("No record found for the Extension : " + obj.SipExtension);
                                     var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, GrpObject);
                                     callback(undefined, undefined);
@@ -375,7 +375,7 @@ function MapwithGroup(reqz,reqId,callback)
                                 }
                                 else {
                                     //logger.info('Group found : ' + obj.GroupID);
-                                    logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithGroup] - [%s] - [PGSQL]  - Record found for UserGroup %s',reqId,obj.GroupID);
+                                    logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [PGSQL]  - Record found for UserGroup %s',reqId,obj.GroupID);
 
                                     try {
                                         /*
@@ -405,7 +405,7 @@ function MapwithGroup(reqz,reqId,callback)
                                         ).then(function (result) {
                                                 //logger.info('Successfully Updated. ');
                                                 //log.info("Extention and Group mapped  : "+result);
-                                                logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithGroup] - [%s] - [PGSQL]  - Mapping UserGroup %s with Extension %s is succeeded',reqId,obj.GroupID,obj.ExtensionId);
+                                                logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [PGSQL]  - Mapping UserGroup %s with Extension %s is succeeded',reqId,obj.GroupID,obj.ExtensionId);
                                                 //var jsonString = messageFormatter.FormatMessage(null, "Maxlimit successfully updated for : "+req.LimitId, true, result);
                                                 callback(undefined, result);
 
@@ -413,7 +413,7 @@ function MapwithGroup(reqz,reqId,callback)
                                                 //logger.info('updation error found in saving. : ' + err);
                                                //log.info("Error in mapping group and extention");
                                                 console.log("updation failed ! " + err);
-                                                logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithGroup] - [%s] - [PGSQL]  - Mapping UserGroup %s with Extension %s is failed',reqId,obj.GroupID,obj.ExtensionId,err);
+                                                logger.error('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [PGSQL]  - Mapping UserGroup %s with Extension %s is failed',reqId,obj.GroupID,obj.ExtensionId,err);
                                                 //handle error here
                                                 var jsonString = messageFormatter.FormatMessage(err, "updation", false, null);
                                                 callback(err, undefined);
@@ -422,7 +422,7 @@ function MapwithGroup(reqz,reqId,callback)
 
                                     }
                                     catch (ex) {
-                                        logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithGroup] - [%s] - [PGSQL]  - Exception in Mapping UserGroup %s with Extension %s ',reqId,obj.GroupID,obj.ExtensionId,ex);
+                                        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [PGSQL]  - Exception in Mapping UserGroup %s with Extension %s ',reqId,obj.GroupID,obj.ExtensionId,ex);
                                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
                                         callback("Exception", undefined);
                                     }
@@ -433,7 +433,7 @@ function MapwithGroup(reqz,reqId,callback)
                         });
                     }
                     catch (ex) {
-                        logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithGroup] - [%s] - [PGSQL]  - Exception in Searching UserGroup %s ',reqId,obj.GroupID,ex);
+                        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [PGSQL]  - Exception in Searching UserGroup %s ',reqId,obj.GroupID,ex);
                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
                         callback("Exception", undefined);
                     }
@@ -443,7 +443,7 @@ function MapwithGroup(reqz,reqId,callback)
     }
     catch(ex)
     {
-        logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtensionWithGroup] - [%s] - [PGSQL]  - Exception in Searching Extension %s ',reqId, obj.ExtensionId,ex);
+        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithGroup] - [%s] - [PGSQL]  - Exception in Searching Extension %s ',reqId, obj.ExtensionId,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
         callback("Exception", undefined);
     }
@@ -479,7 +479,7 @@ function CreateExtension(jobj,reqId,callback)
 
                 if (!err ) {
                     console.log("New User Found and Inserted (Extension : " + jobj.Extension + ")");
-                    logger.debug('[DVP-LimitHandler.ExtensionManagement.NewExtension] - [%s] - [PGSQL]  -  Extension %s insertion succeeded ',reqId,jobj.Extension);
+                    logger.debug('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  -  Extension %s insertion succeeded ',reqId,jobj.Extension);
                     callback(1);
 
                     //callback(err, true);
@@ -489,7 +489,7 @@ function CreateExtension(jobj,reqId,callback)
                 }
                 else {
                     console.log("Error in saving  (Extension :" + jobj.Extension + ")" + err);
-                    logger.error('[DVP-LimitHandler.ExtensionManagement.NewExtension] - [%s] - [PGSQL]  -  Extension %s insertion failed ',reqId,jobj.Extension,err);
+                    logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  -  Extension %s insertion failed ',reqId,jobj.Extension,err);
                     callback(0);
                     // callback(err, false);
                     //pass error and false
@@ -501,7 +501,7 @@ function CreateExtension(jobj,reqId,callback)
     catch (ex)
     {
         console.log("Error found in saving data : "+ex);
-        logger.error('[DVP-LimitHandler.ExtensionManagement.NewExtension] - [%s] - [PGSQL]  -  Exception in saving Extension %s ',reqId,jobj.Extension,ex);
+        logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  -  Exception in saving Extension %s ',reqId,jobj.Extension,ex);
 
         callback(0);
 

@@ -26,7 +26,7 @@ try{
         .complete(function (err, result) {
             if (err) {
                 //console.log('................An error occurred while searching for SIp UAC Record..................', err);
-                logger.error('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,jobj.SipUsername,err);
+                logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUAC] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,jobj.SipUsername,err);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                 callback(err, undefined);
 
@@ -36,7 +36,7 @@ try{
 
 
                 console.log('No user has been found.');
-                    logger.error('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,jobj.SipUsername);
+                    logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,jobj.SipUsername);
                 var jsonString = messageFormatter.FormatMessage(err, "No record found", false, null);
                     callback(undefined, undefined);
 
@@ -78,7 +78,7 @@ try{
 
                 }
                 catch (ex) {
-                    logger.error('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Exception in updating SipUser %s ',reqId,jobj.SipUsername,ex);
+                    logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - Exception in updating SipUser %s ',reqId,jobj.SipUsername,ex);
                     var jsonString = messageFormatter.FormatMessage(ex, "Exception in updation", false, null);
                     callback(ex, undefined);
                 }
@@ -90,7 +90,7 @@ try{
 }
     catch(ex)
     {
-        logger.error('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Exception in Method starts : UpdateUacUserData ',reqId,jobj.SipUsername,ex);
+        logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - Exception in Method starts : UpdateUacUserData ',reqId,jobj.SipUsername,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception in function starts", false, null);
         callback(ex, undefined);
     }
