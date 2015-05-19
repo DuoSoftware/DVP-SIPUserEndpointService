@@ -68,11 +68,11 @@ function AddSipUserGroup(obj,reqId,callback)
                                 GroupName: obj.GroupName,
                                 Domain: obj.Domain,
                                 ExtraData: obj.ExtraData,
-                                ObjClass: obj.ObjClass,
-                                ObjType: obj.ObjType,
-                                ObjCategory: obj.ObjCategory,
-                                CompanyId: obj.CompanyId,
-                                TenantId: obj.TenantId
+                                ObjClass: "OBJCLZ",
+                                ObjType: "OBJTYP",
+                                ObjCategory: "OBJCAT",
+                                CompanyId: 1,
+                                TenantId: 1
 
 
                             }
@@ -148,7 +148,7 @@ function MapExtensionID(obj,callback)
                             }
 
                             else if (groupObject) {
-                                console.log(groupObject);
+                                //console.log(groupObject);
 
                                 try {
                                     groupObject.addSipUACEndpoint(sipObject).complete(function (errx, groupInstancex) {
@@ -161,7 +161,7 @@ function MapExtensionID(obj,callback)
                                         }
 
 
-                                        console.log('mapping group and sip done.................');
+                                        //console.log('mapping group and sip done.................');
 
 
 
@@ -391,11 +391,11 @@ function UpdateSipUserGroup(AID,obj,reqId,callback)
                 GroupName: obj.GroupName,
                 Domain: obj.Domain,
                 ExtraData: obj.ExtraData,
-                ObjClass: obj.ObjClass,
-                ObjType: obj.ObjType,
-                ObjCategory: obj.ObjCategory,
-                CompanyId: obj.CompanyId,
-                TenantId: obj.TenantId
+                ObjClass: "OBJCLZ",
+                ObjType: "OBJTYP",
+                ObjCategory: "OBJCAT",
+                CompanyId: 1,
+                TenantId: 1
 
 
             },
@@ -529,7 +529,7 @@ function EndpointGroupID(obj,reqId,callback)
         )
             .complete(function (err, result) {
                 if (err) {
-                    console.log('An error occurred while searching for Extension:', err);
+                   // console.log('An error occurred while searching for Extension:', err);
                     logger.error('[DVP-SIPUserEndpointService.EndpointGroupID] - [%s] - [PGSQL]  - Error in searching UsrGrp records of SipUACEndpoint %s ',reqId,obj,err);
                     //logger.info( 'Error found in searching : '+err );
                     var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for UserGroup", false, null);
@@ -664,13 +664,13 @@ function Testme(req,callback)
 
         .complete(function(err, result) {
             if (!!err) {
-                console.log('An error occurred while searching for Extension:', err);
+                //console.log('An error occurred while searching for Extension:', err);
                 //logger.info( 'Error found in searching : '+err );
                 var jsonString = messageFormatter.FormatMessage(err, "error has been found.", false, null);
                 callback(null, jsonString);
 
             } else if (!result) {
-                console.log('No user with the Extension has been found.');
+               // console.log('No user with the Extension has been found.');
                 ///logger.info( 'No user found for the requirement. ' );
                 var jsonString = messageFormatter.FormatMessage(err, "No user with the Schedule has been found.", false, null);
                 callback(null, jsonString);

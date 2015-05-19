@@ -97,7 +97,7 @@ function AddExtension(reqz,reqId,callback) {
     //logger.info('Starting new Extension creation .');
     try {
         var obj = reqz;
-        console.log("object size :" +Object.keys(obj).length);
+       // console.log("object size :" +Object.keys(obj).length);
 
     }
     catch (ex) {
@@ -114,7 +114,7 @@ function AddExtension(reqz,reqId,callback) {
 
             // console.log(ExtObject);
             if (err) {
-                console.log("An error occurred in searching Extension : " + obj.Extension);
+              //  console.log("An error occurred in searching Extension : " + obj.Extension);
                 logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,obj.Extension,err);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
                 callback("Error Found", undefined);
@@ -124,7 +124,7 @@ function AddExtension(reqz,reqId,callback) {
             else
             {
                 if (!ExtObject) {
-                    console.log("No record found for the Extension : " + obj.Extension);
+                 //   console.log("No record found for the Extension : " + obj.Extension);
                     logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,obj.Extension);
 
                     CreateExtension(obj,reqId,function (res) {
@@ -141,7 +141,7 @@ function AddExtension(reqz,reqId,callback) {
 
                 }
                 else  {
-                    console.log(" Record is already available for the Extension : " + obj.Extension);
+                   // console.log(" Record is already available for the Extension : " + obj.Extension);
                     var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", false, ExtObject);
                     callback("Already In Db", undefined);
                 }
@@ -461,7 +461,7 @@ function MapwithGroup(Ext,Grp,reqId,callback)
             {
                 if (ExtObject) {
                     logger.debug('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - Extension found -  Data - %s',reqId,JSON.stringify(ExtObject));
-                    console.log(ExtObject);
+                    //console.log(ExtObject);
 
                     try {
                         DbConn.UserGroup.find({where: [{id: Grp}]}).complete(function (errz, groupObject) {
@@ -545,11 +545,11 @@ function CreateExtension(jobj,reqId,callback)
                 Enabled: jobj.Enabled,
                 ExtraData: jobj.ExtraData,
                 ExtRefId: jobj.ExtRefId,
-                CompanyId: jobj.CompanyId,
-                TenantId: jobj.TenantId,
-                ObjClass: jobj.ObjClass,
-                ObjType: jobj.ObjType,
-                ObjCategory: jobj.ObjCategory,
+                ObjClass: "OBJCLZ",
+                ObjType: "OBJTYP",
+                ObjCategory: "OBJCAT",
+                CompanyId: 1,
+                TenantId: 1,
                 AddUser: jobj.AddUser,
                 UpdateUser: jobj.UpdateUser
 
@@ -561,7 +561,7 @@ function CreateExtension(jobj,reqId,callback)
 
 
                 if (!err ) {
-                    console.log("New User Found and Inserted (Extension : " + jobj.Extension + ")");
+                    //console.log("New User Found and Inserted (Extension : " + jobj.Extension + ")");
                     logger.debug('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  -  Extension %s insertion succeeded ',reqId,jobj.Extension);
                     callback(1);
 
@@ -571,7 +571,7 @@ function CreateExtension(jobj,reqId,callback)
 
                 }
                 else {
-                    console.log("Error in saving  (Extension :" + jobj.Extension + ")" + err);
+                   // console.log("Error in saving  (Extension :" + jobj.Extension + ")" + err);
                     logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  -  Extension %s insertion failed ',reqId,jobj.Extension,err);
                     callback(0);
                     // callback(err, false);
@@ -583,7 +583,7 @@ function CreateExtension(jobj,reqId,callback)
     }
     catch (ex)
     {
-        console.log("Error found in saving data : "+ex);
+        //console.log("Error found in saving data : "+ex);
         logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  -  Exception in saving Extension %s ',reqId,jobj.Extension,ex);
 
         callback(0);

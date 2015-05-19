@@ -59,7 +59,7 @@ function AddOrUpdateContext(reqz,reqId,callback) {
 
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
 
-        callback("Exception",undefined)
+        callback("Exception",undefined);
         //resz.end(jsonString);
 
     }
@@ -73,7 +73,7 @@ function AddOrUpdateContext(reqz,reqId,callback) {
                 .find({where: {Context: obj.Context}})
                 .complete(function (err, result) {
                     if (err) {
-                        console.log('An error occurred while searching for Context:', err);
+                        //console.log('An error occurred while searching for Context:', err);
 
                        // logger.info('Error found in Searching , Context :' + obj.Context + ' Error : ' + err);
                         logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Error occurred while searching Context %s ',reqId,obj.Context,err);
@@ -85,7 +85,7 @@ function AddOrUpdateContext(reqz,reqId,callback) {
                     else
                     {
                         if (!result) {
-                            console.log('No user with the Context ' + obj.Context + ' has been found.');
+                            //console.log('No user with the Context ' + obj.Context + ' has been found.');
                             logger.debug('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - No record found for Context %s ',reqId,obj.Context);
 
                             try {
@@ -97,11 +97,11 @@ function AddOrUpdateContext(reqz,reqId,callback) {
                                         Context: obj.Context,
                                         Description: obj.Description,
                                         ContextCat: obj.ContextCat,
-                                        CompanyId: obj.CompanyId,
-                                        TenantId: obj.TenantId,
-                                        ObjClass: obj.ObjClass,
-                                        ObjType: obj.ObjType,
-                                        ObjCategory: obj.ObjCategory,
+                                        ObjClass: "OBJCLZ",
+                                        ObjType: "OBJTYP",
+                                        ObjCategory: "OBJCAT",
+                                        CompanyId: 1,
+                                        TenantId: 1,
                                         AddUser: obj.AddUser,
                                         UpdateUser: obj.UpdateUser
                                         // AddTime: jobj.AddTime,
@@ -114,7 +114,7 @@ function AddOrUpdateContext(reqz,reqId,callback) {
                                 ).complete(function (err, user) {
                                         /* ... */
                                         if (!err ) {
-                                            console.log("New User Found and Inserted (Context : " + obj.Context + ")");
+                                            //console.log("New User Found and Inserted (Context : " + obj.Context + ")");
                                             //logger.info('Record inserted');
                                             logger.debug('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Context %s inserted successfully - Data %s',reqId,obj.Context,JSON.stringify(obj));
                                             var jsonString = messageFormatter.FormatMessage(err, null, true, user);
@@ -123,7 +123,7 @@ function AddOrUpdateContext(reqz,reqId,callback) {
 
                                         }
                                         else {
-                                            console.log("Error in saving  (Context :" + obj.Context + ")" + err);
+                                            //console.log("Error in saving  (Context :" + obj.Context + ")" + err);
                                             logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Context %s insertion  failed - Data %s',reqId,obj.Context,JSON.stringify(obj),err);
                                             var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, user);
                                             callback("Error", undefined);
@@ -135,7 +135,7 @@ function AddOrUpdateContext(reqz,reqId,callback) {
 
                             }
                             catch (ex) {
-                                console.log("An error occurred in data saving process ");
+                                //console.log("An error occurred in data saving process ");
                                 logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s]  - Exception in detail creation of Context %s',reqId,obj.Context,ex);
                                 var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, user);
                                 callback("Exception", undefined);
@@ -143,8 +143,8 @@ function AddOrUpdateContext(reqz,reqId,callback) {
                             }
 
                         } else {
-                            console.log('Context Found ' + result.Context + '!');
-                            console.log('All attributes of Context:', result.values);
+                            //console.log('Context Found ' + result.Context + '!');
+                            //console.log('All attributes of Context:', result.values);
                             logger.debug('[DVP-SIPUserEndpointService.NewContextData] - [%s]  - Context found',reqId,JSON.stringify(result));
 
                             try {
@@ -154,11 +154,11 @@ function AddOrUpdateContext(reqz,reqId,callback) {
                                     {
                                         Description: obj.Description,
                                         ContextCat: obj.ContextCat,
-                                        CompanyId: obj.CompanyId,
-                                        TenantId: obj.TenantId,
-                                        ObjClass: obj.ObjClass,
-                                        ObjType: obj.ObjType,
-                                        ObjCategory: obj.ObjCategory,
+                                        ObjClass: "OBJCLZ",
+                                        ObjType: "OBJTYP",
+                                        ObjCategory: "OBJCAT",
+                                        CompanyId: 1,
+                                        TenantId: 1,
                                         AddUser: obj.AddUser,
                                         UpdateUser: obj.UpdateUser
                                         //  AddDate:obj.AddTime,
@@ -173,14 +173,14 @@ function AddOrUpdateContext(reqz,reqId,callback) {
                                     }
                                 ).then(function (results) {
 
-                                        console.log("Updated successfully!");
+                                        //console.log("Updated successfully!");
                                         logger.debug('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Context %s Updated successfully',reqId,obj.Context);
                                         var jsonString = messageFormatter.FormatMessage(null, "Successfully Updated", true, results);
                                         callback(undefined, results);
 
                                     }).error(function (err) {
 
-                                        console.log("Project update failed !");
+                                        //console.log("Project update failed !");
                                         logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Context %s Updation failed',reqId,obj.Context,err);
                                         var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
                                         callback("Error", undefined);

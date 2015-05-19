@@ -50,9 +50,9 @@ try{
                         {
                             Password: jobj.Password,
                             GuRefId: jobj.GuRefId,
-                            ObjClass: jobj.ObjClass,
-                            ObjType: jobj.ObjType,
-                            ObjCategory: jobj.ObjCategory,
+                            ObjClass: "OBJCLZ",
+                            ObjType: "OBJTYP",
+                            ObjCategory: "OBJCAT",
                             ExtraData: jobj.ExtraData
 
                         },

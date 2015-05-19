@@ -102,7 +102,7 @@ function SaveSip(reqz,callback) {
                     }
                     catch (ex) {
                         //console.log("An error occurred in data saving process ");
-                        logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Exception in saving UAC recs',reqId,ex);
+                        logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Exception in saving UAC records',reqId,ex);
 
                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
                         callback(null,jsonString);
@@ -180,9 +180,9 @@ function SaveUACRec(jobj,reqId,callback) {
                                             GuRefId: jobj.GuRefId,
                                             CompanyId: 1,
                                             TenantId: 1,
-                                            ObjClass: jobj.ObjClass,
-                                            ObjType: jobj.ObjType,
-                                            ObjCategory: jobj.ObjCategory,
+                                            ObjClass: "OBJCLZ",
+                                            ObjType: "OBJTYP",
+                                            ObjCategory: "OBJCAT",
                                             AddUser: jobj.AddUser,
                                             UpdateUser: jobj.UpdateUser
                                             // AddTime: new Date(2009, 10, 11),

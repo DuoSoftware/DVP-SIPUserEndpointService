@@ -34,11 +34,11 @@ function SaveUACRec(jobj,callback) {
                             ExtraData: jobj.ExtraData,
                             EmailAddress: jobj.EmailAddress,
                             GuRefId: jobj.GuRefId,
-                            CompanyId: jobj.CompanyId,
-                            TenantId: jobj.TenantId,
-                            ObjClass: jobj.ObjClass,
-                            ObjType: jobj.ObjType,
-                            ObjCategory: jobj.ObjCategory,
+                            ObjClass: "OBJCLZ",
+                            ObjType: "OBJTYP",
+                            ObjCategory: "OBJCAT",
+                            CompanyId: 1,
+                            TenantId: 1,
                             AddUser: jobj.AddUser,
                             UpdateUser: jobj.UpdateUser
                             // AddTime: new Date(2009, 10, 11),
@@ -47,7 +47,7 @@ function SaveUACRec(jobj,callback) {
 
 
                         }
-                    )
+                    );
 
                     SIPObject.save().complete(function (err) {
                         if (!err) {
