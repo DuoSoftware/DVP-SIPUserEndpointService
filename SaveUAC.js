@@ -7,6 +7,7 @@
  */
 var DbConn = require('DVP-DBModels');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var nodeUuid = require('node-uuid');
 
 //var SaveNewSipUser=function(UContext,UDescription,UCompanyId,UTenantId,UObjClass,UObjType,UObjCategory,UAddUser,UUpdateUser,UAddTime,UUpdateTime,callback)
 
@@ -25,9 +26,12 @@ function SaveUACRec(jobj,callback) {
 
                 if (!err && ContextObject) {
 
+                    var sipUserUuid = nodeUuid.v1();
+
                     var SIPObject = DbConn.SipUACEndpoint
                         .build(
                         {
+                            SipUserUuid: sipUserUuid,
                             SipUsername: jobj.SipUsername,
                             Password: jobj.Password,
                             Enabled: jobj.Enabled,

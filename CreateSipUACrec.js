@@ -10,6 +10,7 @@ var strfy = require('stringify');
 var winston=require('winston');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var nodeUuid = require('node-uuid');
 
 
 
@@ -166,12 +167,15 @@ function SaveUACRec(jobj,reqId,callback) {
                             else
                             {
                                 if (ContextObject) {
+
+                                    var sipUserUuid = nodeUuid.v1();
                                     //logger.info(' CSDBContextContext found,No errors ');
                                     //logger.info(' Creating SipObject ');
                                     logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s] - Record found for Context %s and saving SipUser',reqId,jobj.CSDBContextContext);
                                     var SIPObject = DbConn.SipUACEndpoint
                                         .build(
                                         {
+                                            SipUserUuid: sipUserUuid,
                                             SipUsername: jobj.SipUsername,
                                             Password: jobj.Password,
                                             Enabled: jobj.Enabled,
@@ -184,7 +188,7 @@ function SaveUACRec(jobj,reqId,callback) {
                                             ObjType: "OBJTYP",
                                             ObjCategory: "OBJCAT",
                                             AddUser: jobj.AddUser,
-                                            UpdateUser: jobj.UpdateUser,
+                                            UpdateUser: jobj.UpdateUser
 
 
                                             // AddTime: new Date(2009, 10, 11),
