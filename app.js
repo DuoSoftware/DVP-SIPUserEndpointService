@@ -187,6 +187,52 @@ RestServer.post('/DVP/'+version+'/UACManagement/UAC/:Username',function(req,res,
 
 });
 
+RestServer.get('/DVP/'+version+'/UACManagement/SipUserByUuid/:uuid',function(req,res,next)
+{
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+    var sipUuid = req.params.uuid;
+
+    try
+    {
+
+        logger.debug('[DVP-SIPUserEndpointService.SipUserByUuid] - [%s] - [HTTP]  - Request received -  Uuid - %s ',reqId,sipUuid);
+
+        context.GetSipUserDetailsByUuid(reqId,sipUuid, 1, 1, function (err, sipUsr) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.SipUserByUuid] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, sipUsr);
+                logger.debug('[DVP-SIPUserEndpointService.SipUserByUuid] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.SipUserByUuid] - [%s] - [HTTP]  - Exception in Request',reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.SipUserByUuid] - [%s] - Request response : %s ',reqId, jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+
+});
+
 //Tested :- Done
 //.......................................................................................................................
 

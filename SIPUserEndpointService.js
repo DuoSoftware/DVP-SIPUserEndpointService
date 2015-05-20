@@ -214,6 +214,30 @@ function AddOrUpdateContext(reqz,reqId,callback) {
     }
 }
 
+var GetSipUserDetailsByUuid = function(reqId, uuid, companyId, tenantId, callback)
+{
+    try
+    {
+        DbConn.SipUACEndpoint.find({where: [{SipUserUuid: uuid},{CompanyId: companyId},{TenantId: tenantId}]})
+            .complete(function (err, sipUsrData)
+            {
+                if(err)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.GetSipUserDetailsByUuid] - [%s] - [PGSQL] - Query failed',reqId, err);
+                }
+                else
+                {
+                    logger.debug('[DVP-SIPUserEndpointService.GetSipUserDetailsByUuid] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                }
+                callback(err, sipUsrData);
+            });
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+}
+
 //get :- done
 function GetContextDetails(reqz,reqId,callback)
 {
@@ -280,4 +304,5 @@ function GetContextDetails(reqz,reqId,callback)
 
 module.exports.AddOrUpdateContext = AddOrUpdateContext;
 module.exports.GetContextDetails = GetContextDetails;
+module.exports.GetSipUserDetailsByUuid = GetSipUserDetailsByUuid;
 
