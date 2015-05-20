@@ -57,9 +57,9 @@ function AddOrUpdateContext(reqz,reqId,callback) {
         //console.log("Error in adding new items to object created using request body");
         //logger.info('Exception found in object creation : ' + ex);
 
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+        //var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
 
-        callback("Exception",undefined);
+        callback(ex,undefined);
         //resz.end(jsonString);
 
     }
@@ -77,8 +77,8 @@ function AddOrUpdateContext(reqz,reqId,callback) {
 
                        // logger.info('Error found in Searching , Context :' + obj.Context + ' Error : ' + err);
                         logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Error occurred while searching Context %s ',reqId,obj.Context,err);
-                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
-                        callback("Error", undefined);
+                        //var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                        callback(err, undefined);
 
                     }
 

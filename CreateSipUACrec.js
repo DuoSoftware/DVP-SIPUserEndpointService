@@ -14,7 +14,7 @@ var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 
 
-function SaveSip(reqz,callback) {
+function SaveSip(reqz,reqId,callback) {
     //logger.info('Start Saving new SipUAC');
     try {
         var obj = reqz.body;//
@@ -184,7 +184,9 @@ function SaveUACRec(jobj,reqId,callback) {
                                             ObjType: "OBJTYP",
                                             ObjCategory: "OBJCAT",
                                             AddUser: jobj.AddUser,
-                                            UpdateUser: jobj.UpdateUser
+                                            UpdateUser: jobj.UpdateUser,
+
+
                                             // AddTime: new Date(2009, 10, 11),
                                             //  UpdateTime: new Date(2009, 10, 12),
                                             // CSDBCloudEndUserId: jobj.CSDBCloudEndUserId

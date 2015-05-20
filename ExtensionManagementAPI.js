@@ -28,16 +28,16 @@ var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 
 //post:-done
-function ChangeAvailability(ref,st,reqId,callback) {
+function ChangeAvailability(Id,st,reqId,callback) {
     //logger.info('Start of Extension availability changing ');
     var status = 0;
     try {
-        DbConn.Extension.find({where: {ExtRefId: ref}}).complete(function (err, ExtObject) {
+        DbConn.Extension.find({where: {id: Id}}).complete(function (err, ExtObject) {
             //logger.info('Requested RefID: ' + reqz.params.ref);
             // console.log(ExtObject);
             if (err) {
 
-                logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Error in searching ExtensionRefId %s ',reqId,ref,err);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Error in searching ExtensionRefId %s ',reqId,Id,err);
                 callback("Error Returns", undefined);
             }
             else
@@ -45,7 +45,7 @@ function ChangeAvailability(ref,st,reqId,callback) {
 
                 if (ExtObject) {
                     //logger.info('Updating Availability , RefID :' + reqz.params.ref);
-                    logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s ',reqId,st,ref);
+                    logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s ',reqId,st,Id);
 
                     try {
                         ExtObject.update(
@@ -56,20 +56,20 @@ function ChangeAvailability(ref,st,reqId,callback) {
                         ).then(function (result) {
                                 status = 1;
                                // console.log("Extension updated successfully");
-                                logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s is succeeded ',reqId,st,ref);
+                                logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s is succeeded ',reqId,st,Id);
                                 var jsonString = messageFormatter.FormatMessage(null, "Availability changed successfully", true, result);
                                 callback(undefined, result);
 
                             }).error(function (err) {
                                 console.log("Extension update false ->");
-                                logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s is failed ',reqId,st,ref,err);
+                                logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s is failed ',reqId,st,Id,err);
                                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
                                 callback("Error Found",undefined);
 
                             });
                     }
                     catch (ex) {
-                        logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Exception in Updating status to %s of ExtensionRefId %s',reqId,st,ref,ex);
+                        logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Exception in Updating status to %s of ExtensionRefId %s',reqId,st,Id,ex);
                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
                         callback("Exception found", undefined);
                     }
@@ -77,7 +77,7 @@ function ChangeAvailability(ref,st,reqId,callback) {
 
                 }
                 else {
-                    logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,ref);
+                    logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,Id);
                     var jsonString = messageFormatter.FormatMessage(null, "ERROR", false, null);
                     callback("Error Occured", undefined);
                 }
@@ -86,7 +86,7 @@ function ChangeAvailability(ref,st,reqId,callback) {
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Exception in searching Extension %s',reqId,ref,ex);
+        logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Exception in searching Extension %s',reqId,Id,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
         callback("Exception found",undefined);
     }
