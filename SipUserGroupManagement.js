@@ -653,43 +653,7 @@ function GetAllUsersInGroup(req,callback)
 
 }
 
-function Testme(req,callback)
-{
-    DbConn.Schedule.findAll({ where: Sequelize.and({id:req}), include: [
 
-        {
-            model:DbConn.Appointment,
-            where:Sequelize.or({'ObjCategory':'fdgdgd'})
-        }]})
-
-        .complete(function(err, result) {
-            if (!!err) {
-                //console.log('An error occurred while searching for Extension:', err);
-                //logger.info( 'Error found in searching : '+err );
-                var jsonString = messageFormatter.FormatMessage(err, "error has been found.", false, null);
-                callback(null, jsonString);
-
-            } else if (!result) {
-               // console.log('No user with the Extension has been found.');
-                ///logger.info( 'No user found for the requirement. ' );
-                var jsonString = messageFormatter.FormatMessage(err, "No user with the Schedule has been found.", false, null);
-                callback(null, jsonString);
-
-            } else {
-
-                //var Jresults = result.map(function (result) {
-                var jsonString = messageFormatter.FormatMessage(null, "No user with the user group has been found.", true, result);
-                callback(null, jsonString);
-                //});
-
-                //console.log(result.Action)
-
-            }
-
-        });
-    //res.end();
-
-}
 
 
 //post funcs
@@ -704,4 +668,4 @@ module.exports.GetGroupEndpoints = GetGroupEndpoints;
 module.exports.EndpointGroupID = EndpointGroupID;
 module.exports.AllRecWithCompany = AllRecWithCompany;
 module.exports.GetAllUsersInGroup = GetAllUsersInGroup;
-module.exports.Testme = Testme;
+
