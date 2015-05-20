@@ -126,7 +126,7 @@ function AddOrUpdateContext(reqz,reqId,callback) {
                                             //console.log("Error in saving  (Context :" + obj.Context + ")" + err);
                                             logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Context %s insertion  failed - Data %s',reqId,obj.Context,JSON.stringify(obj),err);
                                             var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, user);
-                                            callback("Error", undefined);
+                                            callback(err, undefined);
                                             //   callback(err, false);
                                             //pass error and false
                                         }
@@ -138,7 +138,7 @@ function AddOrUpdateContext(reqz,reqId,callback) {
                                 //console.log("An error occurred in data saving process ");
                                 logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s]  - Exception in detail creation of Context %s',reqId,obj.Context,ex);
                                 var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, user);
-                                callback("Exception", undefined);
+                                callback(ex, undefined);
 
                             }
 
@@ -183,7 +183,7 @@ function AddOrUpdateContext(reqz,reqId,callback) {
                                         //console.log("Project update failed !");
                                         logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Context %s Updation failed',reqId,obj.Context,err);
                                         var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
-                                        callback("Error", undefined);
+                                        callback(err, undefined);
                                         //handle error here
 
                                     });
@@ -191,7 +191,7 @@ function AddOrUpdateContext(reqz,reqId,callback) {
                             catch (ex) {
                                 logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Exception in updating context %s',reqId,obj.Context,ex);
                                 var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
-                                callback("Exception", undefined);
+                                callback(ex, undefined);
                             }
 
                         }
@@ -203,7 +203,7 @@ function AddOrUpdateContext(reqz,reqId,callback) {
         catch (ex) {
             logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Exception in Searching context %s',reqId,obj.Context,ex);
             var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, obj);
-            callback("Exception",undefined);
+            callback(ex,undefined);
         }
     }
     else
@@ -228,7 +228,7 @@ function GetContextDetails(reqz,reqId,callback)
                     //console.log('An error occurred while searching for Context:', err);
                     logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - Error in searching Context %s ',reqId,reqz,err);
                     var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for Context for Company :" + reqz, false, result);
-                    callback(null, jsonString);
+                    callback(err, undefined);
 
                 } else
                 {
@@ -237,7 +237,7 @@ function GetContextDetails(reqz,reqId,callback)
 
                         logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - No record found for Context %s ',reqId,reqz);
                         var jsonString = messageFormatter.FormatMessage(err, "No context for company :" + reqz, true, result);
-                        callback(undefined, undefined);
+                        callback("No Context record found", undefined);
                     }
                     else {
 
@@ -255,8 +255,8 @@ function GetContextDetails(reqz,reqId,callback)
                             //console.log("Error in creating json object to return : " + ex);
                            // logger.error('[DVP-LimitHandler.UACManagement.FindContextByCompany] - [%s] - [PGSQL]  - Exception in Record found for Context %s Data %s',reqId,reqz,Jresults);
                            // logger.debug('[DVP-LimitHandler.UACManagement.FindContextByCompany] - [%s] - [PGSQL]  - Record found for Context %s Data %s',reqId,reqz,Jresults);
-                            var jsonString = messageFormatter.FormatMessage(ex, "Exception found in json creating .", false, result);
-                            callback("Exception", undefined);
+                            //var jsonString = messageFormatter.FormatMessage(ex, "Exception found in json creating .", false, result);
+                            callback(ex, undefined);
                         }
 
                         // set as Json Object
@@ -269,8 +269,8 @@ function GetContextDetails(reqz,reqId,callback)
     catch (ex)
     {
         logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Exception in starting method : GetContextDetails  Context %s ',reqId,reqz);
-        var jsonString = messageFormatter.FormatMessage(ex, "Exception in calling function", false, null);
-        callback("Exception",undefined);
+        //var jsonString = messageFormatter.FormatMessage(ex, "Exception in calling function", false, null);
+        callback(ex,undefined);
 
     }
 

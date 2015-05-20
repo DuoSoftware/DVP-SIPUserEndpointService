@@ -26,7 +26,7 @@ function SaveSip(reqz,reqId,callback) {
         //console.log("Error in adding new items to object created using request body");
         //logger.info('Exception found : ' + ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        callback(null,jsonString);
+        callback(undefined,jsonString);
     }
 
 
@@ -63,7 +63,7 @@ function SaveSip(reqz,reqId,callback) {
                     //console.log('An error occurred while searching for SipUAC record:');
                     logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,obj.SipUsername,err);
                     var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for SipUAC record", false, result);
-                    callback(null,jsonString);
+                    callback(undefined,jsonString);
 
                 } else if (result == null) {
                     //console.log('No user with the Extension ' + obj.SipUsername + ' has been found.');
@@ -106,7 +106,7 @@ function SaveSip(reqz,reqId,callback) {
                         logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Exception in saving UAC records',reqId,ex);
 
                         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                        callback(null,jsonString);
+                        callback(undefined,jsonString);
 
 
                     }
@@ -118,7 +118,7 @@ function SaveSip(reqz,reqId,callback) {
                     //console.log('Cannot overwrite this record.Check given details........\n');
                     logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Found sip user %s',reqId,result.SipUsername);
                     var jsonString = messageFormatter.FormatMessage(null, "Cannot overwrite this record.Check given details........\n", false, result);
-                    callback(null,jsonString);
+                    callback(undefined,jsonString);
 
 
                 }
@@ -128,7 +128,7 @@ function SaveSip(reqz,reqId,callback) {
     catch (ex) {
         logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Exception in starting : SaveSip of %s',reqId,obj.SipUsername,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception in Saving sip", false, null);
-        callback(null,jsonString);
+        callback(undefined,jsonString);
     }
 
 
@@ -242,7 +242,7 @@ function SaveUACRec(jobj,reqId,callback) {
 
 
                                             //ogger.info('Save Succeeded');
-                                            callback(null, true);
+                                            //callback(undefined, true);
                                         }
                                         else {
                                             logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] -Error in inserting Sip user records %s',reqId,JSON.stringify(jobj),errSave);
@@ -262,7 +262,7 @@ function SaveUACRec(jobj,reqId,callback) {
                                    // logger.info('Returned ContextObject : ' + ContextObject);
                                     logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - No record found for context %s',reqId,jobj.CSDBContextContext);
                                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ContextObject);
-                                    callback("Error occured",undefined);
+                                    callback("Error occurred",undefined);
 
 
                                 }

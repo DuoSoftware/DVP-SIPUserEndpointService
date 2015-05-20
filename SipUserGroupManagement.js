@@ -95,7 +95,7 @@ function AddSipUserGroup(obj,reqId,callback)
                             else {
                                 logger.error('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - New user group insertion failed - Group %s',reqId,JSON.stringify(obj),err);
                                 console.log("..................... Error found in saving.................................... : " + err);
-                                callback("Error", undefined);
+                                callback(err, undefined);
 
                             }
 
@@ -105,7 +105,7 @@ function AddSipUserGroup(obj,reqId,callback)
                     catch (ex) {
                         logger.error('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - Exception in New user group insertion  - Group %s',reqId,JSON.stringify(obj),ex);
                         var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, null);
-                        callback("Exception : "+ex, undefined);
+                        callback(ex, undefined);
                     }
                 }
             }
@@ -118,7 +118,7 @@ function AddSipUserGroup(obj,reqId,callback)
     catch(ex)
     {
         logger.error('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - Exception in user group Searching   - Group %s',reqId,JSON.stringify(obj),ex);
-        callback("Exception",undefined);
+        callback(ex,undefined);
     }
 
 
@@ -174,7 +174,7 @@ function MapExtensionID(obj,callback)
                             }
 
                             else {
-                                callback(undefined, undefined);
+                                callback("No group record found", undefined);
                             }
 
                         })
@@ -258,7 +258,7 @@ function FillUsrGrp(obj,reqId,callback)
 
                             else {
                                 logger.error('[DVP-SIPUserEndpointService.SipUserGroupManagement.FillSipUserGroup] - [%s] - [PGSQL]  - No record found for group %s  ',reqId,obj.GroupId);
-                                callback(undefined, undefined);
+                                callback("No Group record found", undefined);
                             }
 
                         })
@@ -449,7 +449,7 @@ function GetGroupData(obj,reqId,callback)
                     ///logger.info( 'No user found for the requirement. ' );
                         logger.debug('[DVP-SIPUserEndpointService.GroupData] - [%s] - [PGSQL]  - No record found for Group %s ',reqId,obj,err);
                     var jsonString = messageFormatter.FormatMessage(null, "Null object returns", false, null);
-                    callback(undefined, undefined);
+                    callback("No group record found", undefined);
 
                 } else {
 
@@ -495,7 +495,7 @@ function GetGroupEndpoints(obj,reqId,callback)
                         logger.error('[DVP-SIPUserEndpointService.GroupEndPoints] - [%s] - [PGSQL]  - No record found for GroupEndpoints of CSDBUserGroupId %s ',reqId,obj);
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "No user found", false, null);
-                    callback(undefined, undefined);
+                    callback("No group record found", undefined);
 
                 } else {
 
@@ -540,7 +540,7 @@ function EndpointGroupID(obj,reqId,callback)
                         logger.error('[DVP-SIPUserEndpointService.EndpointGroupID] - [%s] - [PGSQL]  - No records for SipUACEndpoint %s ',reqId,obj);
                         ///logger.info( 'No user found for the requirement. ' );
                         var jsonString = messageFormatter.FormatMessage(err, "No user with the Extension has been found.", false, null);
-                        callback(undefined, undefined);
+                        callback("No group record found", undefined);
 
                     } else {
                         logger.debug('[DVP-SIPUserEndpointService.EndpointGroupID] - [%s] - [PGSQL]  - Records for SipUACEndpoint %s ',reqId,obj);
@@ -586,7 +586,7 @@ function AllRecWithCompany(req,reqId,callback)
                     logger.error('[DVP-SIPUserEndpointService.AllRecWithCompany] - [%s] - [PGSQL]  - No Group records found for company %s ',reqId,req);
                 ///logger.info( 'No user found for the requirement. ' );
                 var jsonString = messageFormatter.FormatMessage(err, "No user with the user group has been found.", false, null);
-                    callback(undefined, undefined);
+                    callback("No group record found", undefined);
 
             } else {
 
@@ -628,7 +628,7 @@ function GetAllUsersInGroup(req,callback)
                         logger.error('[DVP-SIPUserEndpointService.AllUsersInGroup] - [%s] - [PGSQL]  - No User record found for Group %s ',reqId,req);
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "No user with the group has been found.", false, null);
-                        callback(undefined, undefined);
+                        callback("No group record found", undefined);
 
                 } else {
 

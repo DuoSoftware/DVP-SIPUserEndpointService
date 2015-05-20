@@ -38,7 +38,7 @@ try{
                 console.log('No user has been found.');
                     logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,jobj.SipUsername);
                 var jsonString = messageFormatter.FormatMessage(err, "No record found", false, null);
-                    callback(undefined, undefined);
+                    callback("No SipUser record found", undefined);
 
             }
             else {
@@ -118,7 +118,7 @@ function GetSIPUsersOfCompany(reqz,reqId,callback)
 
                         logger.error('[DVP-SIPUserEndpointService.AllSIPUsersOfCompany] - [%s] - [PGSQL]  - No record found for SipUser of Company %s ',reqId,reqz);
                         //var jsonString = messageFormatter.FormatMessage(err, "No context for company :" + reqz, true, result);
-                        callback("No Records", undefined);
+                        callback("No SipUSer record found", undefined);
                     }
                     else {
 
