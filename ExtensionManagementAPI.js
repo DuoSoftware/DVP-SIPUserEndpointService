@@ -3,7 +3,7 @@
  */
 
 var DbConn = require('DVP-DBModels');
-var DbSave=require('./SaveSipUserData.js');
+//var DbSave=require('./SaveSipUserData.js');
 var restify = require('restify');
 var winston=require('winston');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');

@@ -3,7 +3,7 @@
  */
 
 var DbConn = require('DVP-DBModels');
-var DbSave=require('./SaveUAC.js');
+//var DbSave=require('./SaveUAC.js');
 var DbUpdate=require('./UpdateSipUserData.js');
 var restify = require('restify');
 var strfy = require('stringify');

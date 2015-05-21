@@ -4,7 +4,7 @@
 //C:\DVP\DVP-SIPUsersEndpointService\DVP-Common\CSORMModels\CsDataModel.js
 
 var DbConn = require('DVP-DBModels');
-var DbSave=require('./SaveSipUserData.js');
+//var DbSave=require('./SaveSipUserData.js');
 var restify = require('restify');
 var strfy = require('stringify');
 var winston=require('winston');
@@ -12,16 +12,7 @@ var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJ
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 
-var logger = new (winston.Logger)({
-    transports: [
-        new winston.transports.Console(),
-        new winston.transports.File({ filename: './ContextMgtLog.log' })
 
-    ],
-    exceptionHandlers: [
-        new winston.transports.File({ filename: './ContextMgtLogErr.log' })
-    ]
-});
 
 
 
