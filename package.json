@@ -12,7 +12,6 @@
     "restify": "^3.0.2",
     "sequelize": "^2.1.0",
     "stringify": "^3.1.0",
-    "swagger-restify-express": "^0.2.1",
     "winston": "^1.0.0",
     "node-uuid": "^1.4.3"
   },

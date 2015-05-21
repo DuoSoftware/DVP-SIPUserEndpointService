@@ -3,7 +3,6 @@
  */
 
 var restify = require('restify');
-var sre = require('swagger-restify-express');
 var context=require('./SIPUserEndpointService.js');
 var UACCreate=require('./CreateSipUACrec.js');
 var Extmgt=require('./ExtensionManagementAPI.js');
