@@ -36,7 +36,7 @@ RestServer.listen(port, function () {
 //.......................................................................................................................
 
 //RestServer.post('/dvp/'+version+'/context_mgmt/save_contextdata',function(req,res,next)
-RestServer.post('/DVP/'+version+'/ContextManagement/Context',function(req,res,next)
+RestServer.post('/DVP/API/'+version+'/ContextManagement/Context',function(req,res,next)
 {
     var reqId='';
 
@@ -90,7 +90,7 @@ RestServer.post('/DVP/'+version+'/ContextManagement/Context',function(req,res,ne
 
 //RestServer.post('/dvp/'+version+'/uac_mgmt/save_uac',function(req,res,next)
 //check body cmp tent
-RestServer.post('/DVP/'+version+'/UACManagement/UAC',function(req,res,next)
+RestServer.post('/DVP/API/'+version+'/UACManagement/UAC',function(req,res,next)
 {
     var reqId='';
 
@@ -140,7 +140,7 @@ RestServer.post('/DVP/'+version+'/UACManagement/UAC',function(req,res,next)
 
 //RestServer.post('/dvp/'+version+'/uac_mgmt/updt_uac',function(req,res,next)
 //check body cmp tent
-RestServer.post('/DVP/'+version+'/UACManagement/UAC/:Username',function(req,res,next)
+RestServer.post('/DVP/API/'+version+'/UACManagement/UAC/:Username',function(req,res,next)
 {
     var reqId='';
 
@@ -186,7 +186,7 @@ RestServer.post('/DVP/'+version+'/UACManagement/UAC/:Username',function(req,res,
 
 });
 
-RestServer.get('/DVP/'+version+'/UACManagement/SipUserByUuid/:uuid',function(req,res,next)
+RestServer.get('/DVP/API/'+version+'/UACManagement/SipUserByUuid/:uuid',function(req,res,next)
 {
     var reqId='';
 
@@ -732,12 +732,14 @@ RestServer.get('/DVP/'+version+'/UACManagement/Context/:cmpid',function(req,res,
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
                 logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Request response : %s ',reqId,jsonString);
+                console.log(jsonString);
                 res.end(jsonString);
             }
             else
             {
                 var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
                 logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Request response : %s ',reqId,jsonString);
+                console.log(jsonString);
                 res.end(jsonString);
             }
         });
@@ -747,6 +749,7 @@ RestServer.get('/DVP/'+version+'/UACManagement/Context/:cmpid',function(req,res,
         logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [HTTP]  - Exception in Request  -  Data - %s',reqId,req.params.cmpid);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
         logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Request response : %s ',reqId,jsonString);
+        console.log(jsonString);
         res.end(jsonString);
     }
     return next();
@@ -1146,6 +1149,7 @@ RestServer.get('/DVP/'+version+'/ExtensionManagement/ExtensionsOfCompany/:Cmp',f
 
 
 });
+
 
 RestServer.get('/DVP/'+version+'/ExtensionManagement/Extension/:Ext',function(req,res,next)
 {
