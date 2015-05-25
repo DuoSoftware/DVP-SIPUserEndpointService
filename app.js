@@ -13,25 +13,31 @@ var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJ
 var config = require('config');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 var uuid = require('node-uuid');
+var cors = require('cors');
 
 var port = config.Host.port || 3000;
 var version=config.Host.version;
+
 
 
 var RestServer = restify.createServer({
     name: "myapp",
     version: '1.0.0'
 });
+
+RestServer.listen(port, function () {
+    console.log('%s listening at %s', RestServer.name, RestServer.url);
+});
+
 //Server listen
 
 //Enable request body parsing(access)
 RestServer.use(restify.bodyParser());
 RestServer.use(restify.acceptParser(RestServer.acceptable));
 RestServer.use(restify.queryParser());
+RestServer.use(cors());
 
-RestServer.listen(port, function () {
-    console.log('%s listening at %s', RestServer.name, RestServer.url);
-});
+
 //Tested :- Done
 //.......................................................................................................................
 
