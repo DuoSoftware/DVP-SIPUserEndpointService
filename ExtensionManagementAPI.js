@@ -26,6 +26,47 @@ var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
  */
 
+var GetAllUserDataForExt = function(reqId, extension, tenantId, callback)
+{
+    try
+    {
+        dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId}]})
+            .complete(function (err, extData)
+            {
+                if(err)
+                {
+                    callback(err, undefined);
+                }
+                else if(extData)
+                {
+                    if(extData.ObjCategory === 'USER')
+                    {
+                        dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId}], include: [{model: dbModel.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: dbModel.UserGroup, as:'UserGroup', include: [{model: dbModel.Extension, as:'Extension'}]}]}]})
+                            .complete(function (err, extData)
+                            {
+                                callback(err, extData);
+                            });
+                    }
+                    else
+                    {
+                        callback(undefined, undefined);
+                    }
+
+                }
+                else
+                {
+                    callback(undefined, undefined);
+                }
+
+            });
+    }
+    catch(ex)
+    {
+        callback(ex, false);
+    }
+
+};
+
 
 //post:-done
 function ChangeAvailability(Id,st,reqId,callback) {
@@ -746,3 +787,4 @@ module.exports.MapwithGroup = MapwithGroup;
 module.exports.GetUserDataOfExtension = GetUserDataOfExtension;
 module.exports.GetExtensionsOfCompany = GetExtensionsOfCompany;
 module.exports.GetExtensions = GetExtensions;
+module.exports.GetAllUserDataForExt = GetAllUserDataForExt;

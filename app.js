@@ -241,6 +241,52 @@ RestServer.get('/DVP/API/'+version+'/UACManagement/SipUserByUuid/:uuid',function
 //Tested :- Done
 //.......................................................................................................................
 
+RestServer.get('/DVP/API/'+version+'/ExtensionManagement/FullExtensionDetails/:ext',function(req,res,next)
+{
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+    var ext = req.params.ext;
+
+    try
+    {
+
+        logger.debug('[DVP-SIPUserEndpointService.FullExtensionDetails] - [%s] - [HTTP]  - Request received -  ext - %s ',reqId,ext);
+
+        Extmgt.GetAllUserDataForExt(reqId,ext, 3, function (err, extInfo) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.FullExtensionDetails] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, extInfo);
+                logger.debug('[DVP-SIPUserEndpointService.FullExtensionDetails] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.FullExtensionDetails] - [%s] - [HTTP]  - Exception in Request',reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.FullExtensionDetails] - [%s] - Request response : %s ',reqId, jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+
+});
+
 //RestServer.post('/dvp/'+version+'/ext_mgmt/update_extension_st/:ref/:st',function(req,res,next)
 RestServer.post('/DVP/'+version+'/ExtensionManagement/ExtensionStatus/:id/:st',function(req,res,next)
 {
