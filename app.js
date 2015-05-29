@@ -42,7 +42,7 @@ RestServer.use(cors());
 //.......................................................................................................................
 
 //RestServer.post('/dvp/'+version+'/context_mgmt/save_contextdata',function(req,res,next)
-RestServer.post('/DVP/API/'+version+'/ContextManagement/Context',function(req,res,next)
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ContextManagement/Context',function(req,res,next)
 {
     var reqId='';
 
@@ -96,7 +96,7 @@ RestServer.post('/DVP/API/'+version+'/ContextManagement/Context',function(req,re
 
 //RestServer.post('/dvp/'+version+'/uac_mgmt/save_uac',function(req,res,next)
 //check body cmp tent
-RestServer.post('/DVP/API/'+version+'/UACManagement/UAC',function(req,res,next)
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/UACManagement/UAC',function(req,res,next)
 {
     var reqId='';
 
@@ -146,7 +146,7 @@ RestServer.post('/DVP/API/'+version+'/UACManagement/UAC',function(req,res,next)
 
 //RestServer.post('/dvp/'+version+'/uac_mgmt/updt_uac',function(req,res,next)
 //check body cmp tent
-RestServer.post('/DVP/API/'+version+'/UACManagement/UAC/:Username',function(req,res,next)
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/UACManagement/UAC/:Username',function(req,res,next)
 {
     var reqId='';
 
@@ -192,7 +192,7 @@ RestServer.post('/DVP/API/'+version+'/UACManagement/UAC/:Username',function(req,
 
 });
 
-RestServer.get('/DVP/API/'+version+'/UACManagement/SipUserByUuid/:uuid',function(req,res,next)
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/UACManagement/SipUserByUuid/:uuid',function(req,res,next)
 {
     var reqId='';
 
@@ -242,7 +242,7 @@ RestServer.get('/DVP/API/'+version+'/UACManagement/SipUserByUuid/:uuid',function
 //.......................................................................................................................
 
 //RestServer.post('/dvp/'+version+'/ext_mgmt/update_extension_st/:ref/:st',function(req,res,next)
-RestServer.post('/DVP/'+version+'/ExtensionManagement/ExtensionStatus/:id/:st',function(req,res,next)
+RestServer.post('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/ExtensionStatus/:id/:st',function(req,res,next)
 {
     var reqId='';
 
@@ -291,7 +291,7 @@ RestServer.post('/DVP/'+version+'/ExtensionManagement/ExtensionStatus/:id/:st',f
 //.......................................................................................................................
 
 //RestServer.post('/dvp/'+version+'/ext_mgmt/add_extension',function(req,res,next)
-RestServer.post('/DVP/'+version+'/ExtensionManagement/Extension',function(req,res,next)
+RestServer.post('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/Extension',function(req,res,next)
 {
     var reqId='';
 
@@ -350,7 +350,7 @@ RestServer.post('/DVP/'+version+'/ExtensionManagement/Extension',function(req,re
 //RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_with_UAC',function(req,res,next)
 
 //check
-RestServer.post('/DVP/'+version+'/ExtensionManagement/:Ext/MapToUAC/:UAC',function(req,res,next)
+RestServer.post('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/:Ext/MapToUAC/:UAC',function(req,res,next)
 {
     var reqId='';
 
@@ -404,7 +404,7 @@ RestServer.post('/DVP/'+version+'/ExtensionManagement/:Ext/MapToUAC/:UAC',functi
 
 //RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_group',function(req,res,next)
 //check
-RestServer.post('/DVP/'+version+'/ExtensionManagement/:Ext/MapToGroup/:Grp',function(req,res,next)
+RestServer.post('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/:Ext/MapToGroup/:Grp',function(req,res,next)
 {
 
     //Updated
@@ -492,7 +492,7 @@ RestServer.post('/DVP/'+version+'/ExtensionManagement/:Ext/MapToGroup/:Grp',func
 //.......................................................................................................................
 
 //RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/add_sipuser_group',function(req,res,next)
-RestServer.post('/dvp/'+version+'/SIPUserGroupManagemnt/SIPUserGroup',function(req,res,next)
+RestServer.post('/dvp/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/SIPUserGroup',function(req,res,next)
 {
     var reqId='';
 
@@ -575,7 +575,7 @@ RestServer.post('/dvp/'+version+'/SIPUserGroupManagemnt/SIPUserGroup',function(r
 //RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/fill_usrgrp',function(req,res,next)
 
 // No need
-RestServer.post('/DVP/'+version+'/SIPUserGroupManagemnt/fill_usrgrp',function(req,res,next)
+RestServer.post('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/fill_usrgrp',function(req,res,next)
 {
     var reqId='';
 
@@ -628,7 +628,7 @@ RestServer.post('/DVP/'+version+'/SIPUserGroupManagemnt/fill_usrgrp',function(re
 
 //RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/update_sipuser_group',function(req,res,next)
 //check
-RestServer.post('/DVP/'+version+'/SIPUserGroupManagemnt/SIPUserGroup/:id',function(req,res,next)
+RestServer.post('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/SIPUserGroup/:id',function(req,res,next)
 {
     var reqId='';
 
@@ -714,7 +714,7 @@ RestServer.post('/DVP/'+version+'/SIPUserGroupManagemnt/SIPUserGroup/:id',functi
 
 //RestServer.get('/dvp/'+version+'/uac_mgmt/find_context/:cmpid',function(req,res,next)
 //check
-RestServer.get('/DVP/'+version+'/UACManagement/Context/:cmpid',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SipUserEndpointService/UACManagement/Context/:cmpid',function(req,res,next)
 {
     var reqId='';
 
@@ -769,7 +769,7 @@ RestServer.get('/DVP/'+version+'/UACManagement/Context/:cmpid',function(req,res,
 //.......................................................................................................................
 
 //RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_group_data/:name',function(req,res,next)
-RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/Group/:name',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/Group/:name',function(req,res,next)
 {
     var reqId='';
 
@@ -820,7 +820,7 @@ RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/Group/:name',function(req
 
 
 //RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_group_endpoints/:GID',function(req,res,next)
-RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/GroupEndPoints/:GID',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/GroupEndPoints/:GID',function(req,res,next)
 {
     var reqId='';
 
@@ -870,7 +870,7 @@ RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/GroupEndPoints/:GID',func
 
 
 //RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/endpoint_groupid/:EID',function(req,res,next)
-RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/EndPointGroupId/:EID',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/EndPointGroupId/:EID',function(req,res,next)
 {
 
     var reqId='';
@@ -920,7 +920,7 @@ RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/EndPointGroupId/:EID',fun
 
 
 //RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/AllRecWithCompany/:CompanyId',function(req,res,next)
-RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/GroupsOfCompany/:CompanyId',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/GroupsOfCompany/:CompanyId',function(req,res,next)
 {
     var reqId='';
 
@@ -968,7 +968,7 @@ RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/GroupsOfCompany/:CompanyI
 //.......................................................................................................................
 
 //RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_all_users_in_group/:companyid',function(req,res,next)
-RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/UsersInGroup/:Grp',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/UsersInGroup/:Grp',function(req,res,next)
 {
     var reqId='';
 
@@ -1018,7 +1018,7 @@ RestServer.get('/DVP/'+version+'/SIPUserGroupManagemnt/UsersInGroup/:Grp',functi
 // New
 
 
-RestServer.get('/DVP/'+version+'/UACManagement/UsersOfCompany/:CompId',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SipUserEndpointService/UACManagement/UsersOfCompany/:CompId',function(req,res,next)
 {
     var reqId='';
 
@@ -1064,7 +1064,7 @@ RestServer.get('/DVP/'+version+'/UACManagement/UsersOfCompany/:CompId',function(
 
 });
 
-RestServer.get('/DVP/'+version+'/ExtensionManagement/UsersOfExtension/:Ext',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/UsersOfExtension/:Ext',function(req,res,next)
 {
     var reqId='';
 
@@ -1110,7 +1110,7 @@ RestServer.get('/DVP/'+version+'/ExtensionManagement/UsersOfExtension/:Ext',func
 
 });
 
-RestServer.get('/DVP/'+version+'/ExtensionManagement/ExtensionsOfCompany/:Cmp',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/ExtensionsOfCompany/:Cmp',function(req,res,next)
 {
     var reqId='';
 
@@ -1157,7 +1157,7 @@ RestServer.get('/DVP/'+version+'/ExtensionManagement/ExtensionsOfCompany/:Cmp',f
 });
 
 
-RestServer.get('/DVP/'+version+'/ExtensionManagement/Extension/:Ext',function(req,res,next)
+RestServer.get('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/Extension/:Ext',function(req,res,next)
 {
     var reqId='';
 
