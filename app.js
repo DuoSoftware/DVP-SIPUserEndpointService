@@ -38,6 +38,331 @@ RestServer.use(restify.queryParser());
 RestServer.use(cors());
 
 
+RestServer.put('/DVP/API/' + version + '/PBXService/NewDidNumber', function(req, res, next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        var securityToken = req.header('authorization');
+        var reqBody = req.body;
+
+        logger.debug('[DVP-PBXService.NewDidNumber] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
+
+        if(reqBody && securityToken) {
+            reqBody.CompanyId = 1;
+            reqBody.TenantId = 3;
+
+
+            pbxBackendHandler.AddDidNumberDB(reqId, reqBody, function (err, addResult)
+            {
+                if (err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Add NewDidNumber Failed", false, false);
+                    logger.debug('[DVP-PBXService.NewDidNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Add NewDidNumber Success", true, addResult);
+                    logger.debug('[DVP-PBXService.NewDidNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+
+            })
+
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error('Empty request body or no authorization token set'), "Empty request body or no authorization token set", false, false);
+            logger.debug('[DVP-PBXService.NewPbxUserTemplate] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PBXService.NewPbxUserTemplate] - [%s] - Exception Occurred', reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, false);
+        logger.debug('[DVP-PBXService.NewPbxUserTemplate] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
+RestServer.post('/DVP/API/' + version + '/PBXService/SetDodNumber', function(req, res, next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        var securityToken = req.header('authorization');
+        var userUuid = req.body.UserUuid;
+        var dodNumber = req.body.DodNumber;
+        var isActive = req.body.DodActive;
+
+        logger.debug('[DVP-PBXService.SetDodNumber] - [%s] - HTTP Request Received - Req Body : %s', reqId, req.body);
+
+        if(securityToken)
+        {
+            pbxBackendHandler.SetDodNumberToUserDB(reqId, dodNumber, userUuid, 1, 3, isActive, function (err, updateRes) {
+                if (err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Set Dod number Failed", false, false);
+                    logger.debug('[DVP-PBXService.SetDodNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Set Dod Number Success", true, updateRes);
+                    logger.debug('[DVP-PBXService.SetDodNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+
+            })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error('Empty request body or no authorization token set'), "Empty request body or no authorization token set", false, false);
+            logger.debug('[DVP-PBXService.SetDidNumberStatus] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PBXService.SetDidNumberStatus] - [%s] - Exception Occurred', reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, false);
+        logger.debug('[DVP-PBXService.SetDidNumberStatus] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
+RestServer.post('/DVP/API/' + version + '/PBXService/DidNumber/:id/Activate/:isActive', function(req, res, next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        var securityToken = req.header('authorization');
+        var didId = req.params.id;
+        var isActive = req.params.isActive;
+
+        logger.debug('[DVP-PBXService.SetDidNumberStatus] - [%s] - HTTP Request Received - Req Params : DidId : %s, isActive " %s', reqId, didId, isActive);
+
+        if(securityToken)
+        {
+            pbxBackendHandler.SetDidNumberActiveStatusDB(reqId, didId, 1, 3, isActive, function (err, assignResult) {
+                if (err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Set Did Number Status Failed", false, false);
+                    logger.debug('[DVP-PBXService.SetDidNumberStatus] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Set Did Number Status Success", true, assignResult);
+                    logger.debug('[DVP-PBXService.SetDidNumberStatus] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+
+            })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error('Empty request body or no authorization token set'), "Empty request body or no authorization token set", false, false);
+            logger.debug('[DVP-PBXService.SetDidNumberStatus] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PBXService.SetDidNumberStatus] - [%s] - Exception Occurred', reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, false);
+        logger.debug('[DVP-PBXService.SetDidNumberStatus] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
+RestServer.del('/DVP/API/' + version + '/PBXService/DidNumber/:id', function(req, res, next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        var securityToken = req.header('authorization');
+        var didId = req.params.id;
+
+        logger.debug('[DVP-PBXService.DeletePBXUser] - [%s] - HTTP Request Received - Req Params - didId : %s', reqId, didId);
+
+        if(securityToken)
+        {
+
+            pbxBackendHandler.DeleteDidNumberDB(reqId, didId, 1, 3, function (err, delResult)
+            {
+                if (err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Delete DID Record Failed", false, false);
+                    logger.debug('[DVP-PBXService.DeletePBXUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Delete DID Record Success", true, delResult);
+                    logger.debug('[DVP-PBXService.DeletePBXUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+
+            })
+
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error('Empty request params or no authorization token set'), "Empty request body or no authorization token set", false, false);
+            logger.debug('[DVP-PBXService.DeletePBXUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PBXService.DeletePBXUser] - [%s] - Exception Occurred', reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, false);
+        logger.debug('[DVP-PBXService.DeletePBXUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
+RestServer.get('/DVP/API/' + version + '/PBXService/DidNumbers', function(req, res, next)
+{
+    var emptyArr = [];
+    var reqId = uuid.v1();
+    try
+    {
+        var securityToken = req.header('authorization');
+
+        logger.debug('[DVP-PBXService.DidNumbers] - [%s] - HTTP Request Received', reqId);
+
+        if(securityToken)
+        {
+
+            pbxBackendHandler.GetDidNumbersForCompanyDB(reqId, 1, 3, function (err, didNums)
+            {
+                if (err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Get did numbers for company Failed", false, didNums);
+                    logger.debug('[DVP-PBXService.DidNumbers] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Get did numbers for company Success", true, didNums);
+                    logger.debug('[DVP-PBXService.DidNumbers] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+
+            })
+
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error('Empty request params or no authorization token set'), "Empty request params or no authorization token set", false, emptyArr);
+            logger.debug('[DVP-PBXService.DidNumbers] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PBXService.DidNumbers] - [%s] - Exception Occurred', reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, emptyArr);
+        logger.debug('[DVP-PBXService.DidNumbers] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
+RestServer.post('/DVP/API/' + version + '/PBXService/AssignDidNumberToUser', function(req, res, next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        var securityToken = req.header('authorization');
+        var reqBody = req.body;
+
+        logger.debug('[DVP-PBXService.AssignDidNumberToUser] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
+
+        if(reqBody && securityToken)
+        {
+            var pbxUserUuid = req.body.PbxUserUuid;
+            var didId = req.body.DidId;
+
+            if(pbxUserUuid && didId)
+            {
+                pbxBackendHandler.AssignDidNumberToUserDB(reqId, didId, pbxUserUuid, 1, 3, function(err, assignResult)
+                {
+                    if(err)
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Assign Did to user Failed", false, false);
+                        logger.debug('[DVP-PBXService.AssignDidNumberToUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+                    else
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Assign Did to user Success", true, assignResult);
+                        logger.debug('[DVP-PBXService.AssignDidNumberToUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+
+                })
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(new Error('Pbx user id and did record not given'), "Pbx user id and did record not given", false, false);
+                logger.debug('[DVP-PBXService.AssignDidNumberToUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error('Empty request body or no authorization token set'), "Empty request body or no authorization token set", false, false);
+            logger.debug('[DVP-PBXService.AssignDidNumberToUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PBXService.AssignDidNumberToUser] - [%s] - Exception Occurred', reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, false);
+        logger.debug('[DVP-PBXService.AssignDidNumberToUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
 //Tested :- Done
 //.......................................................................................................................
 

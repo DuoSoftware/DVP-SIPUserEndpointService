@@ -30,7 +30,7 @@ var GetAllUserDataForExt = function(reqId, extension, tenantId, callback)
 {
     try
     {
-        dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId}]})
+        DbConn.Extension.find({where: [{Extension: extension},{TenantId: tenantId}]})
             .complete(function (err, extData)
             {
                 if(err)
@@ -41,7 +41,7 @@ var GetAllUserDataForExt = function(reqId, extension, tenantId, callback)
                 {
                     if(extData.ObjCategory === 'USER')
                     {
-                        dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId}], include: [{model: dbModel.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: dbModel.UserGroup, as:'UserGroup', include: [{model: dbModel.Extension, as:'Extension'}]}]}]})
+                        DbConn.Extension.find({where: [{Extension: extension},{TenantId: tenantId}], include: [{model: DbConn.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: DbConn.CloudEndUser, as:'CloudEndUser'},{model: DbConn.UserGroup, as:'UserGroup', include: [{model: DbConn.Extension, as:'Extension'}]}]}]})
                             .complete(function (err, extData)
                             {
                                 callback(err, extData);
