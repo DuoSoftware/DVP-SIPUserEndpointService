@@ -772,11 +772,11 @@ RestServer.get('/DVP/API/'+version+'/ExtensionManagement/FullExtensionDetails/:e
 });
 
 //RestServer.post('/dvp/'+version+'/ext_mgmt/update_extension_st/:ref/:st',function(req,res,next)
-<<<<<<< HEAD
-RestServer.post('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/ExtensionStatus/:id/:st',function(req,res,next)
-=======
-RestServer.post('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/ExtensionStatus/:id/:st',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+//RestServer.post('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/ExtensionStatus/:id/:st',function(req,res,next)
+
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement/ExtensionStatus/:id/:st',function(req,res,next)
+
 {
     var reqId='';
 
@@ -825,11 +825,11 @@ RestServer.post('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/
 //.......................................................................................................................
 
 //RestServer.post('/dvp/'+version+'/ext_mgmt/add_extension',function(req,res,next)
-<<<<<<< HEAD
-RestServer.post('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/Extension',function(req,res,next)
-=======
-RestServer.post('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/Extension',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+//RestServer.post('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/Extension',function(req,res,next)
+
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement/Extension',function(req,res,next)
+
 {
     var reqId='';
 
@@ -888,11 +888,9 @@ RestServer.post('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/
 //RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_with_UAC',function(req,res,next)
 
 //check
-<<<<<<< HEAD
-RestServer.post('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/:Ext/MapToUAC/:UAC',function(req,res,next)
-=======
-RestServer.post('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/:Ext/MapToUAC/:UAC',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement/:Ext/MapToUAC/:UAC',function(req,res,next)
+
 {
     var reqId='';
 
@@ -946,11 +944,9 @@ RestServer.post('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/
 
 //RestServer.post('/dvp/'+version+'/ext_mgmt/map_extension_group',function(req,res,next)
 //check
-<<<<<<< HEAD
-RestServer.post('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/:Ext/MapToGroup/:Grp',function(req,res,next)
-=======
-RestServer.post('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/:Ext/MapToGroup/:Grp',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement/:Ext/MapToGroup/:Grp',function(req,res,next)
+
 {
 
     //Updated
@@ -1038,11 +1034,8 @@ RestServer.post('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/
 //.......................................................................................................................
 
 //RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/add_sipuser_group',function(req,res,next)
-<<<<<<< HEAD
-RestServer.post('/dvp/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/SIPUserGroup',function(req,res,next)
-=======
-RestServer.post('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/SIPUserGroup',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/SIPUserGroup',function(req,res,next)
 {
     var reqId='';
 
@@ -1125,11 +1118,11 @@ RestServer.post('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemn
 //RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/fill_usrgrp',function(req,res,next)
 
 // No need
-<<<<<<< HEAD
-RestServer.post('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/fill_usrgrp',function(req,res,next)
-=======
-RestServer.post('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/fill_usrgrp',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+
+
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/fill_usrgrp',function(req,res,next)
+
 {
     var reqId='';
 
@@ -1182,11 +1175,9 @@ RestServer.post('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemn
 
 //RestServer.post('/dvp/'+version+'/sipgroup_mgt/sipuser_group/update_sipuser_group',function(req,res,next)
 //check
-<<<<<<< HEAD
-RestServer.post('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/SIPUserGroup/:id',function(req,res,next)
-=======
-RestServer.post('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/SIPUserGroup/:id',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/SIPUserGroup/:id',function(req,res,next)
+
 {
     var reqId='';
 
@@ -1272,11 +1263,8 @@ RestServer.post('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemn
 
 //RestServer.get('/dvp/'+version+'/uac_mgmt/find_context/:cmpid',function(req,res,next)
 //check
-<<<<<<< HEAD
-RestServer.get('/DVP/'+version+'/SipUserEndpointService/UACManagement/Context/:cmpid',function(req,res,next)
-=======
-RestServer.get('/DVP/API'+version+'/SipUserEndpointService/UACManagement/Context/:cmpid',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/UACManagement/Context/:cmpid',function(req,res,next)
 {
     var reqId='';
 
@@ -1330,12 +1318,10 @@ RestServer.get('/DVP/API'+version+'/SipUserEndpointService/UACManagement/Context
 //Tested :- Done
 //.......................................................................................................................
 
-//RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_group_data/:name',function(req,res,next)
-<<<<<<< HEAD
-RestServer.get('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/Group/:name',function(req,res,next)
-=======
-RestServer.get('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/Group/:name',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/Group/:name',function(req,res,next)
+
 {
     var reqId='';
 
@@ -1386,11 +1372,9 @@ RestServer.get('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt
 
 
 //RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_group_endpoints/:GID',function(req,res,next)
-<<<<<<< HEAD
-RestServer.get('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/GroupEndPoints/:GID',function(req,res,next)
-=======
-RestServer.get('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/GroupEndPoints/:GID',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/GroupEndPoints/:GID',function(req,res,next)
+
 {
     var reqId='';
 
@@ -1439,12 +1423,9 @@ RestServer.get('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt
 
 
 
-//RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/endpoint_groupid/:EID',function(req,res,next)
-<<<<<<< HEAD
-RestServer.get('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/EndPointGroupId/:EID',function(req,res,next)
-=======
-RestServer.get('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/EndPointGroupId/:EID',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/EndPointGroupId/:EID',function(req,res,next)
+
 {
 
     var reqId='';
@@ -1494,11 +1475,9 @@ RestServer.get('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt
 
 
 //RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/AllRecWithCompany/:CompanyId',function(req,res,next)
-<<<<<<< HEAD
-RestServer.get('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/GroupsOfCompany/:CompanyId',function(req,res,next)
-=======
-RestServer.get('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/GroupsOfCompany/:CompanyId',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/GroupsOfCompany/:CompanyId',function(req,res,next)
+
 {
     var reqId='';
 
@@ -1545,12 +1524,10 @@ RestServer.get('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt
 });
 //.......................................................................................................................
 
-//RestServer.get('/dvp/'+version+'/sipgroup_mgt/sipuser_group/get_all_users_in_group/:companyid',function(req,res,next)
-<<<<<<< HEAD
-RestServer.get('/DVP/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/UsersInGroup/:Grp',function(req,res,next)
-=======
-RestServer.get('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/UsersInGroup/:Grp',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/SIPUserGroupManagemnt/UsersInGroup/:Grp',function(req,res,next)
+
 {
     var reqId='';
 
@@ -1600,11 +1577,9 @@ RestServer.get('/DVP/API'+version+'/SipUserEndpointService/SIPUserGroupManagemnt
 // New
 
 
-<<<<<<< HEAD
-RestServer.get('/DVP/'+version+'/SipUserEndpointService/UACManagement/UsersOfCompany/:CompId',function(req,res,next)
-=======
-RestServer.get('/DVP/API'+version+'/SipUserEndpointService/UACManagement/UsersOfCompany/:CompId',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/UACManagement/UsersOfCompany/:CompId',function(req,res,next)
 {
     var reqId='';
 
@@ -1650,11 +1625,9 @@ RestServer.get('/DVP/API'+version+'/SipUserEndpointService/UACManagement/UsersOf
 
 });
 
-<<<<<<< HEAD
-RestServer.get('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/UsersOfExtension/:Ext',function(req,res,next)
-=======
-RestServer.get('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/UsersOfExtension/:Ext',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement/UsersOfExtension/:Ext',function(req,res,next)
+
 {
     var reqId='';
 
@@ -1700,11 +1673,10 @@ RestServer.get('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/U
 
 });
 
-<<<<<<< HEAD
-RestServer.get('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/ExtensionsOfCompany/:Cmp',function(req,res,next)
-=======
-RestServer.get('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/ExtensionsOfCompany/:Cmp',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement/ExtensionsOfCompany/:Cmp',function(req,res,next)
+
 {
     var reqId='';
 
@@ -1751,11 +1723,10 @@ RestServer.get('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/E
 });
 
 
-<<<<<<< HEAD
-RestServer.get('/DVP/'+version+'/SipUserEndpointService/ExtensionManagement/Extension/:Ext',function(req,res,next)
-=======
-RestServer.get('/DVP/API'+version+'/SipUserEndpointService/ExtensionManagement/Extension/:Ext',function(req,res,next)
->>>>>>> 136deb2d7075dcfd16e1b0af5baac27fc63e1833
+
+
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement/Extension/:Ext',function(req,res,next)
+
 {
     var reqId='';
 
