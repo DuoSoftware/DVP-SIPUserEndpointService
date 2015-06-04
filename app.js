@@ -1079,7 +1079,7 @@ RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/SIPUserGroupManagem
     return next();
 
 });
-
+r.String()
 //aps
 
 
