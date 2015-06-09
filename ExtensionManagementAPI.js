@@ -584,7 +584,7 @@ function AddExtension(reqz,reqId,callback) {
     }
     catch (ex) {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-        callback("Exception",undefined);
+        callback(ex,undefined);
     }
     logger.info('Request json body  is converted as object : ' + obj);
 
@@ -599,7 +599,7 @@ function AddExtension(reqz,reqId,callback) {
                 //  console.log("An error occurred in searching Extension : " + obj.Extension);
                 logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,obj.Extension,err);
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
-                callback("Error Found", undefined);
+                callback(ex, undefined);
             }
 
 
@@ -616,7 +616,7 @@ function AddExtension(reqz,reqId,callback) {
                         }
                         else {
                             var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, res);
-                            callback("Error", undefined);
+                            callback(new Error("Error"), undefined);
                         }
                     });
 
@@ -625,7 +625,7 @@ function AddExtension(reqz,reqId,callback) {
                 else  {
                     // console.log(" Record is already available for the Extension : " + obj.Extension);
                     var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", false, ExtObject);
-                    callback("Already In Db", undefined);
+                    callback(new Error("Already In Db"), undefined);
                 }
             }
 

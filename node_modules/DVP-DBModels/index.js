@@ -63,7 +63,8 @@ var models = [
     "DialedCampaignPhones",
     "EmergencyNumber",
     "AutoAttendant",
-    "Action"
+    "Action",
+    "FeatureCode"
 ];
 
 models.forEach(function(model) {

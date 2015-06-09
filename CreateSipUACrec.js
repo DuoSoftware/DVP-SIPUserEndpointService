@@ -84,13 +84,13 @@ function SaveSip(reqz,reqId,callback) {
 
                                     if (st) {
                                        // console.log("New Record is Added Successfully");
-                                        var jsonString = messageFormatter.FormatMessage(null, "SuccessFully stated", true, null);
-                                        callback(undefined, jsonString);
+                                        //var jsonString = messageFormatter.FormatMessage(null, "SuccessFully stated", true, null);
+                                        callback(undefined, st);
                                     }
                                     else {
                                         //console.log("New Record Saving Error " + error);
-                                        var jsonString = messageFormatter.FormatMessage(error, "ERROR in state", false, null);
-                                        callback("Error returns", undefined);
+                                        //var jsonString = messageFormatter.FormatMessage(error, "ERROR in state", false, null);
+                                        callback(new Error("Error returns"), undefined);
                                     }
                                 }
 
@@ -105,8 +105,8 @@ function SaveSip(reqz,reqId,callback) {
                         //console.log("An error occurred in data saving process ");
                         logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Exception in saving UAC records',reqId,ex);
 
-                        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
-                        callback(undefined,jsonString);
+                        //var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                        callback(ex,undefined);
 
 
                     }
@@ -117,8 +117,8 @@ function SaveSip(reqz,reqId,callback) {
                     //console.log('All attributes of Context:', result.values);
                     //console.log('Cannot overwrite this record.Check given details........\n');
                     logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Found sip user %s',reqId,result.SipUsername);
-                    var jsonString = messageFormatter.FormatMessage(null, "Cannot overwrite this record.Check given details........\n", false, result);
-                    callback(undefined,jsonString);
+                    //var jsonString = messageFormatter.FormatMessage(null, "Cannot overwrite this record.Check given details........\n", false, result);
+                    callback(new Error("Cannot overwrite this record"),undefined);
 
 
                 }
@@ -127,8 +127,8 @@ function SaveSip(reqz,reqId,callback) {
     }
     catch (ex) {
         logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Exception in starting : SaveSip of %s',reqId,obj.SipUsername,ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "Exception in Saving sip", false, null);
-        callback(undefined,jsonString);
+       // var jsonString = messageFormatter.FormatMessage(ex, "Exception in Saving sip", false, null);
+        callback(ex,undefined);
     }
 
 
@@ -211,7 +211,7 @@ function SaveUACRec(jobj,reqId,callback) {
                                                 if(errCloud)
                                                 {
                                                     logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Error in mapping cloud %s and SipUser %s',reqId,JSON.stringify(cloudEndObject),JSON.stringify(SIPObject),errCloud);
-                                                    callback('Error in mapping CEU & SipUAC',undefined);
+                                                    callback(new Error('Error in mapping CEU & SipUAC'),undefined);
                                                 }
                                                 else
                                                 {
@@ -222,7 +222,7 @@ function SaveUACRec(jobj,reqId,callback) {
                                                         if(errContext)
                                                         {
                                                             logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] -Error in Mapping context %s and SipUser %s',reqId,JSON.stringify(ContextObject),JSON.stringify(SIPObject),errContext);
-                                                            callback('Error in mapping Context & SipUAC',undefined);
+                                                            callback(new Error('Error in mapping Context & SipUAC'),undefined);
                                                         }
                                                         else
                                                         {
@@ -262,7 +262,7 @@ function SaveUACRec(jobj,reqId,callback) {
                                    // logger.info('Returned ContextObject : ' + ContextObject);
                                     logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - No record found for context %s',reqId,jobj.CSDBContextContext);
                                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ContextObject);
-                                    callback("Error occurred",undefined);
+                                    callback(new Error("Error occurred"),undefined);
 
 
                                 }
@@ -275,7 +275,7 @@ function SaveUACRec(jobj,reqId,callback) {
                         //logger.info('Returned cloudEndObject : ' + cloudEndObject);
                         logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - No record found for cloudEnduser %s',reqId,jobj.CSDBCloudEndUserId);
                         var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, cloudEndObject);
-                        callback("Error Returns",undefined);
+                        callback(new Error("Error occurred"),undefined);
                     }
 
                 }

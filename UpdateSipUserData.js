@@ -27,7 +27,7 @@ try{
             if (err) {
                 //console.log('................An error occurred while searching for SIp UAC Record..................', err);
                 logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUAC] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,jobj.SipUsername,err);
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                ////var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
                 callback(err, undefined);
 
             } else
@@ -38,7 +38,7 @@ try{
                 console.log('No user has been found.');
                     logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,jobj.SipUsername);
                 var jsonString = messageFormatter.FormatMessage(err, "No record found", false, null);
-                    callback("No SipUser record found", undefined);
+                    callback(new Error("No SipUser record found"), undefined);
 
             }
             else {
@@ -63,14 +63,14 @@ try{
 
                             //console.log(".......................Record updated successfully!....................");
                             logger.debug('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Updating records of SipUser %s is succeeded ',reqId,jobj.SipUsername);
-                            var jsonString = messageFormatter.FormatMessage(err, "Record updated successfully", true, result);
+                            //var jsonString = messageFormatter.FormatMessage(err, "Record updated successfully", true, result);
                             callback(undefined, resultz);
 
                         }).error(function (errz) {
 
                             console.log("Project update failed ! " + errz);
                             logger.error('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Updating records of SipUser %s is failed - Data %s ',reqId,jobj.SipUsername,JSON.stringify(jobj),errz);
-                            var jsonString = messageFormatter.FormatMessage(err, "SipUAC rec update failed", false, result);
+                            //var jsonString = messageFormatter.FormatMessage(err, "SipUAC rec update failed", false, result);
                             callback(errz, undefined);
                             //handle error here
 
@@ -79,7 +79,7 @@ try{
                 }
                 catch (ex) {
                     logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - Exception in updating SipUser %s ',reqId,jobj.SipUsername,ex);
-                    var jsonString = messageFormatter.FormatMessage(ex, "Exception in updation", false, null);
+                    //var jsonString = messageFormatter.FormatMessage(ex, "Exception in updation", false, null);
                     callback(ex, undefined);
                 }
             }
@@ -91,7 +91,7 @@ try{
     catch(ex)
     {
         logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - Exception in Method starts : UpdateUacUserData ',reqId,jobj.SipUsername,ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "Exception in function starts", false, null);
+        //var jsonString = messageFormatter.FormatMessage(ex, "Exception in function starts", false, null);
         callback(ex, undefined);
     }
 }
