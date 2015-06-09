@@ -580,7 +580,7 @@ RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ContextManagement/C
 
 //RestServer.post('/dvp/'+version+'/uac_mgmt/save_uac',function(req,res,next)
 //check body cmp tent
-RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/UACManagement/UAC',function(req,res,next)
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/SipUserManagement/SipUser',function(req,res,next)
 {
     var reqId='';
 
@@ -630,7 +630,7 @@ RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/UACManagement/UAC',
 
 //RestServer.post('/dvp/'+version+'/uac_mgmt/updt_uac',function(req,res,next)
 //check body cmp tent
-RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/UACManagement/UAC/:Username',function(req,res,next)
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/SipUserManagement/SipUser/:Username',function(req,res,next)
 {
     var reqId='';
 
@@ -676,7 +676,7 @@ RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/UACManagement/UAC/:
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/UACManagement/SipUserByUuid/:uuid',function(req,res,next)
+RestServer.get('/DVP/API/'+version+'/SipUserEndpointService/SipUserManagement/SipUserByUuid/:uuid',function(req,res,next)
 {
     var reqId='';
 
@@ -889,7 +889,7 @@ RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement
 
 //check
 
-RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement/:Ext/MapToUAC/:UAC',function(req,res,next)
+RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement/MapExtension/:ExtId/ToSipUser/:UACId',function(req,res,next)
 
 {
     var reqId='';
@@ -907,9 +907,9 @@ RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement
 
     try {
 
-        logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [HTTP]  - Request received -  Data - Ext %s UAC %s Data %s',reqId,req.params.Ext,req.params.UAC,JSON.stringify(req.body));
+        logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [HTTP]  - Request received -  Data - Ext %s UAC %s Data %s',reqId,req.params.ExtId,req.params.UACId,JSON.stringify(req.body));
 
-        Extmgt.MapWithSipUacEndpoint(req.params.Ext,req.params.UAC,req.body,reqId,function (err, resz) {
+        Extmgt.MapWithSipUacEndpoint(req.params.ExtId,req.params.UACId,req.body,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -926,7 +926,7 @@ RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [HTTP]  - Exception in Request  -  Ext %s UAC %s Data %s',reqId,req.params.Ext,req.params.UAC,JSON.stringify(req.body),ex);
+        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [HTTP]  - Exception in Request  -  Ext %s UAC %s Data %s',reqId,req.params.ExtId,req.params.UACId,JSON.stringify(req.body),ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
         logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - Request response : %s ',reqId,jsonString);
         res.end(jsonString);
