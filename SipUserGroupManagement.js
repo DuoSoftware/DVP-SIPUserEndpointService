@@ -522,12 +522,18 @@ function GetGroupEndpoints(obj,reqId,callback)
 function EndpointGroupID(obj,reqId,callback)
 {
     try {
+        /*
         DbConn.UsrGrp
             .findAll({
                 where: {CSDBSipUACEndpointId: obj}
             }
         )
             .complete(function (err, result) {
+
+                */
+        DbConn.SipUACEndpoint.find({where: {id: parseInt(obj)}, include: [{model: DbConn.UserGroup, as:"UserGroup"}],attributes:["id"]})
+            .complete(function (err, result) {
+
                 if (err) {
                    // console.log('An error occurred while searching for Extension:', err);
                     logger.error('[DVP-SIPUserEndpointService.EndpointGroupID] - [%s] - [PGSQL]  - Error in searching UsrGrp records of SipUACEndpoint %s ',reqId,obj,err);
@@ -544,8 +550,18 @@ function EndpointGroupID(obj,reqId,callback)
 
                     } else {
                         logger.debug('[DVP-SIPUserEndpointService.EndpointGroupID] - [%s] - [PGSQL]  - Records for SipUACEndpoint %s ',reqId,obj);
-                        var jsonString = messageFormatter.FormatMessage(null, "Success ", true, result);
-                        callback(undefined, result);
+                       // var jsonString = messageFormatter.FormatMessage(null, "Success ", true, result);
+                        if(result.UserGroup)
+                        {
+                            console.log("ID "+result.UserGroup);
+                            callback(undefined, result.UserGroup);
+                        }
+                        else
+                        {
+                            callback(new Error("user is not belongs to any group"),undefined);
+                        }
+
+
 
                         //console.log(result.Action)
 
@@ -609,11 +625,12 @@ function AllRecWithCompany(req,reqId,callback)
 }
 
 //get :-done
-function GetAllUsersInGroup(req,callback)
+function GetAllUsersInGroup(req,reqId,callback)
 {
 
     try {
-        DbConn.UserGroup.findAll({where: {id: req}, include: [{model: DbConn.SipUACEndpoint}]})
+        //DbConn.SipUACEndpoint.find({where: {id: parseInt(obj)}, include: [{model: DbConn.UserGroup, as:"UserGroup"}],attributes:["id"]})
+        DbConn.UserGroup.find({where: {id: req}, include: [{model: DbConn.SipUACEndpoint , as: "SipUACEndpoint" }]})
             .complete(function (err, result) {
                 if (err) {
                    // console.log('An error occurred while searching for Extension:', err);
@@ -628,7 +645,7 @@ function GetAllUsersInGroup(req,callback)
                         logger.error('[DVP-SIPUserEndpointService.AllUsersInGroup] - [%s] - [PGSQL]  - No User record found for Group %s ',reqId,req);
                     ///logger.info( 'No user found for the requirement. ' );
                     var jsonString = messageFormatter.FormatMessage(err, "No user with the group has been found.", false, null);
-                        callback("No group record found", undefined);
+                        callback(newError("No group record found"), undefined);
 
                 } else {
 

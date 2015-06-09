@@ -529,10 +529,12 @@ function ChangeAvailability(Id,st,reqId,callback) {
                     //logger.info('Updating Availability , RefID :' + reqz.params.ref);
                     logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s ',reqId,st,Id);
 
+                    //var ststs=Boolean(st);
+                    //console.log("St "+ststs);
                     try {
-                        ExtObject.update(
+                        ExtObject.updateAttributes(
                             {
-                                Enabled: reqz.params.st
+                                Enabled: st
 
                             }
                         ).then(function (result) {
@@ -654,7 +656,7 @@ function MapWithSipUacEndpoint(Ext,UAC,reqz,reqId,callback) {
 
     try
     {
-        DbConn.Extension.find({where: [{id: Ext},{CompanyId:obj.CompanyId},{ObjType:'USER'}]}).complete(function (err, ExtObject) {
+        DbConn.Extension.find({where: [{id: Ext},{CompanyId:'1'},{ObjType:'USER'}]}).complete(function (err, ExtObject) {
 
 
             if (err) {
@@ -679,7 +681,7 @@ function MapWithSipUacEndpoint(Ext,UAC,reqz,reqId,callback) {
                 else {
                     logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [PGSQL]  - Record found for Extension %s and Searching for SipUser %s ',reqId,Ext,UAC);
                     try {
-                        DbConn.SipUACEndpoint.find({where: [{id: UAC},{CompanyId:obj.CompanyId}]}).complete(function (err, SipObject) {
+                        DbConn.SipUACEndpoint.find({where: [{id: UAC},{CompanyId:'1'}]}).complete(function (err, SipObject) {
 
 
 
@@ -952,11 +954,11 @@ function MapwithGroup(Ext,Grp,reqId,callback)
                                 callback(errz, undefined);
                             }
 
-                            else if (groupObject) {
+                            else if (groupObject!=null) {
                                 logger.debug('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - UserGroup %s found.Mapping is starting ',reqId,Grp);
 
                                 try {
-                                    groupObject.addExtension(ExtObject).complete(function (errx, groupInstancex) {
+                                    groupObject.setExtension(ExtObject).complete(function (errx, groupInstancex) {
 
                                         if (errx) {
                                             logger.error('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - Error in Mapping Extension %s with Group %s -  Data - %s',reqId,ExtObject.id,groupObject.id,errx);
@@ -1147,7 +1149,7 @@ function GetExtensionsOfCompany(Company,Tenant,reqId,callback)
                     logger.error('[DVP-SIPUserEndpointService.GetExtensionsOfCompany] - [%s] - [PGSQL]  - No record found for Company %s ',reqId,Company);
 
                     //var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, res);
-                    callback("EMPTY", undefined);
+                    callback(new Error("EMPTY"), undefined);
 
                 }
 

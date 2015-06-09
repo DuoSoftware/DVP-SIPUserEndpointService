@@ -242,7 +242,7 @@ function GetContextDetails(reqz,reqId,callback)
                 if (err) {
                     //console.log('An error occurred while searching for Context:', err);
                     logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - Error in searching Context %s ',reqId,reqz,err);
-                    var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for Context for Company :" + reqz, false, result);
+                    //var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for Context for Company :" + reqz, false, result);
                     callback(err, undefined);
 
                 } else
@@ -251,19 +251,19 @@ function GetContextDetails(reqz,reqId,callback)
                     if (!result) {
 
                         logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - No record found for Context %s ',reqId,reqz);
-                        var jsonString = messageFormatter.FormatMessage(err, "No context for company :" + reqz, true, result);
-                        callback("No Context record found", undefined);
+                        //var jsonString = messageFormatter.FormatMessage(err, "No context for company :" + reqz, true, result);
+                        callback(new Error("No Context record found"), undefined);
                     }
                     else {
 
                         try {
 
 
-                            var Jresults = JSON.stringify(result);
-
-                            logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - Record found for Context %s Data %s',reqId,reqz,Jresults);
+                           // var Jresults = JSON.stringify(result);
+console.log(result);
+                            logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL] - Record found for Context %s ',reqId,reqz);
                             // var jsonString = messageFormatter.FormatMessage(err, "Successfully json returned", true, result);
-                            callback(undefined, Jresults);
+                            callback(undefined, result);
 
                         }
                         catch (ex) {
@@ -283,7 +283,7 @@ function GetContextDetails(reqz,reqId,callback)
     }
     catch (ex)
     {
-        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Exception in starting method : GetContextDetails  Context %s ',reqId,reqz);
+        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [] - Exception in starting method : GetContextDetails  Context %s ',reqz);
         //var jsonString = messageFormatter.FormatMessage(ex, "Exception in calling function", false, null);
         callback(ex,undefined);
 

@@ -118,7 +118,7 @@ function GetSIPUsersOfCompany(reqz,reqId,callback)
 
                         logger.error('[DVP-SIPUserEndpointService.AllSIPUsersOfCompany] - [%s] - [PGSQL]  - No record found for SipUser of Company %s ',reqId,reqz);
                         //var jsonString = messageFormatter.FormatMessage(err, "No context for company :" + reqz, true, result);
-                        callback("No SipUSer record found", undefined);
+                        callback(new Error("No SipUSer record found"), undefined);
                     }
                     else {
 
@@ -127,7 +127,7 @@ function GetSIPUsersOfCompany(reqz,reqId,callback)
 
                         // var Jresults = JSON.stringify(result);
 
-                        logger.debug('[DVP-SIPUserEndpointService.AllSIPUsersOfCompany] - [%s] - [PGSQL]  - Record found for Context %s Data %s',reqId,reqz,result);
+                        logger.debug('[DVP-SIPUserEndpointService.AllSIPUsersOfCompany] - [%s] - [PGSQL]  - Record found for Context %s ',reqId,reqz);
                         // var jsonString = messageFormatter.FormatMessage(err, "Successfully json returned", true, result);
                         callback(undefined, result);
 
