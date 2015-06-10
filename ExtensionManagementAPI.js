@@ -656,7 +656,7 @@ function MapWithSipUacEndpoint(Ext,UAC,reqz,reqId,callback) {
 
     try
     {
-        DbConn.Extension.find({where: [{id: Ext},{CompanyId:'1'},{ObjType:'USER'}]}).complete(function (err, ExtObject) {
+        DbConn.Extension.find({where: [{id: Ext},{CompanyId:obj.CompanyId},{ObjType:'USER'}]}).complete(function (err, ExtObject) {
 
 
             if (err) {
@@ -1030,7 +1030,7 @@ function CreateExtension(jobj,reqId,callback)
                 ExtraData: jobj.ExtraData,
                 ExtRefId: jobj.ExtRefId,
                 ObjClass: "OBJCLZ",
-                ObjType: "OBJTYP",
+                ObjType: "USER",
                 ObjCategory: "OBJCAT",
                 CompanyId: 1,
                 TenantId: 1,

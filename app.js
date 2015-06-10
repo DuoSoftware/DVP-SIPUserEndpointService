@@ -909,7 +909,7 @@ RestServer.post('/DVP/API/'+version+'/SipUserEndpointService/ExtensionManagement
 
         logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [HTTP]  - Request received -  Data - Ext %s UAC %s Data %s',reqId,req.params.ExtId,req.params.UACId,JSON.stringify(req.body));
 
-        Extmgt.MapWithSipUacEndpoint(req.params.ExtId,req.params.UACId,req.body,reqId,function (err, resz) {
+        Extmgt.MapWithSipUacEndpoint(parseInt(req.params.ExtId),parseInt(req.params.UACId),req.body,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
