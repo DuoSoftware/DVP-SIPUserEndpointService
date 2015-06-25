@@ -1,10 +1,9 @@
 /**
  * Created by Administrator on 1/27/2015.
  */
-//C:\DVP\DVP-SIPUsersEndpointService\DVP-Common\CSORMModels\CsDataModel.js
+
 
 var DbConn = require('DVP-DBModels');
-//var DbSave=require('./SaveSipUserData.js');
 var restify = require('restify');
 var strfy = require('stringify');
 var winston=require('winston');
@@ -13,27 +12,13 @@ var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 
 
-
-
-
-
-
-
-
-//Post
-//Request comes as body
-
-//post :- done
-
 function AddOrUpdateContext(reqz,reqId,callback) {
-   // logger.info('Context Management is Starting.');
-
 
     try {
         var obj = reqz.body;
 
         obj.CompanyId = 1;
-        obj.TenantId = 5;
+        obj.TenantId = 1;
         obj.AddUser = "NAddUser";
         obj.UpdateUser = "NUpdateUser";
         obj.AddTime = new Date(2013, 01, 13);
@@ -195,52 +180,36 @@ var GetSipUserDetailsByUuid = function(reqId, uuid, companyId, tenantId, callbac
     }
 }
 
-//get :- done
-function GetContextDetails(reqz,reqId,callback)
+
+function GetContextDetails(CompanyId,reqId,callback)
 {
     try {
 
         DbConn.Context
-            // .find({ where: { Context: req.params.context } })
-            .findAll({where: {CompanyId: reqz}})
-            .complete(function (err, result) {
+            .findAll({where: {CompanyId: CompanyId}})
+            .complete(function (errContext, resContext) {
 
-                if (err) {
-                    //console.log('An error occurred while searching for Context:', err);
-                    logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - Error in searching Context %s ',reqId,reqz,err);
-                    //var jsonString = messageFormatter.FormatMessage(err, "An error occurred while searching for Context for Company :" + reqz, false, result);
-                    callback(err, undefined);
+                if (errContext) {
+                    logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - Error in searching Context %s ',reqId,CompanyId,err);
+                    callback(errContext, undefined);
 
                 } else
                 {
 
-                    if (!result) {
+                    if (!resContext) {
 
-                        logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - No record found for Context %s ',reqId,reqz);
-                        //var jsonString = messageFormatter.FormatMessage(err, "No context for company :" + reqz, true, result);
+                        logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - No record found for Context %s ',reqId,CompanyId);
                         callback(new Error("No Context record found"), undefined);
                     }
                     else {
 
-                        try {
 
 
-                           // var Jresults = JSON.stringify(result);
-console.log(result);
-                            logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL] - Record found for Context %s ',reqId,reqz);
-                            // var jsonString = messageFormatter.FormatMessage(err, "Successfully json returned", true, result);
-                            callback(undefined, result);
 
-                        }
-                        catch (ex) {
-                            //console.log("Error in creating json object to return : " + ex);
-                           // logger.error('[DVP-LimitHandler.UACManagement.FindContextByCompany] - [%s] - [PGSQL]  - Exception in Record found for Context %s Data %s',reqId,reqz,Jresults);
-                           // logger.debug('[DVP-LimitHandler.UACManagement.FindContextByCompany] - [%s] - [PGSQL]  - Record found for Context %s Data %s',reqId,reqz,Jresults);
-                            //var jsonString = messageFormatter.FormatMessage(ex, "Exception found in json creating .", false, result);
-                            callback(ex, undefined);
-                        }
+                        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL] - Record found for Context %s ',reqId,CompanyId);
+                        callback(undefined, resContext);
 
-                        // set as Json Object
+
 
                     }
 
@@ -249,8 +218,7 @@ console.log(result);
     }
     catch (ex)
     {
-        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [] - Exception in starting method : GetContextDetails  Context %s ',reqz);
-        //var jsonString = messageFormatter.FormatMessage(ex, "Exception in calling function", false, null);
+        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Exception in starting method : GetContextDetails  Context %s ',reqId,CompanyId);
         callback(ex,undefined);
 
     }

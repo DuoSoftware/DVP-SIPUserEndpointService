@@ -3,28 +3,12 @@
  */
 
 var DbConn = require('DVP-DBModels');
-//var DbSave=require('./SaveSipUserData.js');
 var restify = require('restify');
 var winston=require('winston');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
-/*
 
- // Create Restify Server
- var RestServer = restify.createServer({
- name: "myapp",
- version: '1.0.0'
- },function(req,res)
- {
-
- });
- //Server listen
- RestServer.listen(8080, function () {
- console.log('%s listening at %s', RestServer.name, RestServer.url);
- });
-
- */
 
 var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, callback)
 {
@@ -158,39 +142,17 @@ var GetEmergencyNumbersForCompany = function(reqId, companyId, tenantId, callbac
 
 };
 
-var GetAllUserDataForExt = function(reqId, extension, tenantId, callback)
+var GetAllUserDataForExt = function(reqId, extension, tenantId,Company,callback)
 {
     try
     {
-        DbConn.Extension.find({where: [{Extension: extension},{TenantId: tenantId}]})
+
+        DbConn.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{CompanyId:Company}], include: [{model: DbConn.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: DbConn.CloudEndUser, as:'CloudEndUser'},{model: DbConn.UserGroup, as:'UserGroup', include: [{model: DbConn.Extension, as:'Extension'}]}]}]})
             .complete(function (err, extData)
             {
-                if(err)
-                {
-                    callback(err, undefined);
-                }
-                else if(extData)
-                {
-                    if(extData.ObjCategory === 'USER')
-                    {
-                        DbConn.Extension.find({where: [{Extension: extension},{TenantId: tenantId}], include: [{model: DbConn.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: DbConn.CloudEndUser, as:'CloudEndUser'},{model: DbConn.UserGroup, as:'UserGroup', include: [{model: DbConn.Extension, as:'Extension'}]}]}]})
-                            .complete(function (err, extData)
-                            {
-                                callback(err, extData);
-                            });
-                    }
-                    else
-                    {
-                        callback(undefined, undefined);
-                    }
-
-                }
-                else
-                {
-                    callback(undefined, undefined);
-                }
-
+                callback(err, extData);
             });
+
     }
     catch(ex)
     {
@@ -653,74 +615,74 @@ function MapWithSipUacEndpoint(Ext,UAC,Company,Tenant,reqId,callback) {
                                 }
                                 else {
                                     logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Record found for SipUACEndpoint %s ',reqId,UAC);
-/*
-                                    try {
-                                        DbConn.SipUACEndpoint.find({where: [{SipExtension: obj.SipExtension}]}).complete(function (errSip, resSip) {
+                                    /*
+                                     try {
+                                     DbConn.SipUACEndpoint.find({where: [{SipExtension: obj.SipExtension}]}).complete(function (errSip, resSip) {
 
-                                            if (errSip) {
-                                                logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Error in searching SipUACEndpoint Extension  %s ',reqId, obj.SipExtension,err);
-                                                callback(errSip, undefined);
-                                            }
+                                     if (errSip) {
+                                     logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Error in searching SipUACEndpoint Extension  %s ',reqId, obj.SipExtension,err);
+                                     callback(errSip, undefined);
+                                     }
 
 
-                                            else
+                                     else
 
-                                            {
-                                                if (!resSip ) {
+                                     {
+                                     if (!resSip ) {
 
-                                                    logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - No record found for Extension  %s ',reqId, obj.SipExtension);
+                                     logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - No record found for Extension  %s ',reqId, obj.SipExtension);
 
-                                                    try {
-                                                        DbConn.SipUACEndpoint
-                                                            .update(
-                                                            {
-                                                                ExtensionId: ExtObject.id,
-                                                                SipExtension: obj.SipExtension
+                                     try {
+                                     DbConn.SipUACEndpoint
+                                     .update(
+                                     {
+                                     ExtensionId: ExtObject.id,
+                                     SipExtension: obj.SipExtension
 
-                                                            },
-                                                            {
-                                                                where: [{id: UAC}]
-                                                            }
-                                                        ).then(function (resMap) {
-                                                                logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Mapping succeeded - Data - ExtensionId %s SipExtension %s Of SipUACEndpoint %s ',reqId,ExtObject.id,obj.SipExtension,UAC);
-                                                                callback(undefined, resMap);
+                                     },
+                                     {
+                                     where: [{id: UAC}]
+                                     }
+                                     ).then(function (resMap) {
+                                     logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Mapping succeeded - Data - ExtensionId %s SipExtension %s Of SipUACEndpoint %s ',reqId,ExtObject.id,obj.SipExtension,UAC);
+                                     callback(undefined, resMap);
 
-                                                            }).error(function (errMap) {
-                                                                logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Mapping failed - Data - ExtensionId %s SipExtension %s Of SipUACEndpoint %s ',reqId,ExtObject.id,obj.SipExtension,UAC,errMap);
-                                                                callback(errMap, undefined);
+                                     }).error(function (errMap) {
+                                     logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Mapping failed - Data - ExtensionId %s SipExtension %s Of SipUACEndpoint %s ',reqId,ExtObject.id,obj.SipExtension,UAC,errMap);
+                                     callback(errMap, undefined);
 
-                                                            });
-                                                    }
-                                                    catch (ex) {
-                                                        logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Exception in Mapping - Data - ExtensionId %s SipExtension %s Of SipUACEndpoint %s ',reqId,ExtObject.id,obj.SipExtension,UAC,ex);
-                                                        callback(ex, undefined);
-                                                    }
+                                     });
+                                     }
+                                     catch (ex) {
+                                     logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Exception in Mapping - Data - ExtensionId %s SipExtension %s Of SipUACEndpoint %s ',reqId,ExtObject.id,obj.SipExtension,UAC,ex);
+                                     callback(ex, undefined);
+                                     }
 
-                                                }
-                                                else  {
-                                                    logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Record in already in DB - Data - ExtensionId %s SipExtension %s Of SipUACEndpoint %s ',reqId,ExtObject.id,obj.SipExtension,UAC);
-                                                    callback(new Error("Already in DB"),undefined);
-                                                }
+                                     }
+                                     else  {
+                                     logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Record in already in DB - Data - ExtensionId %s SipExtension %s Of SipUACEndpoint %s ',reqId,ExtObject.id,obj.SipExtension,UAC);
+                                     callback(new Error("Already in DB"),undefined);
+                                     }
 
-                                            }
+                                     }
 
-                                        });
-                                    }
-                                    catch (ex) {
-                                        logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Exception in searching SipUACEndpoints SipExtension %s ',reqId,obj.SipExtension,ex);
-                                        callback(ex, undefined);
-                                    }
-*/
+                                     });
+                                     }
+                                     catch (ex) {
+                                     logger.error('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Exception in searching SipUACEndpoints SipExtension %s ',reqId,obj.SipExtension,ex);
+                                     callback(ex, undefined);
+                                     }
+                                     */
                                     resSipObj.setExtension(resExtObj).complete(function(errMap,resMap)
                                     {
-                                       if(errMap)
-                                       {
-                                           callback(errMap,undefined);
-                                       }
+                                        if(errMap)
+                                        {
+                                            callback(errMap,undefined);
+                                        }
                                         else
-                                       {
-                                           callback(undefined,resMap);
-                                       }
+                                        {
+                                            callback(undefined,resMap);
+                                        }
                                     });
 
 
@@ -827,7 +789,6 @@ function MapwithGroup(Ext,Grp,Company,Tenant,reqId,callback)
 
 function CreateExtension(jobj,reqId,callback)
 {
-    //logger.info( 'Saving new Extension.. ');
     try{
         DbConn.Extension
             .create(
@@ -884,41 +845,31 @@ function CreateExtension(jobj,reqId,callback)
 
 }
 
-function GetUserDataOfExtension(Ext,Tenant,reqId,callback)
+function GetUserDataOfExtension(Ext,Company,Tenant,reqId,callback)
 {
-    //logger.info( 'Saving new Extension.. ');
+
     try {
-        DbConn.Extension.find({where: [{Extension: Ext}, {TenantId: Tenant}],include: [{model: DbConn.SipUACEndpoint, as: "SipUACEndpoint"}]}).complete(function (err, ExtObject) {
+        DbConn.Extension.find({where: [{Extension: Ext}, {TenantId: Tenant},{CompanyId:Company}],include: [{model: DbConn.SipUACEndpoint, as: "SipUACEndpoint"}]}).complete(function (errExtUser, resExtUser) {
 
-            //logger.info('Searching Extension : ' + obj.Extension + ' CompanyID : ' + obj.CompanyId + ' TenentID : ' + obj.TenantId);
-
-            // console.log(ExtObject);
-            if (err) {
-                //  console.log("An error occurred in searching Extension : " + obj.Extension);
-                logger.error('[DVP-SIPUserEndpointService.GetUserDataOfExtension] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,Ext,err);
-                //var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
-                callback(err, undefined);
+            if (errExtUser) {
+                logger.error('[DVP-SIPUserEndpointService.GetUserDataOfExtension] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,Ext,errExtUser);
+                callback(errExtUser, undefined);
             }
 
 
             else
             {
-                if (!ExtObject) {
-                    //   console.log("No record found for the Extension : " + obj.Extension);
-                    logger.error('[DVP-SIPUserEndpointService.GetUserDataOfExtension] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,Ext);
+                if (!resExtUser) {
 
-                    //var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, res);
+                    logger.error('[DVP-SIPUserEndpointService.GetUserDataOfExtension] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,Ext);
                     callback("EMPTY", undefined);
 
                 }
 
-
-
                 else  {
-                    // console.log(" Record is already available for the Extension : " + obj.Extension);
-                    //var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", false, ExtObject);
+
                     logger.debug('[DVP-SIPUserEndpointService.GetUserDataOfExtension] - [%s] - [PGSQL]  - User records found for Extension %s ',reqId,Ext);
-                    callback(undefined, ExtObject);
+                    callback(undefined, resExtUser);
                 }
             }
 
@@ -927,7 +878,6 @@ function GetUserDataOfExtension(Ext,Tenant,reqId,callback)
     }
     catch (ex) {
         logger.error('[DVP-SIPUserEndpointService.GetUserDataOfExtension] - [%s] - [PGSQL]  - Exception occurred  %s ',reqId,Ext);
-        //var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
         callback(ex,undefined);
     }
 
@@ -935,39 +885,30 @@ function GetUserDataOfExtension(Ext,Tenant,reqId,callback)
 
 function GetExtensionsOfCompany(Company,Tenant,reqId,callback)
 {
-    //logger.info( 'Saving new Extension.. ');
     try {
-        DbConn.Extension.findAll({where: [{CompanyId: Company}, {TenantId: Tenant}]}).complete(function (err, ExtObject) {
+        DbConn.Extension.findAll({where: [{CompanyId: Company}, {TenantId: Tenant}]}).complete(function (errExt, resExt) {
 
-            //logger.info('Searching Extension : ' + obj.Extension + ' CompanyID : ' + obj.CompanyId + ' TenentID : ' + obj.TenantId);
 
-            // console.log(ExtObject);
-            if (err) {
-                //  console.log("An error occurred in searching Extension : " + obj.Extension);
-                logger.error('[DVP-SIPUserEndpointService.GetExtensionsOfCompany] - [%s] - [PGSQL]  - Error in searching Company %s ',reqId,Company,err);
-                //var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
-                callback(err, undefined);
+            if (errExt) {
+                logger.error('[DVP-SIPUserEndpointService.GetExtensionsOfCompany] - [%s] - [PGSQL]  - Error in searching Company %s ',reqId,Company,errExt);
+                callback(errExt, undefined);
             }
 
 
             else
             {
-                if (!ExtObject) {
-                    //   console.log("No record found for the Extension : " + obj.Extension);
+                if (!resExt) {
                     logger.error('[DVP-SIPUserEndpointService.GetExtensionsOfCompany] - [%s] - [PGSQL]  - No record found for Company %s ',reqId,Company);
-
-                    //var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, res);
-                    callback(new Error("EMPTY"), undefined);
+                    callback(new Error("No extension recode found"), undefined);
 
                 }
 
 
 
                 else  {
-                    // console.log(" Record is already available for the Extension : " + obj.Extension);
-                    //var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", false, ExtObject);
+
                     logger.debug('[DVP-SIPUserEndpointService.GetExtensionsOfCompany] - [%s] - [PGSQL]  - Extension records found for Company %s ',reqId,Company);
-                    callback(undefined, ExtObject);
+                    callback(undefined, resExt);
                 }
             }
 
@@ -976,24 +917,22 @@ function GetExtensionsOfCompany(Company,Tenant,reqId,callback)
     }
     catch (ex) {
         logger.error('[DVP-SIPUserEndpointService.GetExtensionsOfCompany] - [%s] - [PGSQL]  - Exception occurred  %s ',reqId,Company,ex);
-       // var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, null);
         callback(ex,undefined);
     }
 
 }
+/*
 function GetExtensions(Ext,Company,Tenant,reqId,callback)
 {
-    //logger.info( 'Saving new Extension.. ');
+
     try {
         DbConn.Extension.find({where: [{CompanyId: Company},{Extension: Ext}, {TenantId: Tenant}]}).complete(function (err, ExtObject) {
 
-            //logger.info('Searching Extension : ' + obj.Extension + ' CompanyID : ' + obj.CompanyId + ' TenentID : ' + obj.TenantId);
 
-            // console.log(ExtObject);
             if (err) {
-                //  console.log("An error occurred in searching Extension : " + obj.Extension);
+
                 logger.error('[DVP-SIPUserEndpointService.GetExtensions] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,Ext,err);
-                //var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ExtObject);
+
                 callback(err, undefined);
             }
 
@@ -1029,15 +968,14 @@ function GetExtensions(Ext,Company,Tenant,reqId,callback)
     }
 
 }
-
-
+*/
 module.exports.ChangeAvailability = ChangeAvailability;
 module.exports.AddExtension = AddExtension;
 module.exports.MapWithSipUacEndpoint = MapWithSipUacEndpoint;
 module.exports.MapwithGroup = MapwithGroup;
 module.exports.GetUserDataOfExtension = GetUserDataOfExtension;
 module.exports.GetExtensionsOfCompany = GetExtensionsOfCompany;
-module.exports.GetExtensions = GetExtensions;
+//module.exports.GetExtensions = GetExtensions;
 module.exports.GetAllUserDataForExt = GetAllUserDataForExt;
 module.exports.AddDidNumberDB = AddDidNumberDB;
 module.exports.SetDidNumberActiveStatusDB = SetDidNumberActiveStatusDB;
