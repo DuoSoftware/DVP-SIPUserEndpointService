@@ -1,26 +1,26 @@
 module.exports = {
     "DB": {
-        "Type":"DB_TYPE",
-        "User":"DB_USER",
-        "Password":"DB_PASSWORD",
-        "Port":"DB_PORT",
-        "Host":"DB_HOST",
-        "Database":"DB_BASE"
+        "Type":"SYS_DATABASE_TYPE",
+        "User":"SYS_DATABASE_POSTGRES_USER",
+        "Password":"SYS_DATABASE_POSTGRES_PASSWORD",
+        "Port":"SYS_SQL_PORT",
+        "Host":"SYS_DATABASE_HOST",
+        "Database":"SYS_DATABASE_POSTGRES_USER"
     },
 
 
     "Redis":
     {
-        "ip": "REDIS_IP",
-        "port": "REDIS_PORT"
+        "ip": "SYS_REDIS_HOST",
+        "port": "SYS_REDIS_PORT"
 
     },
 
     "Host":
     {
-        "domain": "HOST_IP",
-        "port": "HOST_PORT",
-        "version":"HOST_VERSION"
+        "domain": "HOST_NAME",
+        "port": "HOST_SIPUSERENDPOINTSERVICE_PORT",
+        "version": "HOST_VERSION"
     }
 };
 

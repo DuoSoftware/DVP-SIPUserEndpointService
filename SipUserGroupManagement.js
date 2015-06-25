@@ -9,54 +9,21 @@ var Sequelize=require('sequelize');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
-/*
- var RestServer = restify.createServer({
- name: "myapp",
- version: '1.0.0'
- },function(req,res)
- {
 
- });
- //Server listen
- RestServer.listen(8080, function () {
- console.log('%s listening at %s', RestServer.name, RestServer.url);
- //console.log(moment().format('dddd'));
-
-
- });
-
- RestServer.use(restify.bodyParser());
- RestServer.use(restify.acceptParser(RestServer.acceptable));
- RestServer.use(restify.queryParser());
-
- RestServer.post('/add_usergroup',function(req,res,err)
- {
-
- AddSipUserGroup(req.body);
- res.end();
-
- });
-
-
- */
-
-
-//post :-done
 function AddSipUserGroup(obj,reqId,callback)
 {
     try {
-        DbConn.UserGroup.find({where: [{GroupName: obj.GroupName}]}).complete(function (err, GrpObject) {
+        DbConn.UserGroup.find({where: [{GroupName: obj.GroupName}]}).complete(function (errGroup, resGroup) {
 
-            if (err) {
-                logger.debug('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - Error in searching Group %s',reqId,obj.GroupName);
-                callback(err, undefined);
+            if (errGroup) {
+                logger.error('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - Error in searching Group %s',reqId,obj.GroupName,errGroup);
+                callback(errGroup, undefined);
             }
             else
             {
-                if (GrpObject) {
-                   // console.log("Already in DB");
+                if (resGroup) {
                     logger.debug('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - Already in DB Group %s',reqId,obj.GroupName);
-                    callback(undefined, GrpObject);
+                    callback(undefined, resGroup);
                 }
                 else  {
                     try {
@@ -78,25 +45,16 @@ function AddSipUserGroup(obj,reqId,callback)
                             }
                         );
 
-                        UserGroupobj.save().complete(function (err, result) {
-                            if (!err) {
-                                //  ScheduleObject.addAppointment(AppObject).complete(function (errx, AppInstancex) {
+                        UserGroupobj.save().complete(function (errGrpSave, resGrpSave) {
+                            if (errGrpSave) {
 
-
-                                // res.write(status.toString());
-                                // res.end();
-                                //});
-                                logger.debug('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - New user group insertion succeeded - Group %s',reqId,JSON.stringify(obj));
-                                console.log("..................... Saved Successfully ....................................");
-                                callback(undefined, result);
-
+                                logger.error('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - New user group insertion failed - Group %s',reqId,JSON.stringify(obj),errGrpSave);
+                                callback(errGrpSave, undefined);
 
                             }
                             else {
-                                logger.error('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - New user group insertion failed - Group %s',reqId,JSON.stringify(obj),err);
-                                console.log("..................... Error found in saving.................................... : " + err);
-                                callback(err, undefined);
-
+                                logger.debug('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - New user group insertion succeeded - Group %s',reqId,JSON.stringify(obj));
+                                callback(undefined, result);
                             }
 
 
@@ -104,7 +62,6 @@ function AddSipUserGroup(obj,reqId,callback)
                     }
                     catch (ex) {
                         logger.error('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - Exception in New user group insertion  - Group %s',reqId,JSON.stringify(obj),ex);
-                        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, null);
                         callback(ex, undefined);
                     }
                 }
@@ -382,7 +339,7 @@ callback(undefined,undefined);
     */
 }
 //post :-done
-function UpdateSipUserGroup(AID,obj,reqId,callback)
+function UpdateSipUserGroup(GID,obj,reqId,callback)
 {
     try {
         DbConn.UserGroup
@@ -400,7 +357,7 @@ function UpdateSipUserGroup(AID,obj,reqId,callback)
 
             },
             {
-                where: [{id: AID}]
+                where: [{id: GID}]
             }
         ).then(function (result) {
                 //logger.info('Successfully Mapped. ');
