@@ -142,7 +142,7 @@ var GetEmergencyNumbersForCompany = function(reqId, companyId, tenantId, callbac
 
 };
 
-var GetAllUserDataForExt = function(reqId, extension, tenantId,Company,callback)
+var GetUsersOfExtension = function(reqId, extension, tenantId,Company,callback)
 {
     try
     {
@@ -456,7 +456,7 @@ var SetDidNumberActiveStatusDB = function(reqId, didNumId, companyId, tenantId, 
 };
 
 
-function ChangeAvailability(tenant,ext,st,reqId,callback) {
+function ChangeUserAvailability(tenant,ext,st,reqId,callback) {
 
 
     try {
@@ -512,7 +512,7 @@ function ChangeAvailability(tenant,ext,st,reqId,callback) {
 
 }
 
-function AddExtension(reqExt,reqId,callback) {
+function CreateExtension(reqExt,reqId,callback) {
 
     try {
         var obj = reqExt;
@@ -572,7 +572,7 @@ function AddExtension(reqExt,reqId,callback) {
 
 }
 
-function MapWithSipUacEndpoint(Ext,UAC,Company,Tenant,reqId,callback) {
+function AssignToSipUser(Ext,UAC,Company,Tenant,reqId,callback) {
 
     try
     {
@@ -706,7 +706,7 @@ function MapWithSipUacEndpoint(Ext,UAC,Company,Tenant,reqId,callback) {
 
 }
 
-function MapwithGroup(Ext,Grp,Company,Tenant,reqId,callback)
+function AssignToGroup(Ext,Grp,Company,Tenant,reqId,callback)
 {
 
     try {
@@ -845,7 +845,7 @@ function CreateExtension(jobj,reqId,callback)
 
 }
 
-function GetUserDataOfExtension(Ext,Company,Tenant,reqId,callback)
+function PickExtensionUsers(Ext,Company,Tenant,reqId,callback)
 {
 
     try {
@@ -883,7 +883,7 @@ function GetUserDataOfExtension(Ext,Company,Tenant,reqId,callback)
 
 }
 
-function GetExtensionsOfCompany(Company,Tenant,reqId,callback)
+function PickCompanyExtensions(Company,Tenant,reqId,callback)
 {
     try {
         DbConn.Extension.findAll({where: [{CompanyId: Company}, {TenantId: Tenant}]}).complete(function (errExt, resExt) {
@@ -969,14 +969,14 @@ function GetExtensions(Ext,Company,Tenant,reqId,callback)
 
 }
 */
-module.exports.ChangeAvailability = ChangeAvailability;
-module.exports.AddExtension = AddExtension;
-module.exports.MapWithSipUacEndpoint = MapWithSipUacEndpoint;
-module.exports.MapwithGroup = MapwithGroup;
-module.exports.GetUserDataOfExtension = GetUserDataOfExtension;
-module.exports.GetExtensionsOfCompany = GetExtensionsOfCompany;
+module.exports.ChangeUserAvailability = ChangeUserAvailability;
+module.exports.CreateExtension = CreateExtension;
+module.exports.AssignToSipUser = AssignToSipUser;
+module.exports.AssignToGroup = AssignToGroup;
+module.exports.PickExtensionUsers = PickExtensionUsers;
+module.exports.PickCompanyExtensions = PickCompanyExtensions;
 //module.exports.GetExtensions = GetExtensions;
-module.exports.GetAllUserDataForExt = GetAllUserDataForExt;
+module.exports.GetUsersOfExtension = GetUsersOfExtension;
 module.exports.AddDidNumberDB = AddDidNumberDB;
 module.exports.SetDidNumberActiveStatusDB = SetDidNumberActiveStatusDB;
 module.exports.DeleteDidNumberDB = DeleteDidNumberDB;

@@ -18,7 +18,7 @@ var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 // Save function , 2 params, object from caller and this functions callback
 
 // post :- done
-function UpdateUacUserData(Username,jobj,reqId,callback) {
+function UpdateUser(Username,jobj,reqId,callback) {
 
     try{
         DbConn.SipUACEndpoint
@@ -79,12 +79,12 @@ function UpdateUacUserData(Username,jobj,reqId,callback) {
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - Exception in Method starts : UpdateUacUserData ',reqId,jobj.SipUsername,ex);
+        logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - Exception in Method starts : UpdateUser ',reqId,jobj.SipUsername,ex);
         callback(ex, undefined);
     }
 }
 
-function GetSIPUsersOfCompany(Company,reqId,callback)
+function PickCompanyUsers(Company,reqId,callback)
 {
     try
     {
@@ -129,5 +129,5 @@ function GetSIPUsersOfCompany(Company,reqId,callback)
 
 
 //exporting module
-module.exports.UpdateUacUserData = UpdateUacUserData;
-module.exports.GetSIPUsersOfCompany = GetSIPUsersOfCompany;
+module.exports.UpdateUser = UpdateUser;
+module.exports.PickCompanyUsers = PickCompanyUsers;

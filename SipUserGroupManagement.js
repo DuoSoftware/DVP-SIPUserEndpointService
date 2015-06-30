@@ -10,7 +10,7 @@ var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJ
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 
-function AddSipUserGroup(obj,reqId,callback)
+function CreateUserGroup(obj,reqId,callback)
 {
     try {
         DbConn.UserGroup.find({where: [{GroupName: obj.GroupName}]}).complete(function (errGroup, resGroup) {
@@ -250,7 +250,7 @@ function FillUsrGrp(obj,reqId,callback)
 
 }
 
-function UpdateSipUserGroup(GID,obj,reqId,callback)
+function UpdateUserGroup(GID,obj,reqId,callback)
 {
     try {
         DbConn.UserGroup
@@ -290,7 +290,7 @@ function UpdateSipUserGroup(GID,obj,reqId,callback)
 
 
 
-function GetGroupData(GroupID,Company,Tenant,reqId,callback)
+function PickUserGroup(GroupID,Company,Tenant,reqId,callback)
 {
     try {
         DbConn.UserGroup
@@ -324,7 +324,7 @@ function GetGroupData(GroupID,Company,Tenant,reqId,callback)
     }
     catch(ex)
     {
-        logger.debug('[DVP-SIPUserEndpointService.GroupData] - [%s] - [PGSQL]  - Exception in method starting : GetGroupData ',reqId,GroupID,ex);
+        logger.debug('[DVP-SIPUserEndpointService.GroupData] - [%s] - [PGSQL]  - Exception in method starting : PickUserGroup ',reqId,GroupID,ex);
         callback(ex,undefined);
     }
 }
@@ -376,7 +376,7 @@ function GetGroupEndpoints(obj,Company,Tenant,reqId,callback)
 }
 
 
-function EndpointGroupID(SipID,Company,Tenant,reqId,callback)
+function PickUsersGroup(SipID,Company,Tenant,reqId,callback)
 {
     try {
         
@@ -420,7 +420,7 @@ function EndpointGroupID(SipID,Company,Tenant,reqId,callback)
 
 //get :-done
 
-function AllRecWithCompany(Company,reqId,callback)
+function PickCompayGroups(Company,reqId,callback)
 {
     try{
         DbConn.UserGroup
@@ -458,7 +458,7 @@ function AllRecWithCompany(Company,reqId,callback)
 }
 
 
-function GetAllUsersInGroup(GroupId,Company,Tenant,reqId,callback)
+function PickUsersInGroup(GroupId,Company,Tenant,reqId,callback)
 {
 
     try {
@@ -497,15 +497,15 @@ function GetAllUsersInGroup(GroupId,Company,Tenant,reqId,callback)
 
 
 //post funcs
-module.exports.AddSipUserGroup = AddSipUserGroup;
+module.exports.CreateUserGroup = CreateUserGroup;
 module.exports.MapExtensionID = MapExtensionID;
 module.exports.FillUsrGrp = FillUsrGrp;
-module.exports.UpdateSipUserGroup = UpdateSipUserGroup;
+module.exports.UpdateUserGroup = UpdateUserGroup;
 
 //get funcs
-module.exports.GetGroupData = GetGroupData;
+module.exports.PickUserGroup = PickUserGroup;
 module.exports.GetGroupEndpoints = GetGroupEndpoints;
-module.exports.EndpointGroupID = EndpointGroupID;
-module.exports.AllRecWithCompany = AllRecWithCompany;
-module.exports.GetAllUsersInGroup = GetAllUsersInGroup;
+module.exports.PickUsersGroup = PickUsersGroup;
+module.exports.PickCompayGroups = PickCompayGroups;
+module.exports.PickUsersInGroup = PickUsersInGroup;
 

@@ -14,9 +14,9 @@ var nodeUuid = require('node-uuid');
 
 
 
-function SaveSip(reqz,reqId,callback) {
+function CreateUser(req,reqId,callback) {
     try {
-        var obj = reqz.body;
+        var SipObj = req.body;
 
 
     }
@@ -30,27 +30,27 @@ function SaveSip(reqz,reqId,callback) {
 
 
 
-    logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Searching for SipUACEndPoint %s ',reqId,obj.SipUsername);
+    logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
 
     try {
         DbConn.SipUACEndpoint
-            .find({where: [{SipUsername: obj.SipUsername}, {CompanyId: 1}, {TenantId: 1}]})
-            .complete(function (err, result) {
-                if (err) {
+            .find({where: [{SipUsername: SipObj.SipUsername}, {CompanyId: 1}, {TenantId: 1}]})
+            .complete(function (errUser, resUser) {
+                if (errUser) {
 
-                    logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,obj.SipUsername,err);
-                    callback(err,undefined);
+                    logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername,errUser);
+                    callback(errUser,undefined);
 
-                } else if (result == null) {
+                } else if (resUser == null) {
 
-                    logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - No record found for SipUACEndPoint %s ',reqId,obj.SipUsername);
+                    logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - No record found for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
                     try {
 
 
 
-                        logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Saving new sip user %s',reqId,JSON.stringify(obj));
+                        logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Saving new sip user %s',reqId,JSON.stringify(SipObj));
 
-                        SaveUACRec(obj,reqId,function (error, st) {
+                        SaveUACRec(SipObj,reqId,function (error, st) {
 
                                 if(error)
                                 {
@@ -86,7 +86,7 @@ function SaveSip(reqz,reqId,callback) {
 
                 } else {
 
-                    logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Found sip user %s',reqId,result.SipUsername);
+                    logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Found sip user %s',reqId,resUser.SipUsername);
                     callback(new Error("Cannot overwrite this record"),undefined);
 
 
@@ -95,7 +95,7 @@ function SaveSip(reqz,reqId,callback) {
 
     }
     catch (ex) {
-        logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Exception in starting : SaveSip of %s',reqId,obj.SipUsername,ex);
+        logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Exception in starting : SaveSip of %s',reqId,SipObj.SipUsername,ex);
         callback(ex,undefined);
     }
 
@@ -236,4 +236,4 @@ function SaveUACRec(jobj,reqId,callback) {
 }
 
 
-module.exports.SaveSip = SaveSip;
+module.exports.CreateUser = CreateUser;
