@@ -40,7 +40,7 @@ function AddOrUpdateContext(req,reqId,callback) {
                 .complete(function (err, result) {
                     if (err) {
 
-                        logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Error occurred while searching Context %s ',reqId,ContextObj.Context,err);
+                        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Error occurred while searching Context %s ',reqId,ContextObj.Context,err);
                         callback(err, undefined);
 
                     }
@@ -49,11 +49,11 @@ function AddOrUpdateContext(req,reqId,callback) {
                     {
                         if (!result) {
 
-                            logger.debug('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - No record found for Context %s ',reqId,ContextObj.Context);
+                            logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - No record found for Context %s ',reqId,ContextObj.Context);
 
                             try {
 
-                                logger.debug('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Creating new record of Context %s ',reqId,ContextObj.Context);
+                                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Creating new record of Context %s ',reqId,ContextObj.Context);
                                 DbConn.Context
                                     .create(
                                     {
@@ -73,14 +73,14 @@ function AddOrUpdateContext(req,reqId,callback) {
 
                                         if (err ) {
 
-                                            logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Context %s insertion  failed - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj),err);
+                                            logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s insertion  failed - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj),err);
                                             callback(err, undefined);
 
 
 
                                         }
                                         else {
-                                            logger.debug('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Context %s inserted successfully - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj));
+                                            logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s inserted successfully - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj));
                                             callback(undefined, user);
                                         }
                                     });
@@ -88,17 +88,17 @@ function AddOrUpdateContext(req,reqId,callback) {
 
                             }
                             catch (ex) {
-                                logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s]  - Exception in detail creation of Context %s',reqId,ContextObj.Context,ex);
+                                logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Exception in detail creation of Context %s',reqId,ContextObj.Context,ex);
                                 callback(ex, undefined);
 
                             }
 
                         } else {
 
-                            logger.debug('[DVP-SIPUserEndpointService.NewContextData] - [%s]  - Context found',reqId,JSON.stringify(result));
+                            logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Context found',reqId,JSON.stringify(result));
 
                             try {
-                                logger.debug('[DVP-SIPUserEndpointService.NewContextData] - [%s]  - Updating picked Context data %s to %s',reqId,JSON.stringify(result),JSON.stringify(ContextObj));
+                                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Updating picked Context data %s to %s',reqId,JSON.stringify(result),JSON.stringify(ContextObj));
                                 DbConn.Context
                                     .update(
                                     {
@@ -120,20 +120,20 @@ function AddOrUpdateContext(req,reqId,callback) {
                                 ).then(function (resUpdate) {
 
 
-                                        logger.debug('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Context %s Updated successfully',reqId,ContextObj.Context);
+                                        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s Updated successfully',reqId,ContextObj.Context);
                                         callback(undefined, resUpdate);
 
                                     }).error(function (errUpdate) {
 
 
-                                        logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Context %s Updation failed',reqId,ContextObj.Context,errUpdate);
+                                        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s Updation failed',reqId,ContextObj.Context,errUpdate);
                                         callback(errUpdate, undefined);
 
 
                                     });
                             }
                             catch (ex) {
-                                logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Exception in updating context %s',reqId,ContextObj.Context,ex);
+                                logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Exception in updating context %s',reqId,ContextObj.Context,ex);
                                 callback(ex, undefined);
                             }
 
@@ -144,13 +144,13 @@ function AddOrUpdateContext(req,reqId,callback) {
 
         }
         catch (ex) {
-            logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Exception in Searching context %s',reqId,ContextObj.Context,ex);
+            logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Exception in Searching context %s',reqId,ContextObj.Context,ex);
             callback(ex,undefined);
         }
     }
     else
     {
-        logger.error('[DVP-SIPUserEndpointService.NewContextData] - [%s] - [PGSQL] - Recieved Context id is invalid',reqId);
+        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Recieved Context id is invalid',reqId);
         callback(new Error("Invalid Context"),undefined);
     }
 }
@@ -164,18 +164,18 @@ var PickUserByUUID = function(reqId, uuid, companyId, tenantId, callback)
             {
                 if(errSip)
                 {
-                    logger.error('[DVP-SIPUserEndpointService.GetSipUserDetailsByUuid] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                    logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query failed',reqId, errSip);
                 }
                 else
                 {
-                    logger.debug('[DVP-SIPUserEndpointService.GetSipUserDetailsByUuid] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                    logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query completed successfully',reqId);
                 }
                 callback(errSip, resSip);
             });
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.GetSipUserDetailsByUuid] - [%s] - Method call failed ',reqId, ex);
+        logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - Method call failed ',reqId, ex);
         callback(ex, undefined);
     }
 }

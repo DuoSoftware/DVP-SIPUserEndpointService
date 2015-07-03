@@ -464,14 +464,14 @@ function ChangeUserAvailability(tenant,ext,st,reqId,callback) {
 
             if (errExt) {
 
-                logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Error in searching ExtensionRefId %s of Tenant %s',reqId,ext,tenant,errExt);
+                logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Error in searching ExtensionRefId %s of Tenant %s',reqId,ext,tenant,errExt);
                 callback(err, undefined);
             }
             else
             {
 
                 if (ExtObject) {
-                    logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s of Tenant %s ',reqId,st,ext,tenant);
+                    logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s of Tenant %s ',reqId,st,ext,tenant);
                     try {
                         ExtObject.updateAttributes(
                             {
@@ -480,25 +480,25 @@ function ChangeUserAvailability(tenant,ext,st,reqId,callback) {
                             }
                         ).then(function (resExUpdate) {
 
-                                logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s of Tenant %s is succeeded ',reqId,st,ext,tenant);
+                                logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s of Tenant %s is succeeded ',reqId,st,ext,tenant);
                                 callback(undefined, resExUpdate);
 
                             }).error(function (errExUpdate) {
 
-                                logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s of Tenant %s is failed ',reqId,st,ext,tenant,errExUpdate);
+                                logger.error('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s of Tenant %s is failed ',reqId,st,ext,tenant,errExUpdate);
                                 callback(new Error("Error Found in updating"),undefined);
 
                             });
                     }
                     catch (ex) {
-                        logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Exception in Updating status to %s of ExtensionRefId %s of Tenant %s ',reqId,st,ext,tenant,ex);
+                        logger.error('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Exception in Updating status to %s of ExtensionRefId %s of Tenant %s ',reqId,st,ext,tenant,ex);
                         callback(ex, undefined);
                     }
 
 
                 }
                 else {
-                    logger.debug('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - No record found for Extension %s of Tenant %s ',reqId,ext,tenant);
+                    logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - No record found for Extension %s of Tenant %s ',reqId,ext,tenant);
                     callback(new Error("Error Occurred"), undefined);
                 }
             }
@@ -506,7 +506,7 @@ function ChangeUserAvailability(tenant,ext,st,reqId,callback) {
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.UpdateExtensionStatus] - [%s] - [PGSQL]  - Exception in searching Extension %s of Tenant %s ',reqId,ext,tenant,ex);
+        logger.error('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Exception in searching Extension %s of Tenant %s ',reqId,ext,tenant,ex);
         callback(ex,undefined);
     }
 
@@ -580,7 +580,7 @@ function AssignToSipUser(Ext,UAC,Company,Tenant,reqId,callback) {
 
 
             if (errExt) {
-                logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,Ext,errExt);
+                logger.error('[DVP-SIPUserEndpointService.Extension.AssignToSipUser] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,Ext,errExt);
                 callback(errExt, undefined);
             }
 
@@ -589,18 +589,18 @@ function AssignToSipUser(Ext,UAC,Company,Tenant,reqId,callback) {
             {
 
                 if (!resExtObj ) {
-                    logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,Ext);
+                    logger.error('[DVP-SIPUserEndpointService.Extension.AssignToSipUser] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,Ext);
                     callback(new Error("No Extension record found"), undefined);
 
 
                 }
                 else {
-                    logger.debug('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [PGSQL]  - Record found for Extension %s and Searching for SipUser %s ',reqId,Ext,UAC);
+                    logger.debug('[DVP-SIPUserEndpointService.Extension.AssignToSipUser] - [%s] - [PGSQL]  - Record found for Extension %s and Searching for SipUser %s ',reqId,Ext,UAC);
                     try {
                         DbConn.SipUACEndpoint.find({where: [{id: UAC},{CompanyId:Company},{TenantId:Tenant}]}).complete(function (errSip, resSipObj) {
 
                             if (errSip) {
-                                logger.error('[DVP-LimitHandler.MapExtension] - [%s] - [PGSQL]  - Error in searching SipUACEndpoint %s ',reqId,UAC,errSip);
+                                logger.error('[DVP-LimitHandler.Extension.AssignToSipUser] - [%s] - [PGSQL]  - Error in searching SipUACEndpoint %s ',reqId,UAC,errSip);
                                 callback(errSip, undefined);
                             }
 
@@ -608,13 +608,13 @@ function AssignToSipUser(Ext,UAC,Company,Tenant,reqId,callback) {
                             else
                             {
                                 if (!resSipObj) {
-                                    logger.error('[DVP-LimitHandler.MapExtension] - [%s] - [PGSQL]  - No record found for SipUACEndpoint %s ',reqId,UAC);
+                                    logger.error('[DVP-LimitHandler.Extension.AssignToSipUser] - [%s] - [PGSQL]  - No record found for SipUACEndpoint %s ',reqId,UAC);
 
                                     callback(new Error("No SIPUser record found"), undefined);
 
                                 }
                                 else {
-                                    logger.debug('[DVP-LimitHandler.ExtensionManagement.MapExtension] - [%s] - [PGSQL]  - Record found for SipUACEndpoint %s ',reqId,UAC);
+                                    logger.debug('[DVP-LimitHandler.Extension.AssignToSipUser] - [%s] - [PGSQL]  - Record found for SipUACEndpoint %s ',reqId,UAC);
                                     /*
                                      try {
                                      DbConn.SipUACEndpoint.find({where: [{SipExtension: obj.SipExtension}]}).complete(function (errSip, resSip) {
@@ -691,7 +691,7 @@ function AssignToSipUser(Ext,UAC,Company,Tenant,reqId,callback) {
                         });
                     }
                     catch (ex) {
-                        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [PGSQL]  - Exception in searching SipUACEndpoints ID %s ',reqId,UAC,ex);
+                        logger.error('[DVP-SIPUserEndpointService.Extension.AssignToSipUser] - [%s] - [PGSQL]  - Exception in searching SipUACEndpoints ID %s ',reqId,UAC,ex);
                         callback(ex, undefined);
                     }
                 }
@@ -700,7 +700,7 @@ function AssignToSipUser(Ext,UAC,Company,Tenant,reqId,callback) {
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.MapExtensionWithUAC] - [%s] - [PGSQL]  - Exception in searching Extension %s ',reqId,Ext,ex);
+        logger.error('[DVP-SIPUserEndpointService.Extension.AssignToSipUser] - [%s] - [PGSQL]  - Exception in searching Extension %s ',reqId,Ext,ex);
         callback(ex, undefined);
     }
 
@@ -713,48 +713,48 @@ function AssignToGroup(Ext,Grp,Company,Tenant,reqId,callback)
         DbConn.Extension.find({where: [{Extension: Ext},{CompanyId:Company},{TenantId:Tenant}]}).complete(function (errExt, resExtObject) {
 
             if (errExt) {
-                logger.error('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - Error in searching Extension - Extension %s Group % ',reqId,Ext,errExt);
+                logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - Error in searching Extension - Extension %s Group % ',reqId,Ext,errExt);
                 callback(errExt, undefined);
             }
 
             else
             {
                 if (resExtObject) {
-                    logger.debug('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - Extension found -  Data - %s',reqId,JSON.stringify(resExtObject));
+                    logger.debug('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - Extension found -  Data - %s',reqId,JSON.stringify(resExtObject));
 
                     try {
                         DbConn.UserGroup.find({where: [{id: Grp},{CompanyId:Company},{TenantId:Tenant}]}).complete(function (errGroup, resGroupObject) {
                             if (errGroup) {
-                                logger.error('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - Error in searching UserGroup %s ',reqId,Grp,errGroup);
+                                logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - Error in searching UserGroup %s ',reqId,Grp,errGroup);
                                 callback(errz, undefined);
                             }
 
                             else if (resGroupObject!=null) {
-                                logger.debug('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - UserGroup %s found.Mapping is starting ',reqId,Grp);
+                                logger.debug('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - UserGroup %s found.Mapping is starting ',reqId,Grp);
 
                                 try {
                                     resGroupObject.setExtension(resExtObject).complete(function (errMap, resMap) {
 
                                         if (errMap) {
-                                            logger.error('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - Error in Mapping Extension %s with Group %s -  Data - %s',reqId,resExtObject.id,resGroupObject.id,errMap);
+                                            logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - Error in Mapping Extension %s with Group %s -  Data - %s',reqId,resExtObject.id,resGroupObject.id,errMap);
                                             callback(errMap, undefined)
                                         }
                                         else  {
-                                            logger.error('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - Mapping Extension %s with Group %s is succeeded -  Data - %s',reqId,resExtObject.id,resGroupObject.id);
+                                            logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - Mapping Extension %s with Group %s is succeeded -  Data - %s',reqId,resExtObject.id,resGroupObject.id);
                                             callback(undefined, resMap)
                                         }
 
                                     });
                                 }
                                 catch (ex) {
-                                    logger.error('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - Exception in Mapping Extension %s with Group %s -  Data - %s',reqId,resGroupObject.id,resExtObject.id);
+                                    logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - Exception in Mapping Extension %s with Group %s -  Data - %s',reqId,resGroupObject.id,resExtObject.id);
                                     callback(ex, undefined);
                                 }
 
                             }
 
                             else {
-                                logger.error('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - No record found for group %s  ',reqId,Grp);
+                                logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - No record found for group %s  ',reqId,Grp);
                                 callback(new Error("No group record found"), undefined);
                             }
 
@@ -762,14 +762,14 @@ function AssignToGroup(Ext,Grp,Company,Tenant,reqId,callback)
 
                     }
                     catch (ex) {
-                        logger.error('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - Exception in searching group %s  ',reqId,Grp,ex);
+                        logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - Exception in searching group %s  ',reqId,Grp,ex);
                         callback(ex, undefined);
                     }
 
 
                 }
                 else {
-                    logger.error('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - No record found for Extension %s  ',reqId,Ext);
+                    logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - No record found for Extension %s  ',reqId,Ext);
                     callback(err, sipObject);
 
                 }
@@ -782,7 +782,7 @@ function AssignToGroup(Ext,Grp,Company,Tenant,reqId,callback)
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.ExtensionMapwithGroup] - [%s] - [PGSQL]  - Exception in starting method : MapwithGroup  - Extension %s Group % ',reqId,Ext,Grp,ex);
+        logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - Exception in starting method : MapwithGroup  - Extension %s Group % ',reqId,Ext,Grp,ex);
         callback(ex,undefined);
     }
 }
@@ -815,7 +815,7 @@ function CreateExtension(jobj,reqId,callback)
 
                 if (!err ) {
                     //console.log("New User Found and Inserted (Extension : " + jobj.Extension + ")");
-                    logger.debug('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  -  Extension %s insertion succeeded ',reqId,jobj.Extension);
+                    logger.debug('[DVP-SIPUserEndpointService.CreateExtension] - [%s] - [PGSQL]  -  Extension %s insertion succeeded ',reqId,jobj.Extension);
                     callback(1);
 
                     //callback(err, true);
@@ -825,7 +825,7 @@ function CreateExtension(jobj,reqId,callback)
                 }
                 else {
                     // console.log("Error in saving  (Extension :" + jobj.Extension + ")" + err);
-                    logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  -  Extension %s insertion failed ',reqId,jobj.Extension,err);
+                    logger.error('[DVP-SIPUserEndpointService.CreateExtension] - [%s] - [PGSQL]  -  Extension %s insertion failed ',reqId,jobj.Extension,err);
                     callback(0);
                     // callback(err, false);
                     //pass error and false
@@ -837,7 +837,7 @@ function CreateExtension(jobj,reqId,callback)
     catch (ex)
     {
         //console.log("Error found in saving data : "+ex);
-        logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  -  Exception in saving Extension %s ',reqId,jobj.Extension,ex);
+        logger.error('[DVP-SIPUserEndpointService.CreateExtension] - [%s] - [PGSQL]  -  Exception in saving Extension %s ',reqId,jobj.Extension,ex);
 
         callback(0);
 
@@ -852,7 +852,7 @@ function PickExtensionUsers(Ext,Company,Tenant,reqId,callback)
         DbConn.Extension.find({where: [{Extension: Ext}, {TenantId: Tenant},{CompanyId:Company}],include: [{model: DbConn.SipUACEndpoint, as: "SipUACEndpoint"}]}).complete(function (errExtUser, resExtUser) {
 
             if (errExtUser) {
-                logger.error('[DVP-SIPUserEndpointService.GetUserDataOfExtension] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,Ext,errExtUser);
+                logger.error('[DVP-SIPUserEndpointService.PickExtensionUsers] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,Ext,errExtUser);
                 callback(errExtUser, undefined);
             }
 
@@ -861,14 +861,14 @@ function PickExtensionUsers(Ext,Company,Tenant,reqId,callback)
             {
                 if (!resExtUser) {
 
-                    logger.error('[DVP-SIPUserEndpointService.GetUserDataOfExtension] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,Ext);
+                    logger.error('[DVP-SIPUserEndpointService.PickExtensionUsers] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,Ext);
                     callback("EMPTY", undefined);
 
                 }
 
                 else  {
 
-                    logger.debug('[DVP-SIPUserEndpointService.GetUserDataOfExtension] - [%s] - [PGSQL]  - User records found for Extension %s ',reqId,Ext);
+                    logger.debug('[DVP-SIPUserEndpointService.PickExtensionUsers] - [%s] - [PGSQL]  - User records found for Extension %s ',reqId,Ext);
                     callback(undefined, resExtUser);
                 }
             }
@@ -877,7 +877,7 @@ function PickExtensionUsers(Ext,Company,Tenant,reqId,callback)
 
     }
     catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.GetUserDataOfExtension] - [%s] - [PGSQL]  - Exception occurred  %s ',reqId,Ext);
+        logger.error('[DVP-SIPUserEndpointService.PickExtensionUsers] - [%s] - [PGSQL]  - Exception occurred  %s ',reqId,Ext);
         callback(ex,undefined);
     }
 
@@ -890,7 +890,7 @@ function PickCompanyExtensions(Company,Tenant,reqId,callback)
 
 
             if (errExt) {
-                logger.error('[DVP-SIPUserEndpointService.GetExtensionsOfCompany] - [%s] - [PGSQL]  - Error in searching Company %s ',reqId,Company,errExt);
+                logger.error('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - Error in searching Company %s ',reqId,Company,errExt);
                 callback(errExt, undefined);
             }
 
@@ -898,7 +898,7 @@ function PickCompanyExtensions(Company,Tenant,reqId,callback)
             else
             {
                 if (!resExt) {
-                    logger.error('[DVP-SIPUserEndpointService.GetExtensionsOfCompany] - [%s] - [PGSQL]  - No record found for Company %s ',reqId,Company);
+                    logger.error('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - No record found for Company %s ',reqId,Company);
                     callback(new Error("No extension recode found"), undefined);
 
                 }
@@ -907,7 +907,7 @@ function PickCompanyExtensions(Company,Tenant,reqId,callback)
 
                 else  {
 
-                    logger.debug('[DVP-SIPUserEndpointService.GetExtensionsOfCompany] - [%s] - [PGSQL]  - Extension records found for Company %s ',reqId,Company);
+                    logger.debug('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - Extension records found for Company %s ',reqId,Company);
                     callback(undefined, resExt);
                 }
             }
@@ -916,7 +916,7 @@ function PickCompanyExtensions(Company,Tenant,reqId,callback)
 
     }
     catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.GetExtensionsOfCompany] - [%s] - [PGSQL]  - Exception occurred  %s ',reqId,Company,ex);
+        logger.error('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - Exception occurred  %s ',reqId,Company,ex);
         callback(ex,undefined);
     }
 

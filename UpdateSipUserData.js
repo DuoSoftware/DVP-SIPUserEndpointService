@@ -25,14 +25,14 @@ function UpdateUser(Username,jobj,reqId,callback) {
             .find({where: [{SipUsername: Username}, {CompanyId: 1}, {TenantId: 1}]})
             .complete(function (err, result) {
                 if (err) {
-                    logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUAC] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,jobj.SipUsername,err);
+                    logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUser] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,jobj.SipUsername,err);
                     callback(err, undefined);
 
                 } else
                 {
                     if (!result) {
 
-                        logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,jobj.SipUsername);
+                        logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,jobj.SipUsername);
                         callback(new Error("No SipUser record found"), undefined);
 
                     }
@@ -56,20 +56,20 @@ function UpdateUser(Username,jobj,reqId,callback) {
                                 }
                             ).then(function (resultUpdate) {
 
-                                    logger.debug('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Updating records of SipUser %s is succeeded ',reqId,jobj.SipUsername);
+                                    logger.debug('[DVP-LimitHandler.UACManagement.UpdateUser] - [%s] - [PGSQL]  - Updating records of SipUser %s is succeeded ',reqId,jobj.SipUsername);
                                     callback(undefined, resultUpdate);
 
                                 }).error(function (errUpdate) {
 
                                     console.log("Project update failed ! " + errUpdate);
-                                    logger.error('[DVP-LimitHandler.UACManagement.UpdateUAC] - [%s] - [PGSQL]  - Updating records of SipUser %s is failed - Data %s ',reqId,jobj.SipUsername,JSON.stringify(jobj),errUpdate);
+                                    logger.error('[DVP-LimitHandler.UACManagement.UpdateUser] - [%s] - [PGSQL]  - Updating records of SipUser %s is failed - Data %s ',reqId,jobj.SipUsername,JSON.stringify(jobj),errUpdate);
                                     callback(errUpdate, undefined);
 
                                 });
 
                         }
                         catch (ex) {
-                            logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - Exception in updating SipUser %s ',reqId,jobj.SipUsername,ex);
+                            logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [PGSQL]  - Exception in updating SipUser %s ',reqId,jobj.SipUsername,ex);
                             callback(ex, undefined);
                         }
                     }
@@ -79,7 +79,7 @@ function UpdateUser(Username,jobj,reqId,callback) {
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.UpdateUAC] - [%s] - [PGSQL]  - Exception in Method starts : UpdateUser ',reqId,jobj.SipUsername,ex);
+        logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [PGSQL]  - Exception in Method starts : UpdateUser ',reqId,jobj.SipUsername,ex);
         callback(ex, undefined);
     }
 }
@@ -93,7 +93,7 @@ function PickCompanyUsers(Company,reqId,callback)
             .complete(function (errSip, resSip) {
 
                 if (errSip) {
-                    logger.error('[DVP-SIPUserEndpointService.AllSIPUsersOfCompany] - [%s] - [PGSQL]  - Error in searching SipUser of Company %s ',reqId,Company,errSip);
+                    logger.error('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [PGSQL]  - Error in searching SipUser of Company %s ',reqId,Company,errSip);
                     callback(errSip, undefined);
 
                 } else
@@ -101,12 +101,12 @@ function PickCompanyUsers(Company,reqId,callback)
 
                     if (!resSip) {
 
-                        logger.error('[DVP-SIPUserEndpointService.AllSIPUsersOfCompany] - [%s] - [PGSQL]  - No record found for SipUser of Company %s ',reqId,Company);
+                        logger.error('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [PGSQL]  - No record found for SipUser of Company %s ',reqId,Company);
                         callback(new Error("No SipUSer record found"), undefined);
                     }
                     else {
 
-                        logger.debug('[DVP-SIPUserEndpointService.AllSIPUsersOfCompany] - [%s] - [PGSQL]  - Record found for Context %s ',reqId,Company);
+                        logger.debug('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [PGSQL]  - Record found for Context %s ',reqId,Company);
                         callback(undefined, resSip);
 
 
@@ -121,7 +121,7 @@ function PickCompanyUsers(Company,reqId,callback)
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.AllSIPUsersOfCompany] - [%s] - [PGSQL]  - Exception in starting method:  ',reqId,ex);
+        logger.error('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [PGSQL]  - Exception in starting method:  ',reqId,ex);
         callback(ex, undefined);
     }
 }

@@ -16,13 +16,13 @@ function CreateUserGroup(obj,reqId,callback)
         DbConn.UserGroup.find({where: [{GroupName: obj.GroupName}]}).complete(function (errGroup, resGroup) {
 
             if (errGroup) {
-                logger.error('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - Error in searching Group %s',reqId,obj.GroupName,errGroup);
+                logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Error in searching Group %s',reqId,obj.GroupName,errGroup);
                 callback(errGroup, undefined);
             }
             else
             {
                 if (resGroup) {
-                    logger.debug('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - Already in DB Group %s',reqId,obj.GroupName);
+                    logger.debug('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Already in DB Group %s',reqId,obj.GroupName);
                     callback(undefined, resGroup);
                 }
                 else  {
@@ -48,20 +48,20 @@ function CreateUserGroup(obj,reqId,callback)
                         UserGroupobj.save().complete(function (errGrpSave, resGrpSave) {
                             if (errGrpSave) {
 
-                                logger.error('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - New user group insertion failed - Group %s',reqId,JSON.stringify(obj),errGrpSave);
+                                logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - New user group insertion failed - Group %s',reqId,JSON.stringify(obj),errGrpSave);
                                 callback(errGrpSave, undefined);
 
                             }
                             else {
-                                logger.debug('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - New user group insertion succeeded - Group %s',reqId,JSON.stringify(obj));
-                                callback(undefined, result);
+                                logger.debug('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - New user group insertion succeeded - Group %s',reqId,JSON.stringify(obj));
+                                callback(undefined, resGrpSave);
                             }
 
 
                         });
                     }
                     catch (ex) {
-                        logger.error('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - Exception in New user group insertion  - Group %s',reqId,JSON.stringify(obj),ex);
+                        logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Exception in New user group insertion  - Group %s',reqId,JSON.stringify(obj),ex);
                         callback(ex, undefined);
                     }
                 }
@@ -74,7 +74,7 @@ function CreateUserGroup(obj,reqId,callback)
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.NewSipUserGroup] - [%s] - [PGSQL]  - Exception in user group Searching   - Group %s',reqId,JSON.stringify(obj),ex);
+        logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Exception in user group Searching   - Group %s',reqId,JSON.stringify(obj),ex);
         callback(ex,undefined);
     }
 
@@ -300,20 +300,20 @@ function PickUserGroup(GroupID,Company,Tenant,reqId,callback)
         )
             .complete(function (errGrp, resGrp) {
                 if (errGrp) {
-                    logger.error('[DVP-SIPUserEndpointService.GroupData] - [%s] - [PGSQL]  - Error in searching Group %s ',reqId,GroupID,errGrp);
+                    logger.error('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [PGSQL]  - Error in searching Group %s ',reqId,GroupID,errGrp);
                     callback(errGrp, undefined);
 
                 } else
                 {
                     if (!resGrp) {
 
-                        logger.error('[DVP-SIPUserEndpointService.GroupData] - [%s] - [PGSQL]  - No record found for Group %s ',reqId,GroupID);
+                        logger.error('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [PGSQL]  - No record found for Group %s ',reqId,GroupID);
 
                         callback(new Error("No group record found"), undefined);
 
                     } else {
 
-                        logger.debug('[DVP-SIPUserEndpointService.GroupData] - [%s] - [PGSQL]  - Record found for Group %s ',reqId,GroupID);
+                        logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [PGSQL]  - Record found for Group %s ',reqId,GroupID);
                         callback(undefined, resGrp);
 
                     }
@@ -324,7 +324,7 @@ function PickUserGroup(GroupID,Company,Tenant,reqId,callback)
     }
     catch(ex)
     {
-        logger.debug('[DVP-SIPUserEndpointService.GroupData] - [%s] - [PGSQL]  - Exception in method starting : PickUserGroup ',reqId,GroupID,ex);
+        logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [PGSQL]  - Exception in method starting : PickUserGroup ',reqId,GroupID,ex);
         callback(ex,undefined);
     }
 }
@@ -384,16 +384,16 @@ function PickUsersGroup(SipID,Company,Tenant,reqId,callback)
             .complete(function (errSip, resSip) {
 
                 if (errSip) {
-                    logger.error('[DVP-SIPUserEndpointService.EndpointGroupID] - [%s] - [PGSQL]  - Error in searching UsrGrp records of SipUACEndpoint %s ',reqId,SipID,errSip);
+                    logger.error('[DVP-SIPUserEndpointService.PickUsersGroup] - [%s] - [PGSQL]  - Error in searching UsrGrp records of SipUACEndpoint %s ',reqId,SipID,errSip);
                     callback(errSip, undefined);
 
                 } else {
                     if (!resSip) {
-                        logger.error('[DVP-SIPUserEndpointService.EndpointGroupID] - [%s] - [PGSQL]  - No records for SipUACEndpoint %s ',reqId,SipID);
+                        logger.error('[DVP-SIPUserEndpointService.PickUsersGroup] - [%s] - [PGSQL]  - No records for SipUACEndpoint %s ',reqId,SipID);
                         callback(new Error("No group record found"), undefined);
 
                     } else {
-                        logger.debug('[DVP-SIPUserEndpointService.EndpointGroupID] - [%s] - [PGSQL]  - Records for SipUACEndpoint %s ',reqId,SipID);
+                        logger.debug('[DVP-SIPUserEndpointService.PickUsersGroup] - [%s] - [PGSQL]  - Records for SipUACEndpoint %s ',reqId,SipID);
                         if(resSip.UserGroup)
                         {
                             callback(undefined, resSip.UserGroup);
@@ -412,7 +412,7 @@ function PickUsersGroup(SipID,Company,Tenant,reqId,callback)
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.EndpointGroupID] - [%s] - [PGSQL]  - Error in Method starting : EndpointGroupID  %S ',reqId,SipID,ex);
+        logger.error('[DVP-SIPUserEndpointService.PickUsersGroup] - [%s] - [PGSQL]  - Error in Method starting : EndpointGroupID  %S ',reqId,SipID,ex);
         callback(ex,undefined);
     }
 
@@ -430,18 +430,18 @@ function PickCompayGroups(Company,reqId,callback)
             .complete(function(errGroup, resGroup) {
                 if (errGroup) {
 
-                    logger.error('[DVP-SIPUserEndpointService.AllRecWithCompany] - [%s] - [PGSQL]  - Error in searching Group records of company %s ',reqId,Company,errGroup);
+                    logger.error('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - Error in searching Group records of company %s ',reqId,Company,errGroup);
                     callback(errGroup, undefined);
 
                 } else
                 {
                     if (!resGroup) {
-                        logger.error('[DVP-SIPUserEndpointService.AllRecWithCompany] - [%s] - [PGSQL]  - No Group records found for company %s ',reqId,Company);
+                        logger.error('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - No Group records found for company %s ',reqId,Company);
                         callback(new Error("No group record found"), undefined);
 
                     } else {
 
-                        logger.debug('[DVP-SIPUserEndpointService.AllRecWithCompany] - [%s] - [PGSQL]  - Records found for company %s ',reqId,Company);
+                        logger.debug('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - Records found for company %s ',reqId,Company);
                         callback(undefined, resGroup);
 
                     }
@@ -452,7 +452,7 @@ function PickCompayGroups(Company,reqId,callback)
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.AllRecWithCompany] - [%s] - [PGSQL]  - Exception on method starts : AllRecWithCompany - Data %s',reqId,Company,ex);
+        logger.error('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - Exception on method starts : AllRecWithCompany - Data %s',reqId,Company,ex);
         callback(ex, undefined);
     }
 }
@@ -465,18 +465,18 @@ function PickUsersInGroup(GroupId,Company,Tenant,reqId,callback)
         DbConn.UserGroup.find({where: [{id: GroupId},{CompanyId:Company},{TenantId:Tenant}], include: [{model: DbConn.SipUACEndpoint , as: "SipUACEndpoint" }]})
             .complete(function (errGroup, resGroup) {
                 if (errGroup) {
-                    logger.error('[DVP-SIPUserEndpointService.AllUsersInGroup] - [%s] - [PGSQL]  - Error in searching Users of Group %s ',reqId,GroupId,errGroup);
+                    logger.error('[DVP-SIPUserEndpointService.PickUsersInGroup] - [%s] - [PGSQL]  - Error in searching Users of Group %s ',reqId,GroupId,errGroup);
                     callback(errGroup, undefined);
 
                 } else
                 {
                     if (!resGroup) {
-                        logger.error('[DVP-SIPUserEndpointService.AllUsersInGroup] - [%s] - [PGSQL]  - No User record found for Group %s ',reqId,GroupId);
+                        logger.error('[DVP-SIPUserEndpointService.PickUsersInGroup] - [%s] - [PGSQL]  - No User record found for Group %s ',reqId,GroupId);
                         callback(newError("No group record found"), undefined);
 
                     } else {
 
-                        logger.debug('[DVP-SIPUserEndpointService.AllUsersInGroup] - [%s] - [PGSQL]  - Record found for Group %s ',reqId,GroupId);
+                        logger.debug('[DVP-SIPUserEndpointService.PickUsersInGroup] - [%s] - [PGSQL]  - Record found for Group %s ',reqId,GroupId);
                         callback(undefined, resGroup);
 
                     }
@@ -486,7 +486,7 @@ function PickUsersInGroup(GroupId,Company,Tenant,reqId,callback)
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.AllUsersInGroup] - [%s] - [PGSQL]  - Exception occurred on start : GetAllUsersInGroup %s ',reqId,GroupId,ex);
+        logger.error('[DVP-SIPUserEndpointService.PickUsersInGroup] - [%s] - [PGSQL]  - Exception occurred on start : GetAllUsersInGroup %s ',reqId,GroupId,ex);
         callback(ex, undefined);
 
     }
