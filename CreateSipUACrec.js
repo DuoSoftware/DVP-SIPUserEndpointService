@@ -22,7 +22,7 @@ function CreateUser(req,reqId,callback) {
     }
     catch (ex) {
 
-
+        logger.error('[DVP-SIPUserEndpointService.CreateUser] - error occurred while getting request body for SipUACEndPoint  ',reqId,req.body,errUser);
         callback(ex,undefined);
     }
 
@@ -30,7 +30,7 @@ function CreateUser(req,reqId,callback) {
 
 
 
-    logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
+    logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
 
     try {
         DbConn.SipUACEndpoint
@@ -38,19 +38,19 @@ function CreateUser(req,reqId,callback) {
             .complete(function (errUser, resUser) {
                 if (errUser) {
 
-                    logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername,errUser);
+                    logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername,errUser);
                     callback(errUser,undefined);
 
                 } else if (resUser == null) {
 
-                    logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - No record found for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
+                    logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - No record found for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
                     try {
 
 
 
-                        logger.debug('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Saving new sip user %s',reqId,JSON.stringify(SipObj));
+                        logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Saving new sip user %s',reqId,JSON.stringify(SipObj));
 
-                        SaveUACRec(SipObj,reqId,function (error, st) {
+                        SaveUser(SipObj,reqId,function (error, st) {
 
                                 if(error)
                                 {
@@ -77,7 +77,7 @@ function CreateUser(req,reqId,callback) {
                     }
                     catch (ex) {
 
-                        logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - Exception in saving UAC records',reqId,ex);
+                        logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Exception in saving UAC records',reqId,ex);
                         callback(ex,undefined);
 
 
@@ -86,7 +86,7 @@ function CreateUser(req,reqId,callback) {
 
                 } else {
 
-                    logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Found sip user %s',reqId,resUser.SipUsername);
+                    logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [PGSQL] - Found sip user %s',reqId,resUser.SipUsername);
                     callback(new Error("Cannot overwrite this record"),undefined);
 
 
@@ -95,7 +95,7 @@ function CreateUser(req,reqId,callback) {
 
     }
     catch (ex) {
-        logger.error('[DVP-LimitHandler.UACManagement.NewUAC] - [%s] - [PGSQL] - Exception in starting : SaveSip of %s',reqId,SipObj.SipUsername,ex);
+        logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [PGSQL] - Exception in starting : SaveSip of %s',reqId,SipObj.SipUsername,ex);
         callback(ex,undefined);
     }
 
@@ -103,30 +103,30 @@ function CreateUser(req,reqId,callback) {
 }
 
 
-function SaveUACRec(jobj,reqId,callback) {
+function SaveUser(jobj,reqId,callback) {
 
 
 
     if (jobj) {
 
-        logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s]  - Searching Records of CloudEndUser %s ',reqId,jobj.CSDBCloudEndUserId);
+        logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s]  - Searching Records of CloudEndUser %s ',reqId,jobj.CloudEndUserId);
         try{
             DbConn.CloudEndUser.find({where: [{id: jobj.CloudEndUserId}]}).complete(function (errCloudObject, cloudEndObject) {
 
                 if(errCloudObject)
                 {
-                    logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Error in Searching Records of CloudEndUser %s ',reqId,jobj.CloudEndUserId,errCloudObject);
+                    logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in Searching Records of CloudEndUser %s ',reqId,jobj.CloudEndUserId,errCloudObject);
                     callback(err,undefined);
                 }
                 else {
 
                     if (cloudEndObject) {
 
-                        logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Record found for CloudEndUser %s and searching for Context %s',reqId,jobj.CloudEndUserId,jobj.Context);
+                        logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Record found for CloudEndUser %s and searching for Context %s',reqId,jobj.CloudEndUserId,jobj.Context);
                         DbConn.Context.find({where: [{Context: jobj.Context}]}).complete(function (errz, ContextObject) {
 
                             if (errz) {
-                                logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Error in Searching Records of Context %s ',reqId,jobj.Context,errz);
+                                logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in Searching Records of Context %s ',reqId,jobj.Context,errz);
                                 callback(errz,undefined);
                             }
                             else
@@ -134,7 +134,7 @@ function SaveUACRec(jobj,reqId,callback) {
                                 if (ContextObject) {
 
                                     var sipUserUuid = nodeUuid.v1();
-                                    logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s] - Record found for Context %s and saving SipUser',reqId,jobj.Context);
+                                    logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - Record found for Context %s and saving SipUser',reqId,jobj.Context);
                                     var SIPObject = DbConn.SipUACEndpoint
                                         .build(
                                         {
@@ -159,34 +159,34 @@ function SaveUACRec(jobj,reqId,callback) {
 
                                     SIPObject.save().complete(function (errSave) {
                                         if (errSave) {
-                                            logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] -Error in inserting Sip user records %s',reqId,JSON.stringify(jobj),errSave);
+                                            logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Error in inserting Sip user records %s',reqId,JSON.stringify(jobj),errSave);
                                             callback(errSave, undefined);
 
                                         }
                                         else {
 
-                                            logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - SipUser record added successfully',reqId);
+                                            logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - SipUser record added successfully',reqId);
 
                                             cloudEndObject.addSipUACEndpoint(SIPObject).complete(function (errCloud, CloudEndInstancex) {
 
                                                 if(errCloud)
                                                 {
-                                                    logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Error in mapping cloud %s and SipUser %s',reqId,JSON.stringify(cloudEndObject),JSON.stringify(SIPObject),errCloud);
+                                                    logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in mapping cloud %s and SipUser %s',reqId,JSON.stringify(cloudEndObject),JSON.stringify(SIPObject),errCloud);
                                                     callback(new Error('Error in mapping CEU & SipUAC'),undefined);
                                                 }
                                                 else
                                                 {
-                                                    logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] -Successfully Mapping cloud %s and SipUser %s',reqId,JSON.stringify(cloudEndObject),JSON.stringify(SIPObject));
+                                                    logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping cloud %s and SipUser %s',reqId,JSON.stringify(cloudEndObject),JSON.stringify(SIPObject));
                                                     ContextObject.addSipUACEndpoint(SIPObject).complete(function (errContext, ContextInstancex) {
 
                                                         if(errContext)
                                                         {
-                                                            logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] -Error in Mapping context %s and SipUser %s',reqId,JSON.stringify(ContextObject),JSON.stringify(SIPObject),errContext);
+                                                            logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Error in Mapping context %s and SipUser %s',reqId,JSON.stringify(ContextObject),JSON.stringify(SIPObject),errContext);
                                                             callback(new Error('Error in mapping Context & SipUAC'),undefined);
                                                         }
                                                         else
                                                         {
-                                                            logger.debug('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] -Successfully Mapping context %s and SipUser %s',reqId,JSON.stringify(ContextObject),JSON.stringify(SIPObject));
+                                                            logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping context %s and SipUser %s',reqId,JSON.stringify(ContextObject),JSON.stringify(SIPObject));
                                                             callback(undefined,ContextInstancex);
                                                         }
 
@@ -200,7 +200,7 @@ function SaveUACRec(jobj,reqId,callback) {
                                     });
                                 }
                                 else  {
-                                    logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - No record found for context %s',reqId,jobj.CSDBContextContext);
+                                    logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - No record found for context %s',reqId,jobj.Context);
                                     callback(new Error("No context Found"),undefined);
 
 
@@ -212,7 +212,7 @@ function SaveUACRec(jobj,reqId,callback) {
                     {
 
 
-                        logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - No record found for cloudEnduser %s',reqId,jobj.CSDBCloudEndUserId);
+                        logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - No record found for cloudEnduser %s',reqId,jobj.CloudEndUserId);
                         callback(new Error("No CloudEnduser found"),undefined);
                     }
 
@@ -223,14 +223,14 @@ function SaveUACRec(jobj,reqId,callback) {
         }
         catch(ex)
         {
-            logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Exception in searching cloudEnduser %s',reqId,jobj.CSDBCloudEndUserId,ex);
+            logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Exception in searching cloudEnduser %s',reqId,jobj.CloudEndUserId,ex);
             callback(ex,undefined);
 
         }
     }
     else
     {
-        logger.error('[DVP-SIPUserEndpointService.NewUAC] - [%s] - [PGSQL] - Invalid object received at the start : SaveUACRec %s',reqId,JSON.stringify(jobj),ex);
+        logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Invalid object received at the start : SaveUser %s',reqId,JSON.stringify(jobj),ex);
         callback(new Error("No object recieved "),undefined);
     }
 }

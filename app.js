@@ -829,13 +829,14 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension',function(req,res,next)
 
     }
 
-
+var Company=1;
+    var Tenant=1;
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.CreateExtension] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req.body));
 
-        Extmgt.CreateExtension(req.body,reqId,function (errExt, resExt) {
+        Extmgt.CreateExtension(req.body,Company,Tenant,reqId,function (errExt, resExt) {
             if(errExt)
             {
                 var jsonString = messageFormatter.FormatMessage(errExt, "ERROR/Exception", false, undefined);

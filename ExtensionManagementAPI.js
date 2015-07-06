@@ -465,15 +465,15 @@ function ChangeUserAvailability(tenant,ext,st,reqId,callback) {
             if (errExt) {
 
                 logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Error in searching ExtensionRefId %s of Tenant %s',reqId,ext,tenant,errExt);
-                callback(err, undefined);
+                callback(errExt, undefined);
             }
             else
             {
 
-                if (ExtObject) {
+                if (ResExt) {
                     logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s of Tenant %s ',reqId,st,ext,tenant);
                     try {
-                        ExtObject.updateAttributes(
+                        ResExt.updateAttributes(
                             {
                                 Enabled: st
 
@@ -512,7 +512,7 @@ function ChangeUserAvailability(tenant,ext,st,reqId,callback) {
 
 }
 
-function CreateExtension(reqExt,reqId,callback) {
+function CreateExtension(reqExt,Company,Tenant,reqId,callback) {
 
     try {
         var obj = reqExt;
@@ -525,7 +525,7 @@ function CreateExtension(reqExt,reqId,callback) {
 
 
     try {
-        DbConn.Extension.find({where: [{Extension: obj.Extension}, {CompanyId: 1}]}).complete(function (errExt, resExt) {
+        DbConn.Extension.find({where: [{Extension: obj.Extension}, {CompanyId: Company},{TenantId:Tenant}]}).complete(function (errExt, resExt) {
 
             if (err) {
                 logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,obj.Extension,errExt);
@@ -540,7 +540,7 @@ function CreateExtension(reqExt,reqId,callback) {
 
                     logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,obj.Extension);
 
-                    CreateExtension(obj,reqId,function (resStstus) {
+                    SaveExtension(obj,Company,Tenant,reqId,function (resStstus) {
                         if (resStstus == 1) {
 
                             callback(undefined, resStstus);
@@ -556,7 +556,7 @@ function CreateExtension(reqExt,reqId,callback) {
                 else  {
 
                     logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s]   - Exception %s already In DB ',reqId,obj.Extension);
-                    callback(new Error("Already In Db"), undefined);
+                    callback(new Error("Already in DataBase"), undefined);
                 }
             }
 
@@ -787,7 +787,7 @@ function AssignToGroup(Ext,Grp,Company,Tenant,reqId,callback)
     }
 }
 
-function CreateExtension(jobj,reqId,callback)
+function SaveExtension(jobj,Company,Tenant,reqId,callback)
 {
     try{
         DbConn.Extension
@@ -801,34 +801,29 @@ function CreateExtension(jobj,reqId,callback)
                 ObjClass: "OBJCLZ",
                 ObjType: "USER",
                 ObjCategory: "OBJCAT",
-                CompanyId: 1,
-                TenantId: 1,
+                CompanyId: Company,
+                TenantId: Tenant,
                 AddUser: jobj.AddUser,
                 UpdateUser: jobj.UpdateUser
 
 
 
             }
-        ).complete(function (err, user) {
-                /* ... */
+        ).complete(function (errExt, resExt) {
 
 
-                if (!err ) {
-                    //console.log("New User Found and Inserted (Extension : " + jobj.Extension + ")");
-                    logger.debug('[DVP-SIPUserEndpointService.CreateExtension] - [%s] - [PGSQL]  -  Extension %s insertion succeeded ',reqId,jobj.Extension);
-                    callback(1);
 
-                    //callback(err, true);
-                    // pass null and true
+                if (errExt ) {
+
+                    logger.error('[DVP-SIPUserEndpointService.CreateExtension] - [%s] - [PGSQL]  -  Extension %s insertion failed ',reqId,jobj.Extension,errExt);
+                    callback(0);
+
 
 
                 }
                 else {
-                    // console.log("Error in saving  (Extension :" + jobj.Extension + ")" + err);
-                    logger.error('[DVP-SIPUserEndpointService.CreateExtension] - [%s] - [PGSQL]  -  Extension %s insertion failed ',reqId,jobj.Extension,err);
-                    callback(0);
-                    // callback(err, false);
-                    //pass error and false
+                    logger.debug('[DVP-SIPUserEndpointService.CreateExtension] - [%s] - [PGSQL]  -  Extension %s insertion succeeded ',reqId,jobj.Extension);
+                    callback(1);
                 }
             });
 
@@ -836,10 +831,10 @@ function CreateExtension(jobj,reqId,callback)
     }
     catch (ex)
     {
-        //console.log("Error found in saving data : "+ex);
+
         logger.error('[DVP-SIPUserEndpointService.CreateExtension] - [%s] - [PGSQL]  -  Exception in saving Extension %s ',reqId,jobj.Extension,ex);
 
-        callback(0);
+        callback(ex,undefined);
 
     }
 
@@ -862,7 +857,7 @@ function PickExtensionUsers(Ext,Company,Tenant,reqId,callback)
                 if (!resExtUser) {
 
                     logger.error('[DVP-SIPUserEndpointService.PickExtensionUsers] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,Ext);
-                    callback("EMPTY", undefined);
+                    callback(new Error("No extension found"),undefined);
 
                 }
 
@@ -899,7 +894,7 @@ function PickCompanyExtensions(Company,Tenant,reqId,callback)
             {
                 if (!resExt) {
                     logger.error('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - No record found for Company %s ',reqId,Company);
-                    callback(new Error("No extension recode found"), undefined);
+                    callback(new Error("No extension record found"), undefined);
 
                 }
 
@@ -921,61 +916,13 @@ function PickCompanyExtensions(Company,Tenant,reqId,callback)
     }
 
 }
-/*
-function GetExtensions(Ext,Company,Tenant,reqId,callback)
-{
 
-    try {
-        DbConn.Extension.find({where: [{CompanyId: Company},{Extension: Ext}, {TenantId: Tenant}]}).complete(function (err, ExtObject) {
-
-
-            if (err) {
-
-                logger.error('[DVP-SIPUserEndpointService.GetExtensions] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,Ext,err);
-
-                callback(err, undefined);
-            }
-
-
-            else
-            {
-                if (!ExtObject) {
-                    //   console.log("No record found for the Extension : " + obj.Extension);
-                    logger.error('[DVP-SIPUserEndpointService.GetExtensions] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,Ext);
-
-                    //var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, res);
-                    callback("EMPTY", undefined);
-
-                }
-
-
-
-                else  {
-                    // console.log(" Record is already available for the Extension : " + obj.Extension);
-                    //var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", false, ExtObject);
-                    logger.debug('[DVP-SIPUserEndpointService.GetExtensions] - [%s] - [PGSQL]  - Extension records found for Extension %s ',reqId,Ext);
-                    callback(undefined, ExtObject);
-                }
-            }
-
-        });
-
-    }
-    catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.GetExtensions] - [%s] - [PGSQL]  - Exception occurred  %s ',reqId,Ext,ex);
-        // var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, null);
-        callback(ex,undefined);
-    }
-
-}
-*/
 module.exports.ChangeUserAvailability = ChangeUserAvailability;
 module.exports.CreateExtension = CreateExtension;
 module.exports.AssignToSipUser = AssignToSipUser;
 module.exports.AssignToGroup = AssignToGroup;
 module.exports.PickExtensionUsers = PickExtensionUsers;
 module.exports.PickCompanyExtensions = PickCompanyExtensions;
-//module.exports.GetExtensions = GetExtensions;
 module.exports.GetUsersOfExtension = GetUsersOfExtension;
 module.exports.AddDidNumberDB = AddDidNumberDB;
 module.exports.SetDidNumberActiveStatusDB = SetDidNumberActiveStatusDB;
