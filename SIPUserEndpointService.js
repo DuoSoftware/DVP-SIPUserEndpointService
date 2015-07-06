@@ -26,6 +26,8 @@ function AddOrUpdateContext(req,reqId,callback) {
 
     }
     catch (ex) {
+
+        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Error occurred while Creating request Object ',reqId,ex);
         callback(ex,undefined);
 
     }
@@ -37,17 +39,17 @@ function AddOrUpdateContext(req,reqId,callback) {
         try {
             DbConn.Context
                 .find({where: {Context: ContextObj.Context}})
-                .complete(function (err, result) {
-                    if (err) {
+                .complete(function (errContext, resContext) {
+                    if (errContext) {
 
-                        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Error occurred while searching Context %s ',reqId,ContextObj.Context,err);
-                        callback(err, undefined);
+                        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Error occurred while searching Context %s ',reqId,ContextObj.Context,errContext);
+                        callback(errContext, undefined);
 
                     }
 
                     else
                     {
-                        if (!result) {
+                        if (!resContext) {
 
                             logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - No record found for Context %s ',reqId,ContextObj.Context);
 
@@ -69,19 +71,19 @@ function AddOrUpdateContext(req,reqId,callback) {
                                         UpdateUser: ContextObj.UpdateUser
 
                                     }
-                                ).complete(function (err, user) {
+                                ).complete(function (errSave, resSave) {
 
-                                        if (err ) {
+                                        if (errSave ) {
 
-                                            logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s insertion  failed - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj),err);
-                                            callback(err, undefined);
+                                            logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s insertion  failed - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj),errSave);
+                                            callback(errSave, undefined);
 
 
 
                                         }
                                         else {
                                             logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s inserted successfully - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj));
-                                            callback(undefined, user);
+                                            callback(undefined, resSave);
                                         }
                                     });
 
@@ -95,10 +97,10 @@ function AddOrUpdateContext(req,reqId,callback) {
 
                         } else {
 
-                            logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Context found',reqId,JSON.stringify(result));
+                            logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Context found',reqId,JSON.stringify(resContext));
 
                             try {
-                                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Updating picked Context data %s to %s',reqId,JSON.stringify(result),JSON.stringify(ContextObj));
+                                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Updating picked Context data %s to %s',reqId,JSON.stringify(resContext),JSON.stringify(ContextObj));
                                 DbConn.Context
                                     .update(
                                     {
@@ -155,7 +157,7 @@ function AddOrUpdateContext(req,reqId,callback) {
     }
 }
 
-var PickUserByUUID = function(reqId, uuid, companyId, tenantId, callback)
+function  PickUserByUUID(reqId, uuid, companyId, tenantId, callback)
 {
     try
     {

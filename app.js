@@ -1115,7 +1115,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Context/ByCompany/:companyid',funct
 
 
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Group/:groupid',function(req,res,next)
+RestServer.get('/DVP/API/'+version+'/SipUser/Group/:id',function(req,res,next)
 
 {
     var reqId='';
@@ -1134,9 +1134,9 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Group/:groupid',function(req,res,ne
 
     try {
 
-        logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.groupid);
+        logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.id);
 
-        group.PickUserGroup(req.params.groupid,Company,Tenant,reqId, function (err, resz) {
+        group.PickUserGroup(req.params.id,Company,Tenant,reqId, function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1154,7 +1154,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Group/:groupid',function(req,res,ne
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [HTTP]  - Exception in Request  -  Data - %s',reqId,req.params.groupid);
+        logger.error('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [HTTP]  - Exception in Request  -  Data - %s',reqId,req.params.id);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
         logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
         res.end(jsonString);
@@ -1322,7 +1322,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Groups/Company/:companyid',function
 
 
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Group/:groupid/Users',function(req,res,next)
+RestServer.get('/DVP/API/'+version+'/SipUser/Users/InGroup/:groupid',function(req,res,next)
 
 {
     var reqId='';
