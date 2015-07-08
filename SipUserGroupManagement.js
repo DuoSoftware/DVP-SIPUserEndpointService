@@ -90,12 +90,12 @@ function CreateUserGroup(obj,reqId,callback)
 
 }
 //post :-done
-function MapExtensionID(obj,callback)
+function AssignUserToGroup(SID,GID,reqId,callback)
 {
 
 
     try {
-        DbConn.SipUACEndpoint.find({where: [{id: obj.ExtensionId}]}).complete(function (err, sipObject) {
+        DbConn.SipUACEndpoint.find({where: [{id: SID}]}).complete(function (err, sipObject) {
 
 
             if (err) {
@@ -105,43 +105,39 @@ function MapExtensionID(obj,callback)
             else
             {
                 if (sipObject) {
-                    console.log(sipObject);
 
                     try {
-                        DbConn.UserGroup.find({where: [{id: obj.GroupId}]}).complete(function (errz, groupObject) {
+                        DbConn.UserGroup.find({where: [{id: GID}]}).complete(function (errz, groupObject) {
                             if (errz) {
                                 callback(errz, undefined);
                             }
+                            else
+                            {
+                                if(groupObject)
+                                {
+                                    try {
+                                        groupObject.addSipUACEndpoint(sipObject).complete(function (errx, groupInstancex) {
 
-                            else if (groupObject) {
-                                //console.log(groupObject);
+                                            if (errx) {
+                                                callback(errx, undefined)
+                                            }
+                                            else  {
+                                                callback(undefined, groupInstancex)
+                                            }
 
-                                try {
-                                    groupObject.addSipUACEndpoint(sipObject).complete(function (errx, groupInstancex) {
-
-                                        if (errx) {
-                                            callback(errx, undefined)
-                                        }
-                                        else  {
-                                            callback(undefined, groupInstancex)
-                                        }
-
-
-                                        //console.log('mapping group and sip done.................');
-
-
-
-                                    });
+                                        });
+                                    }
+                                    catch (ex) {
+                                        callback(ex, undefined);
+                                    }
                                 }
-                                catch (ex) {
-                                    callback(ex, undefined);
-                                }
-
-                            }
 
                             else {
-                                callback("No group record found", undefined);
+                                callback(new Error("No group record found"), undefined);
                             }
+                            }
+
+
 
                         })
 
@@ -515,7 +511,7 @@ function PickUsersInGroup(GroupId,Company,Tenant,reqId,callback)
 
 //post funcs
 module.exports.CreateUserGroup = CreateUserGroup;
-module.exports.MapExtensionID = MapExtensionID;
+module.exports.AssignUserToGroup = AssignUserToGroup;
 module.exports.FillUsrGrp = FillUsrGrp;
 module.exports.UpdateUserGroup = UpdateUserGroup;
 

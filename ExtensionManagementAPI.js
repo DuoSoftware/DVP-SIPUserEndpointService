@@ -460,7 +460,7 @@ function ChangeUserAvailability(tenant,ext,st,reqId,callback) {
 
 
     try {
-        DbConn.Extension.find({where: [{id: ext},{TenantId:tenant}]}).complete(function (errExt, ResExt) {
+        DbConn.Extension.find({where: [{Extension: ext},{TenantId:tenant}]}).complete(function (errExt, ResExt) {
 
             if (errExt) {
 

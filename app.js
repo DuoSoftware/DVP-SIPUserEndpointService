@@ -780,13 +780,14 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',f
 
     }
 
-
+var Tenant=1;
+    var Company=1;
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [HTTP]  - Request received -  Data - Tenant %s Id %s Status %s ',reqId,req.params.tenant,req.params.extension,req.params.st);
 
-        Extmgt.ChangeUserAvailability(req.params.tenant,req.params.extension,req.params.st,reqId,function (err, resz) {
+        Extmgt.ChangeUserAvailability(Tenant,req.params.extension,req.params.st,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1518,6 +1519,55 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extensions/OfCompany/:companyid',fu
     }
     return next();
 
+
+});
+
+RestServer.post('/DVP/API/'+version+'/SipUser/:SipID/AssignToGroup/:grpid',function(req,res,next)
+
+{
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var Company=1;
+    var Tenant=1;
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.AssignToGroup] - [%s] - [HTTP]  - Request received -  Extension %s Group %',reqId,req.params.extension,req.params.grpid);
+
+
+        group.AssignUserToGroup(req.params.SipID,req.params.grpid,reqId,function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [HTTP]  - Exception in Request -  User %s Group % Other %s',reqId,req.params.SipID,req.params.grpid,ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
 
 });
 

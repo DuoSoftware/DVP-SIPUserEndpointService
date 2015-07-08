@@ -206,7 +206,7 @@ function GetCompanyContextDetails(CompanyId,reqId,callback)
                 } else
                 {
 
-                    if (!resContext) {
+                    if (resContext.length==0) {
 
                         logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - No record found for Context %s ',reqId,CompanyId);
                         callback(new Error("No Context record found"), undefined);
