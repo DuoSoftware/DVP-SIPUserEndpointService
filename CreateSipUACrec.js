@@ -15,42 +15,43 @@ var nodeUuid = require('node-uuid');
 
 
 function CreateUser(req,reqId,callback) {
-    try {
-        var SipObj = req.body;
-
-
-    }
-    catch (ex) {
-
-        logger.error('[DVP-SIPUserEndpointService.CreateUser] - error occurred while getting request body for SipUACEndPoint  ',reqId,req.body,errUser);
-        callback(ex,undefined);
-    }
-
-
-
 
 
     logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
 
-    try {
-        DbConn.SipUACEndpoint
-            .find({where: [{SipUsername: SipObj.SipUsername}, {CompanyId: 1}, {TenantId: 1}]})
-            .complete(function (errUser, resUser) {
-                if (errUser) {
-
-                    logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername,errUser);
-                    callback(errUser,undefined);
-
-                } else if (resUser == null) {
-
-                    logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - No record found for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
-                    try {
+    if(req.body)
+    {
+        try {
+            var SipObj = req.body;
 
 
+        }
+        catch (ex) {
 
-                        logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Saving new sip user %s',reqId,JSON.stringify(SipObj));
+            logger.error('[DVP-SIPUserEndpointService.CreateUser] - error occurred while getting request body for SipUACEndPoint  ',reqId,req.body,errUser);
+            callback(ex,undefined);
+        }
 
-                        SaveUser(SipObj,reqId,function (error, st) {
+
+        try {
+            DbConn.SipUACEndpoint
+                .find({where: [{SipUsername: SipObj.SipUsername}, {CompanyId: 1}, {TenantId: 1}]})
+                .complete(function (errUser, resUser) {
+                    if (errUser) {
+
+                        logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername,errUser);
+                        callback(errUser,undefined);
+
+                    } else if (resUser == null) {
+
+                        logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - No record found for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
+                        try {
+
+
+
+                            logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Saving new sip user %s',reqId,JSON.stringify(SipObj));
+
+                            SaveUser(SipObj,reqId,function (error, st) {
 
                                 if(error)
                                 {
@@ -71,33 +72,39 @@ function CreateUser(req,reqId,callback) {
 
 
 
-                        });
+                            });
+
+
+                        }
+                        catch (ex) {
+
+                            logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Exception in saving UAC records',reqId,ex);
+                            callback(ex,undefined);
+
+
+                        }
+
+
+                    } else {
+
+                        logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [PGSQL] - Found sip user %s',reqId,resUser.SipUsername);
+                        callback(new Error("Cannot overwrite this record"),undefined);
 
 
                     }
-                    catch (ex) {
+                });
 
-                        logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Exception in saving UAC records',reqId,ex);
-                        callback(ex,undefined);
-
-
-                    }
-
-
-                } else {
-
-                    logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [PGSQL] - Found sip user %s',reqId,resUser.SipUsername);
-                    callback(new Error("Cannot overwrite this record"),undefined);
-
-
-                }
-            });
-
+        }
+        catch (ex) {
+            logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [PGSQL] - Exception in starting : SaveSip of %s',reqId,SipObj.SipUsername,ex);
+            callback(ex,undefined);
+        }
     }
-    catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [PGSQL] - Exception in starting : SaveSip of %s',reqId,SipObj.SipUsername,ex);
-        callback(ex,undefined);
+    else
+    {
+        callback(new Error("Empty request"),undefined)
     }
+
 
 
 }
