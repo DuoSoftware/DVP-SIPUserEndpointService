@@ -17,7 +17,7 @@ function AddOrUpdateContext(req,reqId,callback) {
     if(req)
     {
         try {
-            var ContextObj = req.body;
+            var ContextObj = req;
 
             ContextObj.CompanyId = 1;
             ContextObj.TenantId = 1;
@@ -167,27 +167,37 @@ function AddOrUpdateContext(req,reqId,callback) {
 
 function  PickUserByUUID(reqId, uuid, companyId, tenantId, callback)
 {
-    try
-    {
-        DbConn.SipUACEndpoint.find({where: [{SipUserUuid: uuid},{CompanyId: companyId},{TenantId: tenantId}]})
-            .complete(function (errSip, resSip)
-            {
-                if(errSip)
-                {
-                    logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query failed',reqId, errSip);
-                }
-                else
-                {
-                    logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query completed successfully',reqId);
-                }
-                callback(errSip, resSip);
-            });
-    }
-    catch(ex)
-    {
-        logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - Method call failed ',reqId, ex);
-        callback(ex, undefined);
-    }
+
+   if(uuid)
+   {
+       try
+       {
+           DbConn.SipUACEndpoint.find({where: [{SipUserUuid: uuid},{CompanyId: companyId},{TenantId: tenantId}]})
+               .complete(function (errSip, resSip)
+               {
+                   if(errSip)
+                   {
+                       logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                   }
+                   else
+                   {
+                       logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                   }
+                   callback(errSip, resSip);
+               });
+       }
+       catch(ex)
+       {
+           logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - Method call failed ',reqId, ex);
+           callback(ex, undefined);
+       }
+   }
+    else
+   {
+       logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - UUID value Undefined ');
+       callback(new Error("UUID value Undefined"), undefined);
+   }
+
 }
 
 

@@ -20,7 +20,7 @@ var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 // post :- done
 function UpdateUser(Username,jobj,reqId,callback) {
 
-    if(jobj)
+    if(jobj && Username)
     {
         try{
             DbConn.SipUACEndpoint
@@ -87,7 +87,7 @@ function UpdateUser(Username,jobj,reqId,callback) {
     }
     else
     {
-        callback(new Error("Empty request"),undefined);
+        callback(new Error("Empty request Or Undefined Username"),undefined);
     }
 
 

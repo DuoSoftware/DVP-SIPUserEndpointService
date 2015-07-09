@@ -14,70 +14,75 @@ function CreateUserGroup(obj,reqId,callback)
 {
     if(obj)
     {
-        try {
-            DbConn.UserGroup.find({where: [{GroupName: obj.GroupName}]}).complete(function (errGroup, resGroup) {
+        if(obj.GroupName) {
+            try {
+                DbConn.UserGroup.find({where: [{GroupName: obj.GroupName}]}).complete(function (errGroup, resGroup) {
 
-                if (errGroup) {
-                    logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Error in searching Group %s',reqId,obj.GroupName,errGroup);
-                    callback(errGroup, undefined);
-                }
-                else
-                {
-                    if (resGroup) {
-                        logger.debug('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Already in DB Group %s',reqId,obj.GroupName);
-                        callback(undefined, resGroup);
+                    if (errGroup) {
+                        logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Error in searching Group %s', reqId, obj.GroupName, errGroup);
+                        callback(errGroup, undefined);
                     }
-                    else  {
-                        try {
-
-                            var UserGroupobj = DbConn.UserGroup
-                                .build(
-                                {
-
-                                    GroupName: obj.GroupName,
-                                    Domain: obj.Domain,
-                                    ExtraData: obj.ExtraData,
-                                    ObjClass: "OBJCLZ",
-                                    ObjType: "OBJTYP",
-                                    ObjCategory: "OBJCAT",
-                                    CompanyId: 1,
-                                    TenantId: 1
-
-
-                                }
-                            );
-
-                            UserGroupobj.save().complete(function (errGrpSave, resGrpSave) {
-                                if (errGrpSave) {
-
-                                    logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - New user group insertion failed - Group %s',reqId,JSON.stringify(obj),errGrpSave);
-                                    callback(errGrpSave, undefined);
-
-                                }
-                                else {
-                                    logger.debug('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - New user group insertion succeeded - Group %s',reqId,JSON.stringify(obj));
-                                    callback(undefined, resGrpSave);
-                                }
-
-
-                            });
+                    else {
+                        if (resGroup) {
+                            logger.debug('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Already in DB Group %s', reqId, obj.GroupName);
+                            callback(new Error("Group is Alrady In DB"), undefined);
                         }
-                        catch (ex) {
-                            logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Exception in New user group insertion  - Group %s',reqId,JSON.stringify(obj),ex);
-                            callback(ex, undefined);
+                        else {
+                            try {
+
+                                var UserGroupobj = DbConn.UserGroup
+                                    .build(
+                                    {
+
+                                        GroupName: obj.GroupName,
+                                        Domain: obj.Domain,
+                                        ExtraData: obj.ExtraData,
+                                        ObjClass: "OBJCLZ",
+                                        ObjType: "OBJTYP",
+                                        ObjCategory: "OBJCAT",
+                                        CompanyId: 1,
+                                        TenantId: 1
+
+
+                                    }
+                                );
+
+                                UserGroupobj.save().complete(function (errGrpSave, resGrpSave) {
+                                    if (errGrpSave) {
+
+                                        logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - New user group insertion failed - Group %s', reqId, JSON.stringify(obj), errGrpSave);
+                                        callback(errGrpSave, undefined);
+
+                                    }
+                                    else {
+                                        logger.debug('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - New user group insertion succeeded - Group %s', reqId, JSON.stringify(obj));
+                                        callback(undefined, resGrpSave);
+                                    }
+
+
+                                });
+                            }
+                            catch (ex) {
+                                logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Exception in New user group insertion  - Group %s', reqId, JSON.stringify(obj), ex);
+                                callback(ex, undefined);
+                            }
                         }
                     }
-                }
 
 
-            });
+                });
 
 
+            }
+            catch (ex) {
+                logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Exception in user group Searching   - Group %s', reqId, JSON.stringify(obj), ex);
+                callback(ex, undefined);
+            }
         }
-        catch(ex)
+        else
         {
-            logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Exception in user group Searching   - Group %s',reqId,JSON.stringify(obj),ex);
-            callback(ex,undefined);
+            logger.error('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  -  GroupName is Undefined');
+            callback(new Error("GroupName is Undefined"), undefined);
         }
     }
     else

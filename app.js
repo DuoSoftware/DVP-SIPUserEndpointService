@@ -544,7 +544,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Context',function(req,res,next)
 
         logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId,JSON.stringify(req.body));
 
-        context.AddOrUpdateContext(req,reqId, function (err, resz) {
+        context.AddOrUpdateContext(req.body,reqId, function (err, resz) {
 
             if(err)
             {
