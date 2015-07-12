@@ -669,6 +669,52 @@ RestServer.post('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,n
     return next();
 
 });
+RestServer.get('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,next)
+{
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+ var Company=1;
+    var Tenant=1;
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [HTTP]  - Request received -  Data - Username %s Body %s ',reqId,req.params.Username,JSON.stringify(req.body));
+
+        context.PickUserByName(req.params.Username,Company,Tenant,reqId,function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [HTTP]  - Exception in Request -  Data - Username %s Body %s ',reqId,req.params.Username,JSON.stringify(req.body),ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
 
 RestServer.get('/DVP/API/'+version+'/SipUser/User/ByUUID/:uuid',function(req,res,next)
 {
@@ -1425,7 +1471,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Users/OfCompany/:compid',function(r
 });
 
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/Users',function(req,res,next)
+RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/User',function(req,res,next)
 
 {
     var reqId='';
@@ -1446,7 +1492,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/Users',functio
 
         logger.debug('[DVP-SIPUserEndpointService.PickExtensionUsers] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.extension);
 
-        Extmgt.PickExtensionUsers(req.params.extension,Company,Tenant,reqId,function (err, resz) {
+        Extmgt.PickExtensionUser(req.params.extension,Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
