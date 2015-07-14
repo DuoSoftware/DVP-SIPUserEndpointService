@@ -25,14 +25,14 @@ function UpdateUser(Username,jobj,reqId,callback) {
         try{
             DbConn.SipUACEndpoint
                 .find({where: [{SipUsername: Username}, {CompanyId: 1}, {TenantId: 1}]})
-                .complete(function (err, result) {
-                    if (err) {
-                        logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUser] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,jobj.SipUsername,err);
-                        callback(err, undefined);
+                .complete(function (errUser, resUser) {
+                    if (errUser) {
+                        logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUser] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,jobj.SipUsername,errUser);
+                        callback(errUser, undefined);
 
                     } else
                     {
-                        if (!result) {
+                        if (!resUser) {
 
                             logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,jobj.SipUsername);
                             callback(new Error("No SipUser record found"), undefined);
@@ -56,10 +56,10 @@ function UpdateUser(Username,jobj,reqId,callback) {
                                     {
                                         where: [{SipUsername: Username}, {CompanyId: 1}, {TenantId: 1}]
                                     }
-                                ).then(function (resultUpdate) {
+                                ).then(function (resUpdate) {
 
                                         logger.debug('[DVP-LimitHandler.UACManagement.UpdateUser] - [%s] - [PGSQL]  - Updating records of SipUser %s is succeeded ',reqId,jobj.SipUsername);
-                                        callback(undefined, resultUpdate);
+                                        callback(undefined, resUpdate);
 
                                     }).error(function (errUpdate) {
 
@@ -96,7 +96,7 @@ function UpdateUser(Username,jobj,reqId,callback) {
 function PickCompanyUsers(Company,reqId,callback)
 {
 
-   if(Company)
+   if(!isNaN(Company)&& Company)
    {
        try
        {

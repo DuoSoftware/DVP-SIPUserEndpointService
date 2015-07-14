@@ -127,7 +127,7 @@ function SaveUser(jobj,reqId,callback) {
 
         logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s]  - Searching Records of CloudEndUser %s ',reqId,jobj.CloudEndUserId);
 
-        if(jobj.CloudEndUserId)
+        if(!isNaN(jobj.CloudEndUserId))
         {
             try{
                 DbConn.CloudEndUser.find({where: [{id: jobj.CloudEndUserId}]}).complete(function (errCloudObject, cloudEndObject) {

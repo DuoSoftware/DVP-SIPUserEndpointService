@@ -238,7 +238,7 @@ function  PickUserByName(Username,Company,Tenant,reqId, callback)
 
 function GetCompanyContextDetails(CompanyId,reqId,callback)
 {
-    if(CompanyId)
+    if(!isNaN(CompanyId)&& CompanyId)
     {
         try {
 

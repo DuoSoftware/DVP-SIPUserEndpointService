@@ -98,7 +98,7 @@ function CreateUserGroup(obj,reqId,callback)
 function AssignUserToGroup(SID,GID,reqId,callback)
 {
 
-    if(SID)
+    if(!isNaN(SID)&& SID &&!isNaN(GID)&& GID)
     {
         try {
             DbConn.SipUACEndpoint.find({where: [{id: SID}]}).complete(function (errSip, resSip) {
@@ -192,7 +192,7 @@ function AssignUserToGroup(SID,GID,reqId,callback)
     }
     else
     {
-        callback(new Error("UserID is Undefined"),undefined);
+        callback(new Error("UserID or GroupId is Undefined"),undefined);
     }
 
 }
@@ -290,7 +290,7 @@ function UpdateUserGroup(GID,obj,reqId,callback)
 {
     if(obj)
     {
-        if(GID)
+        if(!isNaN(GID)&&GID)
         {
             try {
                 DbConn.UserGroup
@@ -329,7 +329,7 @@ function UpdateUserGroup(GID,obj,reqId,callback)
         }
         else
         {
-            callback(new Error("GroupID is Undefined"),undefined);
+            callback(new Error("GroupID is not in Correct format"),undefined);
         }
 
     }
@@ -344,7 +344,7 @@ function UpdateUserGroup(GID,obj,reqId,callback)
 
 function PickUserGroup(GroupID,Company,Tenant,reqId,callback)
 {
-    if(GroupID)
+    if(!isNaN(GroupID)&& GroupID)
     {
         try {
             DbConn.UserGroup
@@ -438,7 +438,7 @@ function GetGroupEndpoints(obj,Company,Tenant,reqId,callback)
 
 function PickUsersGroup(SipID,Company,Tenant,reqId,callback)
 {
-    if(SipID)
+    if(!isNaN(SipID)&& SipID)
     {
         try {
 
@@ -481,7 +481,7 @@ function PickUsersGroup(SipID,Company,Tenant,reqId,callback)
     else
     {
         logger.error('[DVP-SIPUserEndpointService.PickUsersGroup] - [%s] - GroupId is Undefined ');
-        callback(new Error("GroupId is Undefined"),undefined);
+        callback(new Error("GroupId is not in correct format"),undefined);
     }
 
 
@@ -491,7 +491,7 @@ function PickUsersGroup(SipID,Company,Tenant,reqId,callback)
 
 function PickCompayGroups(Company,reqId,callback)
 {
-    if(Company)
+    if(!isNaN(Company)&&Company)
     {
         try{
             DbConn.UserGroup
@@ -539,7 +539,7 @@ function PickCompayGroups(Company,reqId,callback)
 function PickUsersInGroup(GroupId,Company,Tenant,reqId,callback)
 {
 
-    if(GroupId)
+    if(!isNaN(GroupId)&&GroupId)
     {
         try {
             DbConn.UserGroup.find({where: [{id: GroupId},{CompanyId:Company},{TenantId:Tenant}], include: [{model: DbConn.SipUACEndpoint , as: "SipUACEndpoint" }]})
