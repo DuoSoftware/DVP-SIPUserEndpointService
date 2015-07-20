@@ -13,11 +13,11 @@ var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 
 function AddOrUpdateContext(req,reqId,callback) {
-
+    logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Method Hit',reqId);
     if(req)
     {
         try {
-            var ContextObj = req.body;
+            var ContextObj = req;
 
             ContextObj.CompanyId = 1;
             ContextObj.TenantId = 1;
@@ -167,71 +167,125 @@ function AddOrUpdateContext(req,reqId,callback) {
 
 function  PickUserByUUID(reqId, uuid, companyId, tenantId, callback)
 {
-    try
+    logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Method Hit',reqId);
+   if(uuid)
+   {
+       try
+       {
+           DbConn.SipUACEndpoint.find({where: [{SipUserUuid: uuid},{CompanyId: companyId},{TenantId: tenantId}]})
+               .complete(function (errSip, resSip)
+               {
+                   if(errSip)
+                   {
+                       logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                   }
+                   else
+                   {
+                       logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                   }
+                   callback(errSip, resSip);
+               });
+       }
+       catch(ex)
+       {
+           logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - Method call failed ',reqId, ex);
+           callback(ex, undefined);
+       }
+   }
+    else
+   {
+       logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - UUID value Undefined ');
+       callback(new Error("UUID value Undefined"), undefined);
+   }
+
+}
+
+function  PickUserByName(Username,Company,Tenant,reqId, callback)
+{
+    logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Method Hit',reqId);
+    if(Username)
     {
-        DbConn.SipUACEndpoint.find({where: [{SipUserUuid: uuid},{CompanyId: companyId},{TenantId: tenantId}]})
-            .complete(function (errSip, resSip)
-            {
-                if(errSip)
+        try
+        {
+            DbConn.SipUACEndpoint.find({where: [{SipUsername: Username},{CompanyId: Company},{TenantId: Tenant}]})
+                .complete(function (errSip, resSip)
                 {
-                    logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query failed',reqId, errSip);
-                }
-                else
-                {
-                    logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query completed successfully',reqId);
-                }
-                callback(errSip, resSip);
-            });
+                    if(errSip)
+                    {
+                        logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                    }
+                    else
+                    {
+                        logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                    }
+                    callback(errSip, resSip);
+                });
+        }
+        catch(ex)
+        {
+            logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - Method call failed ',reqId, ex);
+            callback(ex, undefined);
+        }
     }
-    catch(ex)
+    else
     {
-        logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - Method call failed ',reqId, ex);
-        callback(ex, undefined);
+        logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - UUID value Undefined ');
+        callback(new Error("Username value Undefined"), undefined);
     }
+
 }
 
 
 function GetCompanyContextDetails(CompanyId,reqId,callback)
 {
-    try {
-
-        DbConn.Context
-            .findAll({where: {CompanyId: CompanyId}})
-            .complete(function (errContext, resContext) {
-
-                if (errContext) {
-                    logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - Error in searching Context %s ',reqId,CompanyId,err);
-                    callback(errContext, undefined);
-
-                } else
-                {
-
-                    if (resContext.length==0) {
-
-                        logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - No record found for Context %s ',reqId,CompanyId);
-                        callback(new Error("No Context record found"), undefined);
-                    }
-                    else {
-
-
-
-
-                        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL] - Record found for Context %s ',reqId,CompanyId);
-                        callback(undefined, resContext);
-
-
-
-                    }
-
-                }
-            });
-    }
-    catch (ex)
+    if(!isNaN(CompanyId)&& CompanyId)
     {
-        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Exception in starting method : GetContextDetails  Context %s ',reqId,CompanyId);
-        callback(ex,undefined);
+        try {
 
+            DbConn.Context
+                .findAll({where: {CompanyId: CompanyId}})
+                .complete(function (errContext, resContext) {
+
+                    if (errContext) {
+                        logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - Error in searching Context %s ',reqId,CompanyId,errContext);
+                        callback(errContext, undefined);
+
+                    } else
+                    {
+
+                        if (resContext.length==0) {
+
+                            logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - No record found for Context %s ',reqId,CompanyId);
+                            callback(new Error("No Context record found"), undefined);
+                        }
+                        else {
+
+
+
+
+                            logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL] - Record found for Context %s ',reqId,CompanyId);
+                            callback(undefined, resContext);
+
+
+
+                        }
+
+                    }
+                });
+        }
+        catch (ex)
+        {
+            logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Exception in starting method : GetContextDetails  Context %s ',reqId,CompanyId);
+            callback(ex,undefined);
+
+        }
     }
+    else
+    {
+        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - CompanyID is Undefined');
+        callback(new Error("CompanyID is Undefined"),undefined);
+    }
+
 
 }
 
@@ -240,4 +294,4 @@ function GetCompanyContextDetails(CompanyId,reqId,callback)
 module.exports.AddOrUpdateContext = AddOrUpdateContext;
 module.exports.GetCompanyContextDetails = GetCompanyContextDetails;
 module.exports.PickUserByUUID = PickUserByUUID;
-
+module.exports.PickUserByName = PickUserByName;

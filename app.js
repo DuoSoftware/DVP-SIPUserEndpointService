@@ -24,6 +24,10 @@ var RestServer = restify.createServer({
     version: '1.0.0'
 });
 
+restify.CORS.ALLOW_HEADERS.push('api_key');
+RestServer.use(restify.CORS());
+RestServer.use(restify.fullResponse());
+
 RestServer.listen(port, function () {
     console.log('%s listening at %s', RestServer.name, RestServer.url);
 });
@@ -37,7 +41,7 @@ RestServer.use(restify.queryParser());
 RestServer.use(cors());
 
 
-RestServer.put('/DVP/API/' + version + '/SipUser/DidNumber', function(req, res, next)
+RestServer.post('/DVP/API/' + version + '/SipUser/DidNumber', function(req, res, next)
 {
     var reqId = uuid.v1();
     try
@@ -92,7 +96,7 @@ RestServer.put('/DVP/API/' + version + '/SipUser/DidNumber', function(req, res, 
 
 });
 
-RestServer.put('/DVP/API/' + version + '/SipUser/EmergencyNumber', function(req, res, next)
+RestServer.post('/DVP/API/' + version + '/SipUser/EmergencyNumber', function(req, res, next)
 {
     var reqId = uuid.v1();
     try
@@ -544,7 +548,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Context',function(req,res,next)
 
         logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId,JSON.stringify(req.body));
 
-        context.AddOrUpdateContext(req,reqId, function (err, resz) {
+        context.AddOrUpdateContext(req.body,reqId, function (err, resz) {
 
             if(err)
             {
@@ -664,6 +668,52 @@ RestServer.post('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,n
         logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [HTTP]  - Exception in Request -  Data - Username %s Body %s ',reqId,req.params.Username,JSON.stringify(req.body),ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
         logger.debug('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+RestServer.get('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,next)
+{
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+ var Company=1;
+    var Tenant=1;
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [HTTP]  - Request received -  Data - Username %s Body %s ',reqId,req.params.Username,JSON.stringify(req.body));
+
+        context.PickUserByName(req.params.Username,Company,Tenant,reqId,function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [HTTP]  - Exception in Request -  Data - Username %s Body %s ',reqId,req.params.Username,JSON.stringify(req.body),ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - Request response : %s ',reqId,jsonString);
         res.end(jsonString);
     }
     return next();
@@ -888,7 +938,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUs
 
         logger.debug('[DVP-SIPUserEndpointService.Extension.AssignToSipUser] - [%s] - [HTTP]  - Request received -  Data - Ext %s UAC %s Data %s',reqId,req.params.extension,req.params.id,JSON.stringify(req.body));
 
-        Extmgt.AssignToSipUser(req.params.extension,parseInt(req.params.id),Company,Tenant,reqId,function (err, resz) {
+        Extmgt.AssignToSipUser(req.params.extension,req.params.id,Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1345,7 +1395,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Users/InGroup/:groupid',function(re
 
         logger.debug('[DVP-SIPUserEndpointService.PickUsersInGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.groupid);
 
-        group.PickUsersInGroup(parseInt(req.params.groupid),Company,Tenant,reqId,function (err, resz) {
+        group.PickUsersInGroup(req.params.groupid,Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1425,7 +1475,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Users/OfCompany/:compid',function(r
 });
 
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/Users',function(req,res,next)
+RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/User',function(req,res,next)
 
 {
     var reqId='';
@@ -1446,7 +1496,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/Users',functio
 
         logger.debug('[DVP-SIPUserEndpointService.PickExtensionUsers] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.extension);
 
-        Extmgt.PickExtensionUsers(req.params.extension,Company,Tenant,reqId,function (err, resz) {
+        Extmgt.PickExtensionUser(req.params.extension,Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1495,7 +1545,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extensions/OfCompany/:companyid',fu
 
         logger.debug('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.companyid);
 
-        Extmgt.PickCompanyExtensions(parseInt(req.params.companyid),Tenant,reqId,function (err, resz) {
+        Extmgt.PickCompanyExtensions(req.params.companyid,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
