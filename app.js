@@ -49,7 +49,7 @@ RestServer.put('/DVP/API/' + version + '/SipUser/DidNumber', function(req, res, 
 
         if(reqBody && securityToken) {
             reqBody.CompanyId = 1;
-            reqBody.TenantId = 3;
+            reqBody.TenantId = 1;
 
 
             Extmgt.AddDidNumberDB(reqId, reqBody, function (err, addResult)
@@ -105,7 +105,7 @@ RestServer.put('/DVP/API/' + version + '/SipUser/EmergencyNumber', function(req,
         if(reqBody && securityToken)
         {
             reqBody.CompanyId = 1;
-            reqBody.TenantId = 3;
+            reqBody.TenantId = 1;
 
             Extmgt.AddEmergencyNumberDB(reqId, reqBody, function (err, addResult)
             {
@@ -161,7 +161,7 @@ RestServer.post('/DVP/API/' + version + '/SipUser/DodNumber', function(req, res,
 
         if(securityToken)
         {
-            Extmgt.SetDodNumberToExtDB(reqId, dodNumber, extId, 1, 3, isActive, function (err, updateRes) {
+            Extmgt.SetDodNumberToExtDB(reqId, dodNumber, extId, 1, 1, isActive, function (err, updateRes) {
                 if (err)
                 {
                     var jsonString = messageFormatter.FormatMessage(err, "Set Dod number Failed", false, false);
@@ -212,7 +212,7 @@ RestServer.post('/DVP/API/' + version + '/SipUser/DidNumber/:id/Activate/:isActi
 
         if(securityToken)
         {
-            Extmgt.SetDidNumberActiveStatusDB(reqId, didId, 1, 3, isActive, function (err, assignResult) {
+            Extmgt.SetDidNumberActiveStatusDB(reqId, didId, 1, 1, isActive, function (err, assignResult) {
                 if (err)
                 {
                     var jsonString = messageFormatter.FormatMessage(err, "Set Did Number Status Failed", false, false);
@@ -263,7 +263,7 @@ RestServer.del('/DVP/API/' + version + '/SipUser/DidNumber/:id', function(req, r
         if(securityToken)
         {
 
-            Extmgt.DeleteDidNumberDB(reqId, didId, 1, 3, function (err, delResult)
+            Extmgt.DeleteDidNumberDB(reqId, didId, 1, 1, function (err, delResult)
             {
                 if (err)
                 {
@@ -315,7 +315,7 @@ RestServer.del('/DVP/API/' + version + '/SipUser/EmergencyNumber/:emergencyNum',
         if(securityToken && emergencyNum)
         {
 
-            Extmgt.DeleteEmergencyNumberDB(reqId, emergencyNum, 1, 3, function (err, delResult)
+            Extmgt.DeleteEmergencyNumberDB(reqId, emergencyNum, 1, 1, function (err, delResult)
             {
                 if (err)
                 {
@@ -367,7 +367,7 @@ RestServer.get('/DVP/API/' + version + '/SipUser/EmergencyNumbers', function(req
         if(securityToken)
         {
 
-            Extmgt.GetEmergencyNumbersForCompany(reqId, 1, 3, function (err, eNums)
+            Extmgt.GetEmergencyNumbersForCompany(reqId, 1, 1, function (err, eNums)
             {
                 if (err)
                 {
@@ -419,7 +419,7 @@ RestServer.get('/DVP/API/' + version + '/SipUser/DidNumbers', function(req, res,
         if(securityToken)
         {
 
-            Extmgt.GetDidNumbersForCompanyDB(reqId, 1, 3, function (err, didNums)
+            Extmgt.GetDidNumbersForCompanyDB(reqId, 1, 1, function (err, didNums)
             {
                 if (err)
                 {
@@ -475,7 +475,7 @@ RestServer.post('/DVP/API/' + version + '/SipUser/AssignDidNumberToExtension', f
 
             if(extId && didId)
             {
-                Extmgt.AssignDidNumberToExtDB(reqId, didId, extId, 1, 3, function(err, assignResult)
+                Extmgt.AssignDidNumberToExtDB(reqId, didId, extId, 1, 1, function(err, assignResult)
                 {
                     if(err)
                     {
