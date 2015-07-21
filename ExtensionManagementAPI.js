@@ -702,7 +702,17 @@ function AssignToSipUser(Ext,UAC,Company,Tenant,reqId,callback) {
 
                                     resSipObj.setExtension(resExtObj).then(function (resMap)
                                     {
-                                        callback(undefined, resMap);
+
+
+
+                                        resSipObj.updateAttributes({SipExtension: Ext}).then(function (resUpdate) {
+                                            callback(undefined, resUpdate);
+
+                                        }).catch(function (errUpdate) {
+                                            callback(errUpdate, undefined);
+                                        });
+
+
 
                                     }).catch(function (errMap)
                                     {
