@@ -1098,7 +1098,7 @@ function SaveExtension(jobj,Company,Tenant,reqId,callback)
                 ExtRefId: jobj.ExtRefId,
                 ObjClass: "OBJCLZ",
                 ObjType: "USER",
-                ObjCategory: "OBJCAT",
+                ObjCategory: jobj.ObjCategory,
                 CompanyId: Company,
                 TenantId: Tenant,
                 AddUser: jobj.AddUser,
