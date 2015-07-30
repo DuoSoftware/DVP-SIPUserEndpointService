@@ -41,7 +41,122 @@ function AddOrUpdateContext(req,reqId,callback) {
             try {
                 DbConn.Context
                     .find({where: {Context: ContextObj.Context}})
-                    .complete(function (errContext, resContext) {
+                    .then(function (resContext) {
+
+                        if (!resContext) {
+
+                            logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - No record found for Context %s ',reqId,ContextObj.Context);
+
+                            try {
+
+                                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Creating new record of Context %s ',reqId,ContextObj.Context);
+                                DbConn.Context
+                                    .create(
+                                    {
+                                        Context: ContextObj.Context,
+                                        Description: ContextObj.Description,
+                                        ContextCat: ContextObj.ContextCat,
+                                        ObjClass: "OBJCLZ",
+                                        ObjType: "OBJTYP",
+                                        ObjCategory: "OBJCAT",
+                                        CompanyId: 1,
+                                        TenantId: 1,
+                                        AddUser: ContextObj.AddUser,
+                                        UpdateUser: ContextObj.UpdateUser
+
+                                    }
+                                ).then(function (resSave) {
+
+                                        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s inserted successfully - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj));
+                                        callback(undefined, resSave);
+
+                                    }).catch(function (errSave) {
+
+                                        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s insertion  failed - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj),errSave);
+                                        callback(errSave, undefined);
+
+                                    });
+                                    
+                                    
+                                   /* complete(function (errSave, resSave) {
+
+                                        if (errSave ) {
+
+                                            logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s insertion  failed - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj),errSave);
+                                            callback(errSave, undefined);
+
+
+
+                                        }
+                                        else {
+                                            logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s inserted successfully - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj));
+                                            callback(undefined, resSave);
+                                        }
+                                    });*/
+
+
+                            }
+                            catch (ex) {
+                                logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Exception in detail creation of Context %s',reqId,ContextObj.Context,ex);
+                                callback(ex, undefined);
+
+                            }
+
+                        } else {
+
+                            logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Context found',reqId,JSON.stringify(resContext));
+
+                            try {
+                                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Updating picked Context data %s to %s',reqId,JSON.stringify(resContext),JSON.stringify(ContextObj));
+                                DbConn.Context
+                                    .update(
+                                    {
+                                        Description: ContextObj.Description,
+                                        ContextCat: ContextObj.ContextCat,
+                                        ObjClass: "OBJCLZ",
+                                        ObjType: "OBJTYP",
+                                        ObjCategory: "OBJCAT",
+                                        CompanyId: 1,
+                                        TenantId: 1,
+                                        AddUser: ContextObj.AddUser,
+                                        UpdateUser: ContextObj.UpdateUser
+                                    },
+                                    {
+                                        where: {
+                                            Context: ContextObj.Context
+                                        }
+                                    }
+                                ).then(function (resUpdate) {
+
+
+                                        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s Updated successfully',reqId,ContextObj.Context);
+                                        callback(undefined, resUpdate);
+
+                                    }).catch(function (errUpdate) {
+
+
+                                        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s Updation failed',reqId,ContextObj.Context,errUpdate);
+                                        callback(errUpdate, undefined);
+
+
+                                    });
+                            }
+                            catch (ex) {
+                                logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Exception in updating context %s',reqId,ContextObj.Context,ex);
+                                callback(ex, undefined);
+                            }
+
+                        }
+                        
+                    }).catch(function (errContext) {
+
+                        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Error occurred while searching Context %s ',reqId,ContextObj.Context,errContext);
+                        callback(errContext, undefined);
+                        
+                    });
+                    
+                    
+                    /*complete(function (errContext, resContext) {
                         if (errContext) {
 
                             logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Error occurred while searching Context %s ',reqId,ContextObj.Context,errContext);
@@ -144,7 +259,7 @@ function AddOrUpdateContext(req,reqId,callback) {
                             }
 
                         }
-                    });
+                    });*/
 
             }
             catch (ex) {
@@ -173,7 +288,19 @@ function  PickUserByUUID(reqId, uuid, companyId, tenantId, callback)
        try
        {
            DbConn.SipUACEndpoint.find({where: [{SipUserUuid: uuid},{CompanyId: companyId},{TenantId: tenantId}]})
-               .complete(function (errSip, resSip)
+               .then(function (resSip) {
+
+                   logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                   callback(undefined, resSip);
+
+               }).catch(function (errSip) {
+
+                   logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                   callback(errSip, undefined);
+               });
+
+
+               /*complete(function (errSip, resSip)
                {
                    if(errSip)
                    {
@@ -184,7 +311,7 @@ function  PickUserByUUID(reqId, uuid, companyId, tenantId, callback)
                        logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query completed successfully',reqId);
                    }
                    callback(errSip, resSip);
-               });
+               });*/
        }
        catch(ex)
        {
@@ -208,7 +335,20 @@ function  PickUserByName(Username,Company,Tenant,reqId, callback)
         try
         {
             DbConn.SipUACEndpoint.find({where: [{SipUsername: Username},{CompanyId: Company},{TenantId: Tenant}]})
-                .complete(function (errSip, resSip)
+                .then(function (resSip) {
+
+                    logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                    callback(undefined, resSip);
+
+                }).catch(function (errSip) {
+
+                    logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                    callback(errSip, undefined);
+
+                });
+
+
+               /* complete(function (errSip, resSip)
                 {
                     if(errSip)
                     {
@@ -220,6 +360,7 @@ function  PickUserByName(Username,Company,Tenant,reqId, callback)
                     }
                     callback(errSip, resSip);
                 });
+            */
         }
         catch(ex)
         {
@@ -244,7 +385,30 @@ function GetCompanyContextDetails(CompanyId,reqId,callback)
 
             DbConn.Context
                 .findAll({where: {CompanyId: CompanyId}})
-                .complete(function (errContext, resContext) {
+                .then(function (resContext) {
+
+                    if (resContext.length==0) {
+
+                        logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - No record found for Context %s ',reqId,CompanyId);
+                        callback(new Error("No Context record found"), undefined);
+                    }
+                    else {
+
+                        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL] - Record found for Context %s ',reqId,CompanyId);
+                        callback(undefined, resContext);
+
+
+
+                    }
+
+                }).catch(function (errContext) {
+
+                    logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - Error in searching Context %s ',reqId,CompanyId,errContext);
+                    callback(errContext, undefined);
+
+                });
+
+                /*complete(function (errContext, resContext) {
 
                     if (errContext) {
                         logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - Error in searching Context %s ',reqId,CompanyId,errContext);
@@ -271,7 +435,7 @@ function GetCompanyContextDetails(CompanyId,reqId,callback)
                         }
 
                     }
-                });
+                });*/
         }
         catch (ex)
         {
