@@ -185,7 +185,7 @@ var SetDodNumberToExtDB = function(reqId, dodNumber, extId, companyId, tenantId,
             {
                 logger.debug('[DVP-SIPUserEndpointService.SetDodNumberToExtDB] - [%s] - Get Extension PGSQL query success', reqId);
 
-                ext.updateAttributes({DodActive: isActive.toString(), DodNumber: dodNumber}).complete(function (err)
+                ext.updateAttributes({DodActive: isActive, DodNumber: dodNumber}).complete(function (err)
                 {
                     if(err)
                     {

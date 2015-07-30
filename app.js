@@ -157,7 +157,7 @@ RestServer.post('/DVP/API/' + version + '/SipUser/DodNumber', function(req, res,
     try
     {
         var securityToken = req.header('authorization');
-        var extId = req.body.UserUuid;
+        var extId = req.body.ExtId;
         var dodNumber = req.body.DodNumber;
         var isActive = req.body.DodActive;
 
