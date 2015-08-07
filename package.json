@@ -14,7 +14,7 @@
     "sequelize": "^2.1.0",
     "winston": "^1.0.0",
     "DVP-Common": "DuoSoftware/DVP-Common",
-    "DVP-DBModels": "DuoSoftware/DVP-DBModels"
+    "DVP-DBModels": "DuoSoftware/DVP-DBModels#Development"
   },
   "devDependencies": {},
   "scripts": {
