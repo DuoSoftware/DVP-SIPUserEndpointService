@@ -9,6 +9,7 @@ var Extmgt=require('./ExtensionManagementAPI.js');
 var UACUpdate=require('./UpdateSipUserData.js');
 var PublicUser=require('./PublicUserService.js');
 var group=require('./SipUserGroupManagement.js');
+var EndPoint=require('./EndpointManagement.js');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var config = require('config');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
@@ -35,7 +36,7 @@ RestServer.use(restify.fullResponse());
 RestServer.listen(port, function () {
     console.log('%s listening at %s', RestServer.name, RestServer.url);
     //console.log(moment(new Date()).format("YYYY-MM-DD HH:mm:ss"));
-
+    console.log(PublicUser.PhoneNumberValidation('+94721389808'));
 
 });
 
@@ -1720,7 +1721,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',function(req,
         res.end(jsonString);
     }
 
-
+next();
 });
 
 RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/:User/Pin',function(req,res,next) {
@@ -1764,7 +1765,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/:User/Pin',function(req,
         res.end(jsonString);
     }
 
-
+    next();
 });
 
 RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/RegeneratePin',function(req,res,next) {
@@ -1808,7 +1809,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/RegeneratePin',function(
         res.end(jsonString);
     }
 
-
+    next();
 });
 
 /*
@@ -1860,3 +1861,362 @@ RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/RegeneratePin',function(
 
  });
  */
+
+RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint',function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var Company=1;
+    var Tenant=1;
+
+
+    try {
+        if(req.header('authorization'))
+        {
+            var auth = req.header('authorization');
+            var authInfo = auth.split("#");
+
+            if (authInfo.length >= 2) {
+                Tenant = authInfo[0];
+                Company = authInfo[1];
+            }
+        }
+        else
+        {
+            Tenant = 1;
+            Company = 1;
+        }
+
+    }
+    catch (ex) {
+        logger.error('[DVP-SIPUserEndpointService.AddEndpoint] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
+    }
+
+
+    try
+    {
+        EndPoint.AddEndPoint(req.body,Company,Tenant,reqId,function(err,resz)
+        {
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.AddEndpoint] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.AddEndpoint] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.AddEndpoint] - [%s] - [HTTP]  - Exception in Request ',ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.AddEndpoint] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+
+next();
+});
+
+
+RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint/:user/Availability',function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var Company=1;
+    var Tenant=1;
+
+
+    try {
+        if(req.header('authorization'))
+        {
+            var auth = req.header('authorization');
+            var authInfo = auth.split("#");
+
+            if (authInfo.length >= 2) {
+                Tenant = authInfo[0];
+                Company = authInfo[1];
+            }
+        }
+        else
+        {
+            Tenant = 1;
+            Company = 1;
+        }
+
+    }
+    catch (ex) {
+        logger.error('[DVP-SIPUserEndpointService.UpdateAvailability] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
+    }
+
+
+    try
+    {
+        EndPoint.EndpointAvailabilityUpdation(req.params.user,req.body.Phone,req.body.Availability,reqId,function(err,resz)
+        {
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateAvailability] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateAvailability] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.UpdateAvailability] - [%s] - [HTTP]  - Exception in Request ',ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.UpdateAvailability] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+
+    next();
+});
+
+RestServer.del('/DVP/API/'+version+'/SipUser/Endpoint/:user',function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var Company=1;
+    var Tenant=1;
+
+
+
+    try {
+        if(req.header('authorization'))
+        {
+            var auth = req.header('authorization');
+            var authInfo = auth.split("#");
+
+            if (authInfo.length >= 2) {
+                Tenant = authInfo[0];
+                Company = authInfo[1];
+            }
+        }
+        else
+        {
+            Tenant = 1;
+            Company = 1;
+        }
+
+    }
+    catch (ex) {
+        logger.error('[DVP-SIPUserEndpointService.RemoveEndPoint] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
+    }
+
+
+    try
+    {
+        EndPoint.RemoveEndpoint(req.params.user,req.body.Phone,reqId,function(err,resz)
+        {
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.RemoveEndPoint] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.RemoveEndPoint] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.RemoveEndPoint] - [%s] - [HTTP]  - Exception in Request ',ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.RemoveEndPoint] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+
+    next();
+});
+
+RestServer.get('/DVP/API/'+version+'/SipUser/Endpoints/:user',function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var Company=1;
+    var Tenant=1;
+
+
+
+    try {
+        if(req.header('authorization'))
+        {
+            var auth = req.header('authorization');
+            var authInfo = auth.split("#");
+
+            if (authInfo.length >= 2) {
+                Tenant = authInfo[0];
+                Company = authInfo[1];
+            }
+        }
+        else
+        {
+            Tenant = 1;
+            Company = 1;
+        }
+
+    }
+    catch (ex) {
+        logger.error('[DVP-SIPUserEndpointService.AllEndpoints] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
+    }
+
+
+    try
+    {
+        EndPoint.AllEndpointsOfuser(req.params.user,reqId,function(err,resz)
+        {
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.AllEndpoints] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.AllEndpoints] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.AllEndpoints] - [%s] - [HTTP]  - Exception in Request ',ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.AllEndpoints] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+
+    next();
+});
+
+RestServer.get('/DVP/API/'+version+'/SipUser/Endpoint/:user/:phone',function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var Company=1;
+    var Tenant=1;
+
+
+
+    try {
+        if(req.header('authorization'))
+        {
+            var auth = req.header('authorization');
+            var authInfo = auth.split("#");
+
+            if (authInfo.length >= 2) {
+                Tenant = authInfo[0];
+                Company = authInfo[1];
+            }
+        }
+        else
+        {
+            Tenant = 1;
+            Company = 1;
+        }
+
+    }
+    catch (ex) {
+        logger.error('[DVP-SIPUserEndpointService.AllEndpoints] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
+    }
+
+
+    try
+    {
+        EndPoint.GetEndpointDetails(req.params.user,req.params.phone,reqId,function(err,resz)
+        {
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.GetEndpoint] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.GetEndpoint] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.GetEndpoint] - [%s] - [HTTP]  - Exception in Request ',ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.GetEndpoint] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+
+    next();
+});
