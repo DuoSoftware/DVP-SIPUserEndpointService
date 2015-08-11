@@ -36,7 +36,9 @@ RestServer.use(restify.fullResponse());
 RestServer.listen(port, function () {
     console.log('%s listening at %s', RestServer.name, RestServer.url);
     //console.log(moment(new Date()).format("YYYY-MM-DD HH:mm:ss"));
-    console.log(PublicUser.PhoneNumberValidation('+94721389808'));
+
+    EndPoint.PhoneNumberValidation('+94612257699');
+
 
 });
 
