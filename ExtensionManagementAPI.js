@@ -15,14 +15,9 @@ var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, callback)
     try
     {
         DbConn.EmergencyNumber.find({where: [{EmergencyNum: emergencyNumInfo.EmergencyNumber},{TenantId: emergencyNumInfo.TenantId}]})
-            .complete(function (err, numData)
+            .then(function (numData)
             {
-                if(err)
-                {
-                    logger.error('[DVP-SIPUserEndpointService.AddEmergencyNumbersDB] - [%s] - Get Emergency Numbers PGSQL query failed', reqId, err);
-                    callback(err, false, -1);
-                }
-                else if(numData)
+                if(numData)
                 {
                     logger.debug('[DVP-SIPUserEndpointService.AddEmergencyNumbersDB] - [%s] - Get Emergency Numbers PGSQL query success', reqId);
                     callback(new Error('Emergency number already added for tenant'), false, numData.id);
@@ -42,22 +37,24 @@ var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, callback)
 
                     emerNum
                         .save()
-                        .complete(function (err)
+                        .then(function (saveRes)
                         {
-                            if (err)
-                            {
-                                logger.error('[DVP-SIPUserEndpointService.AddEmergencyNumbersDB] - [%s] - PGSQL query failed', reqId, err);
-                                callback(err, false, -1);
-                            }
-                            else
-                            {
+
                                 logger.debug('[DVP-SIPUserEndpointService.AddEmergencyNumbersDB] - [%s] - PGSQL query success', reqId);
                                 callback(undefined, true, emerNum.id);
-                            }
 
+
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-SIPUserEndpointService.AddEmergencyNumbersDB] - [%s] - PGSQL query failed', reqId, err);
+                            callback(err, false, -1);
                         })
                 }
 
+            }).catch(function(err)
+            {
+                logger.error('[DVP-SIPUserEndpointService.AddEmergencyNumbersDB] - [%s] - Get Emergency Numbers PGSQL query failed', reqId, err);
+                callback(err, false, -1);
             })
 
 
@@ -74,27 +71,18 @@ var DeleteEmergencyNumberDB = function(reqId, emergencyNum, companyId, tenantId,
 {
     try
     {
-        DbConn.EmergencyNumber.find({where: [{EmergencyNum: emergencyNum},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, eNumRec)
+        DbConn.EmergencyNumber.find({where: [{EmergencyNum: emergencyNum},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (eNumRec)
         {
-            if (err)
+            if(eNumRec)
             {
-                logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] - [%s] - PGSQL Get did number query failed', reqId, err);
-                callback(err, false);
-            }
-            else if(eNumRec)
-            {
-                eNumRec.destroy().complete(function (err, result)
+                eNumRec.destroy().then(function (result)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query failed', err);
-                        callback(err, false);
-                    }
-                    else
-                    {
-                        logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success', err);
-                        callback(err, true);
-                    }
+                    logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success', err);
+                    callback(undefined, true);
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query failed', err);
+                    callback(err, false);
                 });
             }
             else
@@ -103,6 +91,10 @@ var DeleteEmergencyNumberDB = function(reqId, emergencyNum, companyId, tenantId,
                 callback(undefined, true);
             }
 
+        }).catch(function(err)
+        {
+            logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] - [%s] - PGSQL Get did number query failed', reqId, err);
+            callback(err, false);
         })
 
     }
@@ -120,19 +112,17 @@ var GetEmergencyNumbersForCompany = function(reqId, companyId, tenantId, callbac
     try
     {
         DbConn.EmergencyNumber.findAll({where: [{CompanyId: companyId},{TenantId: tenantId}]})
-            .complete(function (err, eNumData)
+            .then(function (eNumData)
             {
-                if(err)
-                {
-                    logger.error('[DVP-SIPUserEndpointService.GetEmergencyNumbersForCompany] - [%s] - Get emergency numbers PGSQL query failed', reqId, err);
-                    callback(err, emptyArr);
-                }
-                else
-                {
+
                     logger.debug('[DVP-SIPUserEndpointService.GetEmergencyNumbersForCompany] - [%s] - Get emergency numbers PGSQL query success', reqId);
                     callback(undefined, eNumData);
-                }
 
+
+            }).catch(function(err)
+            {
+                logger.error('[DVP-SIPUserEndpointService.GetEmergencyNumbersForCompany] - [%s] - Get emergency numbers PGSQL query failed', reqId, err);
+                callback(err, emptyArr);
             });
     }
     catch(ex)
@@ -149,11 +139,14 @@ var GetUsersOfExtension = function(reqId, extension, tenantId,Company,callback)
     {
         try
         {
-
             DbConn.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{CompanyId:Company}], include: [{model: DbConn.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: DbConn.CloudEndUser, as:'CloudEndUser'},{model: DbConn.UserGroup, as:'UserGroup', include: [{model: DbConn.Extension, as:'Extension'}]}]}]})
-                .complete(function (errExt, resExt)
+                .then(function (resExt)
                 {
-                    callback(errExt, resExt);
+                    callback(undefined, resExt);
+
+                }).catch(function(err)
+                {
+                    callback(err, undefined);
                 });
 
         }
@@ -174,30 +167,21 @@ var SetDodNumberToExtDB = function(reqId, dodNumber, extId, companyId, tenantId,
 {
     try
     {
-        DbConn.Extension.find({where: [{TenantId: tenantId},{CompanyId: companyId},{id: extId}]}).complete(function (err, ext)
+        DbConn.Extension.find({where: [{TenantId: tenantId},{CompanyId: companyId},{id: extId}]}).then(function (ext)
         {
-            if(err)
-            {
-                logger.error('[DVP-SIPUserEndpointService.SetDodNumberToExtDB] - [%s] - Get Extension PGSQL query failed', reqId, err);
-                callback(err, false);
-            }
-            else if(ext)
+            if(ext)
             {
                 logger.debug('[DVP-SIPUserEndpointService.SetDodNumberToExtDB] - [%s] - Get Extension PGSQL query success', reqId);
 
-                ext.updateAttributes({DodActive: isActive.toString(), DodNumber: dodNumber}).complete(function (err)
+                ext.updateAttributes({DodActive: isActive, DodNumber: dodNumber}).then(function (updtRes)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-SIPUserEndpointService.SetDodNumberToExtDB] PGSQL Update Dod Number query failed', err);
-                        callback(err, false);
-                    }
-                    else
-                    {
-                        logger.info('[DVP-SIPUserEndpointService.SetDodNumberToExtDB] PGSQL Update Dod Number query success');
-                        callback(undefined, true);
-                    }
+                    logger.info('[DVP-SIPUserEndpointService.SetDodNumberToExtDB] PGSQL Update Dod Number query success');
+                    callback(undefined, true);
 
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.SetDodNumberToExtDB] PGSQL Update Dod Number query failed', err);
+                    callback(err, false);
                 });
 
             }
@@ -206,6 +190,10 @@ var SetDodNumberToExtDB = function(reqId, dodNumber, extId, companyId, tenantId,
                 callback(new Error('Extension record not found'), false);
             }
 
+        }).catch(function(err)
+        {
+            logger.error('[DVP-SIPUserEndpointService.SetDodNumberToExtDB] - [%s] - Get Extension PGSQL query failed', reqId, err);
+            callback(err, false);
         });
 
 
@@ -221,27 +209,19 @@ var DeleteDidNumberDB = function(reqId, didNumId, companyId, tenantId, callback)
 {
     try
     {
-        DbConn.DidNumber.find({where: [{id: didNumId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, didRec)
+        DbConn.DidNumber.find({where: [{id: didNumId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (didRec)
         {
-            if (err)
+            if(didRec)
             {
-                logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] - [%s] - PGSQL Get did number query failed', reqId, err);
-                callback(err, false);
-            }
-            else if(didRec)
-            {
-                didRec.destroy().complete(function (err, result)
+                didRec.destroy().complete(function (result)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query failed', err);
-                        callback(err, false);
-                    }
-                    else
-                    {
-                        logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success', err);
-                        callback(err, true);
-                    }
+                    logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success', err);
+                    callback(undefined, true);
+
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query failed', err);
+                    callback(err, false);
                 });
             }
             else
@@ -249,6 +229,10 @@ var DeleteDidNumberDB = function(reqId, didNumId, companyId, tenantId, callback)
                 logger.debug('[DVP-SIPUserEndpointService.DeleteDidNumberDB] - [%s] - PGSQL Get did number query success', reqId);
             }
 
+        }).catch(function(err)
+        {
+            logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] - [%s] - PGSQL Get did number query failed', reqId, err);
+            callback(err, false);
         })
 
     }
@@ -264,14 +248,9 @@ var AddDidNumberDB = function(reqId, didNumberInfo, callback)
 {
     try
     {
-        DbConn.DidNumber.find({where: [{TenantId: didNumberInfo.TenantId},{DidNumber: didNumberInfo.DidNumber}]}).complete(function (err, didRec)
+        DbConn.DidNumber.find({where: [{TenantId: didNumberInfo.TenantId},{DidNumber: didNumberInfo.DidNumber}]}).then(function (didRec)
         {
-            if(err)
-            {
-                logger.error('[DVP-SIPUserEndpointService.AddDidNumber] - [%s] - Get Did Number PGSQL query failed', reqId, err);
-                callback(err, false, -1);
-            }
-            else if(didRec)
+            if(didRec)
             {
                 logger.debug('[DVP-SIPUserEndpointService.AddDidNumber] - [%s] - Get Did Number PGSQL query success', reqId);
                 callback(new Error('DidNumber already added'), false, -1);
@@ -293,22 +272,23 @@ var AddDidNumberDB = function(reqId, didNumberInfo, callback)
 
                 didNum
                     .save()
-                    .complete(function (err)
+                    .then(function (saveRes)
                     {
-                        if (err)
-                        {
-                            logger.error('[DVP-SIPUserEndpointService.AddDidNumber] - [%s] - PGSQL query failed', reqId, err);
-                            callback(err, false, -1);
-                        }
-                        else
-                        {
-                            logger.debug('[DVP-SIPUserEndpointService.AddDidNumber] - [%s] - PGSQL query success', reqId);
-                            callback(undefined, true, didNum.id);
-                        }
+                        logger.debug('[DVP-SIPUserEndpointService.AddDidNumber] - [%s] - PGSQL query success', reqId);
+                        callback(undefined, true, didNum.id);
 
+
+                    }).catch(function(err)
+                    {
+                        logger.error('[DVP-SIPUserEndpointService.AddDidNumber] - [%s] - PGSQL query failed', reqId, err);
+                        callback(err, false, -1);
                     })
             }
 
+        }).catch(function(err)
+        {
+            logger.error('[DVP-SIPUserEndpointService.AddDidNumber] - [%s] - Get Did Number PGSQL query failed', reqId, err);
+            callback(err, false, -1);
         });
 
 
@@ -326,18 +306,15 @@ var GetDidNumbersForCompanyDB = function(reqId, companyId, tenantId, callback)
     try
     {
         DbConn.DidNumber.findAll({where: [{CompanyId: companyId},{TenantId: tenantId}]})
-            .complete(function (err, didNumList)
+            .then(function (didNumList)
             {
-                if (err)
-                {
-                    logger.error('[DVP-SIPUserEndpointService.GetDidNumbersForCompanyDB] - [%s] - PGSQL get did numbers for company query failed', reqId, err);
-                    callback(err, emptyArr);
-                }
-                else
-                {
-                    logger.debug('[DVP-SIPUserEndpointService.GetDidNumbersForCompanyDB] - [%s] - PGSQL get did numbers for company query success', reqId);
-                    callback(err, didNumList);
-                }
+                logger.debug('[DVP-SIPUserEndpointService.GetDidNumbersForCompanyDB] - [%s] - PGSQL get did numbers for company query success', reqId);
+                callback(undefined, didNumList);
+
+            }).catch(function(err)
+            {
+                logger.error('[DVP-SIPUserEndpointService.GetDidNumbersForCompanyDB] - [%s] - PGSQL get did numbers for company query failed', reqId, err);
+                callback(err, emptyArr);
             });
     }
     catch(ex)
@@ -353,41 +330,27 @@ var AssignDidNumberToExtDB = function(reqId, didNumId, extId, companyId, tenantI
     try
     {
         DbConn.Extension.find({where: [{id: extId},{CompanyId: companyId},{TenantId: tenantId}]})
-            .complete(function (err, extInf)
+            .then(function (extInf)
             {
-                if(err)
-                {
-                    logger.error('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Get Extension query failed', reqId, err);
-                    callback(err, false);
-                }
-                else if(extInf)
+                if(extInf)
                 {
                     logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Get Extension query success', reqId);
 
                     DbConn.DidNumber.find({where: [{id: didNumId},{CompanyId: companyId},{TenantId: tenantId}]})
-                        .complete(function (err, didNum)
+                        .then(function (didNum)
                         {
-                            if(err)
-                            {
-                                logger.error('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Get did number query failed', reqId, err);
-                                callback(err, false);
-                            }
-                            else if(didNum)
+                            if(didNum)
                             {
                                 logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Get didnumber query success', reqId);
-                                didNum.setExtension(extInf).complete(function (err, result)
+                                didNum.setExtension(extInf).then(function (result)
                                 {
-                                    if(err)
-                                    {
-                                        logger.error('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Update did number with extension query failed', reqId, err);
-                                        callback(err, false);
-                                    }
-                                    else
-                                    {
-                                        logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Update did number with extension query success', reqId);
-                                        callback(err, true);
-                                    }
+                                    logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Update did number with extension query success', reqId);
+                                    callback(undefined, true);
 
+                                }).catch(function(err)
+                                {
+                                    logger.error('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Update did number with extension query failed', reqId, err);
+                                    callback(err, false);
                                 });
                             }
                             else
@@ -397,6 +360,10 @@ var AssignDidNumberToExtDB = function(reqId, didNumId, extId, companyId, tenantI
 
                                 callback(new Error('Extension not found'), false);
                             }
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Get did number query failed', reqId, err);
+                            callback(err, false);
                         });
                 }
                 else
@@ -406,6 +373,10 @@ var AssignDidNumberToExtDB = function(reqId, didNumId, extId, companyId, tenantI
 
                     callback(new Error('Extension not found'), false);
                 }
+            }).catch(function(err)
+            {
+                logger.error('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Get Extension query failed', reqId, err);
+                callback(err, false);
             });
     }
     catch(ex)
@@ -419,30 +390,22 @@ var SetDidNumberActiveStatusDB = function(reqId, didNumId, companyId, tenantId, 
 {
     try
     {
-        DbConn.DidNumber.find({where: [{TenantId: tenantId},{CompanyId: companyId},{id: didNumId}]}).complete(function (err, didRec)
+        DbConn.DidNumber.find({where: [{TenantId: tenantId},{CompanyId: companyId},{id: didNumId}]}).then(function (didRec)
         {
-            if(err)
-            {
-                logger.error('[DVP-SIPUserEndpointService.SetDidNumberActiveStatusDB] - [%s] - Get Did Number PGSQL query failed', reqId, err);
-                callback(err, false);
-            }
-            else if(didRec)
+            if(didRec)
             {
                 logger.debug('[DVP-SIPUserEndpointService.SetDidNumberActiveStatusDB] - [%s] - Get Did Number PGSQL query success', reqId);
 
-                didRec.updateAttributes({DidActive: isActive.toString()}).complete(function (err)
+                didRec.updateAttributes({DidActive: isActive.toString()}).then(function (upReslt)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-SIPUserEndpointService.SetDidNumberActiveStatusDB] PGSQL Update Did Status query failed', err);
-                        callback(err, false);
-                    }
-                    else
-                    {
-                        logger.info('[DVP-SIPUserEndpointService.SetDidNumberActiveStatusDB] PGSQL Update Did Status query success');
-                        callback(undefined, true);
-                    }
+                    logger.info('[DVP-SIPUserEndpointService.SetDidNumberActiveStatusDB] PGSQL Update Did Status query success');
+                    callback(undefined, true);
 
+
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.SetDidNumberActiveStatusDB] PGSQL Update Did Status query failed', err);
+                    callback(err, false);
                 });
 
             }
@@ -451,6 +414,10 @@ var SetDidNumberActiveStatusDB = function(reqId, didNumId, companyId, tenantId, 
                 callback(new Error('Did record not found'), false);
             }
 
+        }).catch(function(err)
+        {
+            logger.error('[DVP-SIPUserEndpointService.SetDidNumberActiveStatusDB] - [%s] - Get Did Number PGSQL query failed', reqId, err);
+            callback(err, false);
         });
 
 
