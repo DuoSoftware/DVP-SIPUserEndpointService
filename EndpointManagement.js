@@ -2,7 +2,7 @@
  * Created by Pawan on 8/10/2015.
  */
 
-var DbConn = require('DVP-DBModels');
+var DbConn = require('dvp-dbmodels');
 var phone=require('phone');
 
 function AddEndPoint(req,Company,Tenant,reqId,callback)

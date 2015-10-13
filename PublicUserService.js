@@ -3,11 +3,10 @@
  */
 
 var Chance = require('chance');
-var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var nodeUuid = require('node-uuid');
-var DbConn = require('DVP-DBModels');
-var phone=require('phone');
+var DbConn = require('dvp-dbmodels');
 var EndPoint=require('./EndpointManagement.js');
 
 

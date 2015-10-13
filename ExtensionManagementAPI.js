@@ -2,11 +2,11 @@
  * Created by pawan on 2/6/2015.
  */
 
-var DbConn = require('DVP-DBModels');
+var DbConn = require('dvp-dbmodels');
 var restify = require('restify');
 var winston=require('winston');
-var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 
 
 

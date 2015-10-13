@@ -2,12 +2,12 @@
  * Created by pawan on 2/20/2015.
  */
 
-var DbConn = require('DVP-DBModels');
+var DbConn = require('dvp-dbmodels');
 var restify = require('restify');
 var stringify=require('stringify');
 var Sequelize=require('sequelize');
-var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 
 
 function CreateUserGroup(obj,reqId,callback)
