@@ -2,7 +2,7 @@
  * Created by pawan on 2/2/2015.
  */
 
-var DbConn = require('DVP-DBModels');
+var DbConn = require('dvp-dbmodels');
 var DbUpdate=require('./UpdateSipUserData.js');
 var restify = require('restify');
 var strfy = require('stringify');
