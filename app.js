@@ -15,8 +15,6 @@ var config = require('config');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var uuid = require('node-uuid');
 var cors = require('cors');
-var moment = require('moment');
-var sequalize=require('sequelize');
 
 
 var port = config.Host.port || 3000;
@@ -35,11 +33,6 @@ RestServer.use(restify.fullResponse());
 
 RestServer.listen(port, function () {
     console.log('%s listening at %s', RestServer.name, RestServer.url);
-    //console.log(moment(new Date()).format("YYYY-MM-DD HH:mm:ss"));
-
-    EndPoint.PhoneNumberValidation('+94612257699');
-
-
 });
 
 //Server listen
@@ -528,6 +521,61 @@ RestServer.post('/DVP/API/' + version + '/SipUser/AssignDidNumberToExtension', f
         logger.error('[DVP-SIPUserEndpointService.AssignDidNumberToExtension] - [%s] - Exception Occurred', reqId, ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, false);
         logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtension] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
+RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        var securityToken = req.header('authorization');
+        var reqBody = req.body;
+
+        logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
+
+        if(reqBody && securityToken)
+        {
+            reqBody.CompanyId = 1;
+            reqBody.TenantId = 1;
+
+            PublicUser.UpdatePublicUser(reqId, reqBody, function (err, addResult)
+            {
+                if (err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Add NewDidNumber Failed", false, false);
+                    logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Add NewDidNumber Success", true, addResult);
+                    logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+
+            })
+
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error('Empty request body or no authorization token set'), "Empty request body or no authorization token set", false, false);
+            logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - Exception Occurred', reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, false);
+        logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
         res.end(jsonString);
 
     }

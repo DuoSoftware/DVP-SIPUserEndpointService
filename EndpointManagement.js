@@ -3,7 +3,6 @@
  */
 
 var DbConn = require('dvp-dbmodels');
-var phone=require('phone');
 
 function AddEndPoint(req,Company,Tenant,reqId,callback)
 {

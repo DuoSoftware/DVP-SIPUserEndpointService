@@ -16,6 +16,14 @@ module.exports = {
 
     },
 
+    "Kamailio":
+    {
+        "User":"SYS_KAMAILIODB_USER",
+        "Password":"SYS_KAMAILIODB_PASSWORD",
+        "Host":"SYS_KAMAILIODB_HOST",
+        "Database":"SYS_KAMAILIODB_DATABASE"
+    },
+
     "Host":
     {
         "domain": "HOST_NAME",

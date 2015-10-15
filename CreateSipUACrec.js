@@ -10,7 +10,6 @@ var winston=require('winston');
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var nodeUuid = require('node-uuid');
-var moment = require('moment');
 
 
 

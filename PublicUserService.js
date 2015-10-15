@@ -8,9 +8,184 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var nodeUuid = require('node-uuid');
 var DbConn = require('dvp-dbmodels');
 var EndPoint=require('./EndpointManagement.js');
+var mysql = require('mysql');
+var config = require('config');
 
+var AddOrUpdateLbUser = function(reqId, usrInfo, callback)
+{
+    try
+    {
+        var connection = mysql.createConnection({
+            host     : config.Kamailio.Host,
+            user     : config.Kamailio.User,
+            password : config.Kamailio.Password,
+            database : config.Kamailio.Database
+        });
 
+        connection.connect();
 
+        //check username exists
+
+        connection.query('SELECT * FROM subscriber WHERE username = "' + usrInfo.SipUsername + '"', function(err, rows)
+        {
+            if (err)
+            {
+                connection.end();
+                callback(err, false);
+            }
+            else
+            {
+                if(rows && rows.length > 0)
+                {
+                    //update
+
+                    connection.query('UPDATE subscriber SET password = "' + usrInfo.Password + '" WHERE username = "' + usrInfo.SipUsername + '"', function(err, resultss)
+                    {
+                        if (err)
+                        {
+                            callback(err, false);
+                            connection.end();
+                        }
+                        else
+                        {
+                            connection.end();
+                        }
+                    });
+                }
+                else
+                {
+                    //insert
+                    var insertQueryObj  = {username: usrInfo.SipUsername, password: usrInfo.Password, domain: usrInfo.Domain};
+
+                    connection.query('INSERT INTO subscriber SET ?', insertQueryObj, function(err, result)
+                    {
+                        if (err)
+                        {
+                            callback(err, false);
+                            connection.end();
+                        }
+                        else
+                        {
+                            connection.end();
+                        }
+                    });
+                }
+            }
+        });
+
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+
+    }
+}
+
+var UpdatePublicUser = function(reqId, publicUserInfo, callback)
+{
+    try
+    {
+        DbConn.SipUACEndpoint.find({where: [{SipUsername: publicUserInfo.SipUsername}]}).then(function (sipUsr)
+        {
+            if(sipUsr)
+            {
+                //check for company tenant
+
+                if(publicUserInfo.CompanyId === sipUsr.CompanyId && publicUserInfo.TenantId === sipUsr.TenantId)
+                {
+                    //ok to update
+
+                    AddOrUpdateLbUser(reqId, publicUserInfo, function(err, rslt)
+                    {
+                        delete publicUserInfo.CompanyId;
+                        delete publicUserInfo.TenantId;
+                        delete publicUserInfo.SipUserUuid;
+                        delete publicUserInfo.SipUsername;
+                        delete publicUserInfo.SipExtension;
+                        delete publicUserInfo.TryCount;
+
+                        sipUsr.updateAttributes(publicUserInfo).then(function(updateResult)
+                        {
+                            logger.debug('[DVP-PBXService.UpdatePbxUserDB] - [%s] - PGSQL Update PBX User query success', reqId);
+                            callback(undefined, true);
+
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-PBXService.UpdatePbxUserDB] - [%s] - PGSQL Update Pbx User Failed', reqId, err);
+                            callback(err, false);
+                        })
+
+                    });
+
+                }
+                else
+                {
+                    //cannot update another record
+                    logger.error('[DVP-SIPUserEndpointService.UpdatePublicUser] - [%s] - Cannot update a user belonging to a different company', reqId);
+                    callback(new Error('Cannot update a user belonging to a different company'), undefined);
+                }
+
+            }
+            else
+            {
+                //save new user
+
+                AddOrUpdateKamailioUser(reqId, publicUserInfo, function(err)
+                {
+
+                });
+
+                logger.debug('[DVP-SIPUserEndpointService.UpdatePublicUser] - [%s] - Get Did Number PGSQL query success', reqId);
+                //save ok
+                var sipUac = DbConn.SipUACEndpoint.build({
+                    SipUserUuid: nodeUuid.v1(),
+                    SipUsername: publicUserInfo.SipUsername,
+                    Password: publicUserInfo.Password,
+                    Enabled: true,
+                    ExtraData: publicUserInfo.ExtraData,
+                    EmailAddress: publicUserInfo.EmailAddress,
+                    GuRefId: publicUserInfo.GuRefId,
+                    CompanyId: 1,
+                    TenantId: 1,
+                    ObjClass: '',
+                    ObjType: '',
+                    ObjCategory: '',
+                    Pin: chance.zip(),
+                    PinGenTime: new Date(),
+                    TryCount: 0,
+                    UsePublic: true,
+                    TransInternalEnable: false,
+                    TransExternalEnable: false,
+                    TransConferenceEnable: false,
+                    TransGroupEnable: false
+                });
+
+                sipUac
+                    .save()
+                    .then(function (saveRes)
+                    {
+                        callback(undefined, saveRes);
+
+                    }).catch(function(err)
+                    {
+                        logger.error('[DVP-SIPUserEndpointService.UpdatePublicUser] - [%s] - PGSQL query failed', reqId, err);
+                        callback(err, undefined);
+                    })
+            }
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-SIPUserEndpointService.AddDidNumber] - [%s] - Get Did Number PGSQL query failed', reqId, err);
+            callback(err, undefined);
+        });
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.AddDidNumber] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, undefined);
+    }
+};
 
 
 function AddPublicUser(req,reqId,callback)
@@ -21,7 +196,9 @@ function AddPublicUser(req,reqId,callback)
     {
         chance = new Chance();
 
-        ValidateUserName(req.SipUsername,reqId,function(errValid,resValid)
+        var User=req.AreaCode.concat(req.Phone);
+
+        ValidateUserName(User, reqId,function(errValid,resValid)
         {
             if(errValid)
             {
@@ -53,8 +230,6 @@ function AddPublicUser(req,reqId,callback)
                         var NowDt=new Date();
                         console.log(NowDt);
 
-                        var User=req.AreaCode.concat(req.Phone);
-
                         if(EndPoint.PhoneNumberValidation(User))
                         {
 
@@ -64,23 +239,21 @@ function AddPublicUser(req,reqId,callback)
                                     SipUserUuid: sipUserUuid,
                                     SipUsername: User,
                                     Password: req.Password,
-                                    Enabled: false,
+                                    Enabled: true,
                                     ExtraData: req.ExtraData,
                                     EmailAddress: req.EmailAddress,
                                     GuRefId: req.GuRefId,
                                     CompanyId: Company,
                                     TenantId: Tenant,
-                                    ObjClass: "OBJCLZ",
-                                    ObjType: "PUBLIC",
-                                    ObjCategory: "OBJCAT",
+                                    ObjClass: "",
+                                    ObjType: "",
+                                    ObjCategory: "",
                                     AddUser: req.AddUser,
                                     Pin:chance.zip(),
                                     PinGenTime:NowDt,
                                     TryCount:0,
-                                    UpdateUser: req.UpdateUser
-
-
-
+                                    UpdateUser: req.UpdateUser,
+                                    UserPublic: false
                                 }
                             );
 
@@ -197,10 +370,7 @@ function ActivatePublicUser(Usname,Pin,reqId,callback)
                         .update(
                         {
                             TryCount: 0,
-                            Enabled:true
-
-
-
+                            UsePublic: true
                         },
                         {
                             where: [{SipUsername: Usname}, {Pin: resUser.Pin}]
@@ -232,8 +402,6 @@ function ActivatePublicUser(Usname,Pin,reqId,callback)
                             .update(
                             {
                                 TryCount: NewTryCount
-
-
                             },
                             {
                                 where: [{SipUsername: Usname}, {Pin: resUser.Pin}]
@@ -441,3 +609,4 @@ module.exports.AddPublicUser = AddPublicUser;
 module.exports.ActivatePublicUser = ActivatePublicUser;
 module.exports.PinOfUser = PinOfUser;
 module.exports.ReGeneratePin = ReGeneratePin;
+module.exports.UpdatePublicUser = UpdatePublicUser;
