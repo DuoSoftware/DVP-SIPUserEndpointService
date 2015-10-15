@@ -27,7 +27,7 @@ module.exports = {
     "Host":
     {
         "domain": "HOST_NAME",
-        "port": "HOST_SIPUSERENDPOINT_PORT",
+        "port": "HOST_SIPUSERENDPOINTSERVICE_PORT",
         "version": "HOST_VERSION"
     }
 };
