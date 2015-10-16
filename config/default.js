@@ -20,7 +20,8 @@ module.exports = {
     "User":"root",
     "Password":"DuoS123",
     "Host":"104.131.105.222",
-    "Database":"kamailio"
+    "Database":"kamailio",
+    "Port":"3306"
   },
 
   "Host":

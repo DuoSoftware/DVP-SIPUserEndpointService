@@ -17,6 +17,7 @@ var AddOrUpdateLbUser = function(reqId, usrInfo, callback)
     {
         var connection = mysql.createConnection({
             host     : config.Kamailio.Host,
+            port     : config.Kamailio.Port,
             user     : config.Kamailio.User,
             password : config.Kamailio.Password,
             database : config.Kamailio.Database

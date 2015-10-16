@@ -18,10 +18,11 @@ module.exports = {
 
     "Kamailio":
     {
-        "User":"SYS_KAMAILIODB_USER",
-        "Password":"SYS_KAMAILIODB_PASSWORD",
-        "Host":"SYS_KAMAILIODB_HOST",
-        "Database":"SYS_KAMAILIODB_DATABASE"
+        "User":"SYS_LBDATABASE_MYSQL_USER",
+        "Password":"SYS_LBDATABASE_MYSQL_PASSWORD",
+        "Host":"SYS_LBDATABASE_HOST",
+        "Port":"SYS_LBMYSQL_PORT",
+        "Database":"SYS_LBDATABASE_MYSQL_DB"
     },
 
     "Host":
