@@ -131,7 +131,7 @@ var UpdatePublicUser = function(reqId, publicUserInfo, callback)
             {
                 //save new user
 
-                AddOrUpdateKamailioUser(reqId, publicUserInfo, function(err)
+                AddOrUpdateLbUser(reqId, publicUserInfo, function(err)
                 {
 
                 });
