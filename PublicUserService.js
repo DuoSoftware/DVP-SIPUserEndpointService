@@ -32,6 +32,7 @@ var AddOrUpdateLbUser = function(reqId, usrInfo, callback)
             if (err)
             {
                 connection.end();
+                logger.error('[DVP-PBXService.AddOrUpdateLbUser] - [%s] - MYSQL Update Subscriber', reqId, err);
                 callback(err, false);
             }
             else
@@ -45,6 +46,7 @@ var AddOrUpdateLbUser = function(reqId, usrInfo, callback)
                         if (err)
                         {
                             callback(err, false);
+                            logger.error('[DVP-PBXService.AddOrUpdateLbUser] - [%s] - MYSQL Update Subscriber', reqId, err);
                             connection.end();
                         }
                         else
@@ -63,6 +65,7 @@ var AddOrUpdateLbUser = function(reqId, usrInfo, callback)
                         if (err)
                         {
                             callback(err, false);
+                            logger.error('[DVP-PBXService.AddOrUpdateLbUser] - [%s] - MYSQL Update Subscriber', reqId, err);
                             connection.end();
                         }
                         else
@@ -77,6 +80,7 @@ var AddOrUpdateLbUser = function(reqId, usrInfo, callback)
     }
     catch(ex)
     {
+        logger.error('[DVP-PBXService.AddOrUpdateLbUser] - [%s] - MYSQL Update Subscriber', reqId, ex);
         callback(ex, undefined);
 
     }
@@ -99,6 +103,7 @@ var UpdatePublicUser = function(reqId, publicUserInfo, callback)
 
                     AddOrUpdateLbUser(reqId, publicUserInfo, function(err, rslt)
                     {
+
                         delete publicUserInfo.CompanyId;
                         delete publicUserInfo.TenantId;
                         delete publicUserInfo.SipUserUuid;
