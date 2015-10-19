@@ -86,6 +86,7 @@ var UpdatePublicUser = function(reqId, publicUserInfo, callback)
 {
     try
     {
+        var chance = new Chance();
         DbConn.SipUACEndpoint.find({where: [{SipUsername: publicUserInfo.SipUsername}]}).then(function (sipUsr)
         {
             if(sipUsr)
@@ -195,7 +196,7 @@ function AddPublicUser(req,reqId,callback)
     logger.debug('[DVP-SIPUserEndpointService.AddPublicUser] - [%s] - Public user adding started Username -  %s ',reqId,req.SipUsername);
     try
     {
-        chance = new Chance();
+        var chance = new Chance();
 
         var User=req.AreaCode.concat(req.Phone);
 
@@ -472,6 +473,7 @@ function PinOfUser(Usnm,reqId,callback)
 
 function ReGeneratePin(Usnm,reqId,callback)
 {
+    var chance = new Chance();
     logger.debug('[DVP-SIPUserEndpointService.ResetAttempts] - [%s] -Pin ReGenerating of %s started ',reqId,Usnm);
 
         DbConn.SipUACEndpoint.find({where:[{SipUsername:Usnm}]}).then(function(resUser)
