@@ -44,7 +44,7 @@ RestServer.use(restify.queryParser());
 RestServer.use(cors());
 
 
-RestServer.post('/DVP/API/' + version + '/SipUser/DidNumber', function(req, res, next)
+RestServer.post('/DVP/API/:version/SipUser/DidNumber', function(req, res, next)
 {
     var reqId = uuid.v1();
     try
@@ -99,7 +99,7 @@ RestServer.post('/DVP/API/' + version + '/SipUser/DidNumber', function(req, res,
 
 });
 
-RestServer.post('/DVP/API/' + version + '/SipUser/EmergencyNumber', function(req, res, next)
+RestServer.post('/DVP/API/:version/SipUser/EmergencyNumber', function(req, res, next)
 {
     var reqId = uuid.v1();
     try
@@ -154,7 +154,7 @@ RestServer.post('/DVP/API/' + version + '/SipUser/EmergencyNumber', function(req
 
 });
 
-RestServer.post('/DVP/API/' + version + '/SipUser/DodNumber', function(req, res, next)
+RestServer.post('/DVP/API/:version/SipUser/DodNumber', function(req, res, next)
 {
     var reqId = uuid.v1();
     try
@@ -206,7 +206,7 @@ RestServer.post('/DVP/API/' + version + '/SipUser/DodNumber', function(req, res,
 
 });
 
-RestServer.post('/DVP/API/' + version + '/SipUser/DidNumber/:id/Activate/:isActive', function(req, res, next)
+RestServer.post('/DVP/API/:version/SipUser/DidNumber/:id/Activate/:isActive', function(req, res, next)
 {
     var reqId = uuid.v1();
     try
@@ -257,7 +257,7 @@ RestServer.post('/DVP/API/' + version + '/SipUser/DidNumber/:id/Activate/:isActi
 
 });
 
-RestServer.del('/DVP/API/' + version + '/SipUser/DidNumber/:id', function(req, res, next)
+RestServer.del('/DVP/API/:version/SipUser/DidNumber/:id', function(req, res, next)
 {
     var reqId = uuid.v1();
     try
@@ -309,7 +309,7 @@ RestServer.del('/DVP/API/' + version + '/SipUser/DidNumber/:id', function(req, r
 
 });
 
-RestServer.del('/DVP/API/' + version + '/SipUser/EmergencyNumber/:emergencyNum', function(req, res, next)
+RestServer.del('/DVP/API/:version/SipUser/EmergencyNumber/:emergencyNum', function(req, res, next)
 {
     var reqId = uuid.v1();
     try
@@ -361,7 +361,7 @@ RestServer.del('/DVP/API/' + version + '/SipUser/EmergencyNumber/:emergencyNum',
 
 });
 
-RestServer.get('/DVP/API/' + version + '/SipUser/EmergencyNumbers', function(req, res, next)
+RestServer.get('/DVP/API/:version/SipUser/EmergencyNumbers', function(req, res, next)
 {
     var emptyArr = [];
     var reqId = uuid.v1();
@@ -413,7 +413,7 @@ RestServer.get('/DVP/API/' + version + '/SipUser/EmergencyNumbers', function(req
 
 });
 
-RestServer.get('/DVP/API/' + version + '/SipUser/DidNumbers', function(req, res, next)
+RestServer.get('/DVP/API/:version/SipUser/DidNumbers', function(req, res, next)
 {
     var emptyArr = [];
     var reqId = uuid.v1();
@@ -465,7 +465,7 @@ RestServer.get('/DVP/API/' + version + '/SipUser/DidNumbers', function(req, res,
 
 });
 
-RestServer.post('/DVP/API/' + version + '/SipUser/AssignDidNumberToExtension', function(req, res, next)
+RestServer.post('/DVP/API/:version/SipUser/AssignDidNumberToExtension', function(req, res, next)
 {
     var reqId = uuid.v1();
     try
@@ -536,7 +536,7 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, nex
         var securityToken = req.header('authorization');
         var reqBody = req.body;
 
-        logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
+        logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
 
         if(reqBody && securityToken)
         {
@@ -548,13 +548,13 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, nex
                 if (err)
                 {
                     var jsonString = messageFormatter.FormatMessage(err, "Add NewDidNumber Failed", false, false);
-                    logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
                     res.end(jsonString);
                 }
                 else
                 {
-                    var jsonString = messageFormatter.FormatMessage(err, "Add NewDidNumber Success", true, addResult);
-                    logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    var jsonString = messageFormatter.FormatMessage(err, "Add DuoWorldUser Success", true, addResult);
+                    logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
                     res.end(jsonString);
                 }
 
@@ -564,7 +564,7 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, nex
         else
         {
             var jsonString = messageFormatter.FormatMessage(new Error('Empty request body or no authorization token set'), "Empty request body or no authorization token set", false, false);
-            logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
             res.end(jsonString);
 
         }
@@ -573,7 +573,7 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, nex
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - Exception Occurred', reqId, ex);
+        logger.error('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - Exception Occurred', reqId, ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, false);
         logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - API RESPONSE : %s', reqId, jsonString);
         res.end(jsonString);
