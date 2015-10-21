@@ -480,49 +480,7 @@ function ChangeUserAvailability(tenant,ext,st,reqId,callback) {
 
 
 
-        /* complete(function (errExt, resExt) {
 
-         if (errExt) {
-
-         logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Error in searching ExtensionRefId %s of Tenant %s',reqId,ext,tenant,errExt);
-         callback(errExt, undefined);
-         }
-         else
-         {
-
-         if (resExt) {
-         logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s of Tenant %s ',reqId,st,ext,tenant);
-         try {
-         resExt.updateAttributes(
-         {
-         Enabled: st
-
-         }
-         ).then(function (resUpdate) {
-
-         logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s of Tenant %s is succeeded ',reqId,st,ext,tenant);
-         callback(undefined, resUpdate);
-
-         }).error(function (errUpdate) {
-
-         logger.error('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s of Tenant %s is failed ',reqId,st,ext,tenant,errUpdate);
-         callback(new Error("Error Found in updating"),undefined);
-
-         });
-         }
-         catch (ex) {
-         logger.error('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Exception in Updating status to %s of ExtensionRefId %s of Tenant %s ',reqId,st,ext,tenant,ex);
-         callback(ex, undefined);
-         }
-
-
-         }
-         else {
-         logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - No record found for Extension %s of Tenant %s ',reqId,ext,tenant);
-         callback(new Error("Error Occurred"), undefined);
-         }
-         }
-         });*/
     }
     catch(ex)
     {
@@ -580,35 +538,7 @@ function CreateExtension(reqExt,Company,Tenant,reqId,callback) {
 
 
 
-                /* complete(function (errExt, resExt) {
 
-                 if (errExt) {
-                 logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,obj.Extension,errExt);
-                 callback(errExt, undefined);
-                 }
-
-
-                 else
-                 {
-                 if (!resExt) {
-
-
-                 logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,obj.Extension);
-
-                 SaveExtension(obj,Company,Tenant,reqId,function (errStatus,resStatus) {
-                 callback(errStatus,resStatus);
-                 });
-
-
-                 }
-                 else  {
-
-                 logger.error('[DVP-SIPUserEndpointService.NewExtension] - [%s]   - Exception %s already In DB ',reqId,obj.Extension);
-                 callback(new Error("Already in DataBase"), undefined);
-                 }
-                 }
-
-                 });*/
 
             }
             catch (ex) {
