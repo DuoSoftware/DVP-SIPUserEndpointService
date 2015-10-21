@@ -213,9 +213,9 @@ var DeleteDidNumberDB = function(reqId, didNumId, companyId, tenantId, callback)
         {
             if(didRec)
             {
-                didRec.destroy().complete(function (result)
+                didRec.destroy().then(function (result)
                 {
-                    logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success', err);
+                    logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success');
                     callback(undefined, true);
 
                 }).catch(function(err)
@@ -227,6 +227,7 @@ var DeleteDidNumberDB = function(reqId, didNumId, companyId, tenantId, callback)
             else
             {
                 logger.debug('[DVP-SIPUserEndpointService.DeleteDidNumberDB] - [%s] - PGSQL Get did number query success', reqId);
+                callback(new Error('Did record not found'), false);
             }
 
         }).catch(function(err)
