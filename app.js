@@ -519,69 +519,6 @@ RestServer.get('/DVP/API/:version/SipUser/DidNumbers', function(req, res, next)
 
 });
 
-RestServer.post('/DVP/API/:version/SipUser/AssignDidNumberToExtension', function(req, res, next)
-{
-    var reqId = uuid.v1();
-    try
-    {
-        var securityToken = req.header('authorization');
-        var reqBody = req.body;
-
-        logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtension] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
-
-        if(reqBody && securityToken)
-        {
-            var extId = req.body.ExtensionId;
-            var didId = req.body.DidId;
-
-            if(extId && didId)
-            {
-                Extmgt.AssignDidNumberToExtDB(reqId, didId, extId, 1, 1, function(err, assignResult)
-                {
-                    if(err)
-                    {
-                        var jsonString = messageFormatter.FormatMessage(err, "Assign Did to extension Failed", false, false);
-                        logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtension] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                        res.end(jsonString);
-                    }
-                    else
-                    {
-                        var jsonString = messageFormatter.FormatMessage(err, "Assign Did to extension Success", true, assignResult);
-                        logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtension] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                        res.end(jsonString);
-                    }
-
-                })
-            }
-            else
-            {
-                var jsonString = messageFormatter.FormatMessage(new Error('Extension id and did record not given'), "Extension id and did record not given", false, false);
-                logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtension] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                res.end(jsonString);
-            }
-        }
-        else
-        {
-            var jsonString = messageFormatter.FormatMessage(new Error('Empty request body or no authorization token set'), "Empty request body or no authorization token set", false, false);
-            logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtension] - [%s] - API RESPONSE : %s', reqId, jsonString);
-            res.end(jsonString);
-
-        }
-
-
-    }
-    catch(ex)
-    {
-        logger.error('[DVP-SIPUserEndpointService.AssignDidNumberToExtension] - [%s] - Exception Occurred', reqId, ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, false);
-        logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtension] - [%s] - API RESPONSE : %s', reqId, jsonString);
-        res.end(jsonString);
-
-    }
-    return next();
-
-});
-
 RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, next)
 {
     var reqId = uuid.v1();
