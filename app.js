@@ -99,6 +99,60 @@ RestServer.post('/DVP/API/:version/SipUser/DidNumber', function(req, res, next)
 
 });
 
+RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/AssignToExt/:ext', function(req, res, next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        var securityToken = req.header('authorization');
+
+        var didNum = req.params.didNum;
+        var ext = req.params.ext;
+
+        logger.debug('[DVP-SIPUserEndpointService.AssignDidNumToExt] - [%s] - HTTP Request Received - Req Params - didNum : %s, ext : %s', reqId, didNum, ext);
+
+        if(securityToken)
+        {
+            Extmgt.AssignDidNumberToExtDB(reqId, didNum, ext, 1, 1, function (err, setResult)
+            {
+                if (err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "AssignDidNumToExt Failed", false, false);
+                    logger.debug('[DVP-SIPUserEndpointService.AssignDidNumToExt] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "AssignDidNumToExt Success", true, setResult);
+                    logger.debug('[DVP-SIPUserEndpointService.AssignDidNumToExt] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+
+            })
+
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error('No authorization token set'), "No authorization token set", false, false);
+            logger.debug('[DVP-SIPUserEndpointService.AssignDidNumToExt] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.AssignDidNumToExt] - [%s] - Exception Occurred', reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, false);
+        logger.debug('[DVP-SIPUserEndpointService.AssignDidNumToExt] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
 RestServer.post('/DVP/API/:version/SipUser/EmergencyNumber', function(req, res, next)
 {
     var reqId = uuid.v1();

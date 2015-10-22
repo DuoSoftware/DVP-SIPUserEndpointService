@@ -326,18 +326,18 @@ var GetDidNumbersForCompanyDB = function(reqId, companyId, tenantId, callback)
 
 };
 
-var AssignDidNumberToExtDB = function(reqId, didNumId, extId, companyId, tenantId, callback)
+var AssignDidNumberToExtDB = function(reqId, didNum, ext, companyId, tenantId, callback)
 {
     try
     {
-        DbConn.Extension.find({where: [{id: extId},{CompanyId: companyId},{TenantId: tenantId}]})
+        DbConn.Extension.find({where: [{Extension: ext},{CompanyId: companyId},{TenantId: tenantId}]})
             .then(function (extInf)
             {
                 if(extInf)
                 {
                     logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Get Extension query success', reqId);
 
-                    DbConn.DidNumber.find({where: [{id: didNumId},{CompanyId: companyId},{TenantId: tenantId}]})
+                    DbConn.DidNumber.find({where: [{DidNumber: didNum},{CompanyId: companyId},{TenantId: tenantId}]})
                         .then(function (didNum)
                         {
                             if(didNum)
