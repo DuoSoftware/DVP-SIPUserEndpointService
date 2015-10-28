@@ -93,63 +93,7 @@ function CreateUser(req,reqId,callback) {
                     });
 
 
-                /*complete(function (errUser, resUser) {
-                 if (errUser) {
 
-                 logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername,errUser);
-                 callback(errUser,undefined);
-
-                 } else if (resUser == null) {
-
-                 logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - No record found for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
-                 try {
-
-
-
-                 logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Saving new sip user %s',reqId,JSON.stringify(SipObj));
-
-                 SaveUser(SipObj,reqId,function (error, st) {
-
-                 if(error)
-                 {
-                 callback(error,undefined);
-                 }
-                 else {
-
-                 if (st) {
-
-                 callback(undefined, st);
-                 }
-                 else
-                 {
-                 callback(new Error("Error returns"), undefined);
-                 }
-                 }
-
-
-
-
-                 });
-
-
-                 }
-                 catch (ex) {
-
-                 logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Exception in saving UAC records',reqId,ex);
-                 callback(ex,undefined);
-
-
-                 }
-
-
-                 } else {
-
-                 logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [PGSQL] - Found sip user %s',reqId,resUser.SipUsername);
-                 callback(new Error("Cannot overwrite this record"),undefined);
-
-
-                 }
-                 });*/
 
             }
             catch (ex) {
@@ -218,7 +162,11 @@ function SaveUser(jobj,reqId,callback) {
                                                 ObjType: "OBJTYP",
                                                 ObjCategory: "OBJCAT",
                                                 AddUser: jobj.AddUser,
-                                                UpdateUser: jobj.UpdateUser
+                                                UpdateUser: jobj.UpdateUser,
+                                                TransInternalEnable:jobj.TransInternalEnable,
+                                                TransExternalEnable:jobj.TransExternalEnable,
+                                                TransConferenceEnable:jobj.TransConferenceEnable,
+                                                TransGroupEnable:jobj.TransGroupEnable
 
 
                                             }
@@ -242,24 +190,7 @@ function SaveUser(jobj,reqId,callback) {
                                                     callback(new Error('Error in mapping Context & SipUAC'),undefined);
                                                 });
 
-                                                /*
-                                                 complete(function (errContext, ContextInstancex) {
 
-                                                 if(errContext)
-                                                 {
-                                                 logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Error in Mapping context %s and SipUser %s',reqId,JSON.stringify(resContext),JSON.stringify(SIPObject),errContext);
-                                                 callback(new Error('Error in mapping Context & SipUAC'),undefined);
-                                                 }
-                                                 else
-                                                 {
-                                                 logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping context %s and SipUser %s',reqId,JSON.stringify(resContext),JSON.stringify(SIPObject));
-                                                 callback(undefined,ContextInstancex);
-                                                 }
-
-
-
-                                                 });
-                                                 */
 
 
                                             }).catch(function (errMapCldUser) {
@@ -269,35 +200,7 @@ function SaveUser(jobj,reqId,callback) {
 
 
 
-                                            /* complete(function (errCloud, CloudEndInstancex) {
 
-                                             if(errCloud)
-                                             {
-                                             logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in mapping cloud %s and SipUser %s',reqId,JSON.stringify(resCloudUser),JSON.stringify(SIPObject),errCloud);
-                                             callback(new Error('Error in mapping CEU & SipUAC'),undefined);
-                                             }
-                                             else
-                                             {
-                                             logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping cloud %s and SipUser %s',reqId,JSON.stringify(resCloudUser),JSON.stringify(SIPObject));
-                                             resContext.addSipUACEndpoint(SIPObject).complete(function (errContext, ContextInstancex) {
-
-                                             if(errContext)
-                                             {
-                                             logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Error in Mapping context %s and SipUser %s',reqId,JSON.stringify(resContext),JSON.stringify(SIPObject),errContext);
-                                             callback(new Error('Error in mapping Context & SipUAC'),undefined);
-                                             }
-                                             else
-                                             {
-                                             logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping context %s and SipUser %s',reqId,JSON.stringify(resContext),JSON.stringify(SIPObject));
-                                             callback(undefined,ContextInstancex);
-                                             }
-
-
-
-                                             });
-                                             }
-
-                                             });*/
 
 
                                         }).catch(function (errSave) {
@@ -305,50 +208,7 @@ function SaveUser(jobj,reqId,callback) {
                                             callback(errSave, undefined);
                                         });
 
-                                        /*
-                                         complete(function (errSave) {
-                                         if (errSave) {
-                                         logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Error in inserting Sip user records %s',reqId,JSON.stringify(jobj),errSave);
-                                         callback(errSave, undefined);
 
-                                         }
-                                         else {
-
-                                         logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - SipUser record added successfully',reqId);
-
-                                         resCloudUser.addSipUACEndpoint(SIPObject).complete(function (errCloud, CloudEndInstancex) {
-
-                                         if(errCloud)
-                                         {
-                                         logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in mapping cloud %s and SipUser %s',reqId,JSON.stringify(resCloudUser),JSON.stringify(SIPObject),errCloud);
-                                         callback(new Error('Error in mapping CEU & SipUAC'),undefined);
-                                         }
-                                         else
-                                         {
-                                         logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping cloud %s and SipUser %s',reqId,JSON.stringify(resCloudUser),JSON.stringify(SIPObject));
-                                         resContext.addSipUACEndpoint(SIPObject).complete(function (errContext, ContextInstancex) {
-
-                                         if(errContext)
-                                         {
-                                         logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Error in Mapping context %s and SipUser %s',reqId,JSON.stringify(resContext),JSON.stringify(SIPObject),errContext);
-                                         callback(new Error('Error in mapping Context & SipUAC'),undefined);
-                                         }
-                                         else
-                                         {
-                                         logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping context %s and SipUser %s',reqId,JSON.stringify(resContext),JSON.stringify(SIPObject));
-                                         callback(undefined,ContextInstancex);
-                                         }
-
-
-
-                                         });
-                                         }
-
-                                         });
-                                         }
-                                         });
-
-                                         */
                                     }
                                     else  {
                                         logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - No record found for context %s',reqId,jobj.Context);
@@ -365,92 +225,7 @@ function SaveUser(jobj,reqId,callback) {
 
 
 
-                                /*
-                                 .complete(function (errz, ContextObject) {
 
-                                 if (errz) {
-                                 logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in Searching Records of Context %s ',reqId,jobj.Context,errz);
-                                 callback(errz,undefined);
-                                 }
-                                 else
-                                 {
-                                 if (ContextObject) {
-
-                                 var sipUserUuid = nodeUuid.v1();
-                                 logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - Record found for Context %s and saving SipUser',reqId,jobj.Context);
-                                 var SIPObject = DbConn.SipUACEndpoint
-                                 .build(
-                                 {
-                                 SipUserUuid: sipUserUuid,
-                                 SipUsername: jobj.SipUsername,
-                                 Password: jobj.Password,
-                                 Enabled: jobj.Enabled,
-                                 ExtraData: jobj.ExtraData,
-                                 EmailAddress: jobj.EmailAddress,
-                                 GuRefId: jobj.GuRefId,
-                                 CompanyId: 1,
-                                 TenantId: 1,
-                                 ObjClass: "OBJCLZ",
-                                 ObjType: "OBJTYP",
-                                 ObjCategory: "OBJCAT",
-                                 AddUser: jobj.AddUser,
-                                 UpdateUser: jobj.UpdateUser
-
-
-                                 }
-                                 );
-
-                                 SIPObject.save().complete(function (errSave) {
-                                 if (errSave) {
-                                 logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Error in inserting Sip user records %s',reqId,JSON.stringify(jobj),errSave);
-                                 callback(errSave, undefined);
-
-                                 }
-                                 else {
-
-                                 logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - SipUser record added successfully',reqId);
-
-                                 cloudEndObject.addSipUACEndpoint(SIPObject).complete(function (errCloud, CloudEndInstancex) {
-
-                                 if(errCloud)
-                                 {
-                                 logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in mapping cloud %s and SipUser %s',reqId,JSON.stringify(cloudEndObject),JSON.stringify(SIPObject),errCloud);
-                                 callback(new Error('Error in mapping CEU & SipUAC'),undefined);
-                                 }
-                                 else
-                                 {
-                                 logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping cloud %s and SipUser %s',reqId,JSON.stringify(cloudEndObject),JSON.stringify(SIPObject));
-                                 ContextObject.addSipUACEndpoint(SIPObject).complete(function (errContext, ContextInstancex) {
-
-                                 if(errContext)
-                                 {
-                                 logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Error in Mapping context %s and SipUser %s',reqId,JSON.stringify(ContextObject),JSON.stringify(SIPObject),errContext);
-                                 callback(new Error('Error in mapping Context & SipUAC'),undefined);
-                                 }
-                                 else
-                                 {
-                                 logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping context %s and SipUser %s',reqId,JSON.stringify(ContextObject),JSON.stringify(SIPObject));
-                                 callback(undefined,ContextInstancex);
-                                 }
-
-
-
-                                 });
-                                 }
-
-                                 });
-                                 }
-                                 });
-                                 }
-                                 else  {
-                                 logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - No record found for context %s',reqId,jobj.Context);
-                                 callback(new Error("No context Found"),undefined);
-
-
-                                 }
-                                 }
-                                 });
-                                 */
                             }
                             catch(ex)
                             {
