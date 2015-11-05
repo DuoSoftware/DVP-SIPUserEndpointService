@@ -51,6 +51,7 @@ var AddOrUpdateLbUser = function(reqId, usrInfo, callback)
                         }
                         else
                         {
+                            callback(undefined, true);
                             connection.end();
                         }
                     });
@@ -70,6 +71,7 @@ var AddOrUpdateLbUser = function(reqId, usrInfo, callback)
                         }
                         else
                         {
+                            callback(undefined, true);
                             connection.end();
                         }
                     });
@@ -81,7 +83,7 @@ var AddOrUpdateLbUser = function(reqId, usrInfo, callback)
     catch(ex)
     {
         logger.error('[DVP-PBXService.AddOrUpdateLbUser] - [%s] - MYSQL Update Subscriber', reqId, ex);
-        callback(ex, undefined);
+        callback(ex, false);
 
     }
 }
