@@ -677,7 +677,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/User',function(req,res,next)
 
 //RestServer.post('/dvp/'+version+'/uac_mgmt/updt_uac',function(req,res,next)
 
-RestServer.post('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,next)
+RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,next)
 {
     var reqId='';
 
