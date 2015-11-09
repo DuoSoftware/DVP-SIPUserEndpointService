@@ -917,6 +917,115 @@ function PickCompanyExtensions(Company,Tenant,reqId,callback)
 
 }
 
+function AddTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
+{
+    if(!isNaN(Company) && !isNaN(Tenant))
+    {
+        try
+        {
+            DbConn.TransferCode
+                .create(
+                {
+                    InternalTransfer: Codeinfo.InternalTransfer,
+                    ExternalTransfer: Codeinfo.ExtensionName,
+                    GroupTransfer: Codeinfo.GroupTransfer,
+                    ConferenceTransfer: Codeinfo.ConferenceTransfer,
+                    CompanyId: Company,
+                    TenantId: Tenant,
+                    ObjClass: Codeinfo.ObjClass,
+                    ObjType: Codeinfo.jobj.ObjType,
+                    ObjCategory: Codeinfo.ObjCategory
+
+
+
+
+                }
+            ).then(function (resCode)
+                {
+                    logger.debug('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  -  Insertion succeeded for Company %d and Tenant %d',reqId,Company,Tenant);
+                    callback(undefined,resCode);
+
+                }).catch(function (errCode)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  -  TransferCodes for Company %d and Tenant %d insertion failed ',reqId,Company,Tenant,errCode);
+                    callback(errCode,undefined);
+                });
+
+        }
+        catch(ex)
+        {
+            logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  - Exception in Adding TransferCodes ',reqId,ex);
+            callback(ex, undefined);
+        }
+    }
+}
+function UpdateTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
+{
+    if(!isNaN(Company) && !isNaN(Tenant))
+    {
+        try
+        {
+            DbConn.TransferCode.findAll({where: [{CompanyId: Company}, {TenantId: Tenant}]}).then(function (resTCodes)
+            {
+
+                if (resTCodes.length==0) {
+                    logger.error('[DVP-SIPUserEndpointService.UpdateTransferCodes] - [%s] - [PGSQL]  - No record found for Company %s ',reqId,Company);
+                    callback(new Error("No record found for Company "+Company), undefined);
+
+                }
+
+
+
+                else  {
+
+                    logger.debug('[DVP-SIPUserEndpointService.UpdateTransferCodes] - [%s] - [PGSQL]  - Records found for Company %s ',reqId,Company);
+
+                    try {
+
+                        delete Codeinfo.CompanyId;
+                        delete Codeinfo.TenantId;
+
+                        resTCodes.updateAttributes(Codeinfo).then(function (resUpdate) {
+
+                            logger.debug('[DVP-LimitHandler.UACManagement.UpdateTransferCodes] - [%s] - [PGSQL]  - Updating records of Company %s Tenant %s',reqId,Company,Tenant);
+                            callback(undefined, resUpdate);
+
+                        }).catch(function (errUpdate) {
+
+
+                            logger.error('[DVP-LimitHandler.UACManagement.UpdateTransferCodes] - [%s] - [PGSQL]  - Updating records of Company %s Tenant %s',reqId,Company,Tenant,errUpdate);
+                            callback(errUpdate, undefined);
+
+                        });
+
+                    }
+                    catch (ex) {
+                        logger.error('[DVP-SIPUserEndpointService.UpdateTransferCodes] - [%s] - [PGSQL]  - Exception in updating Company %s Tenant %s',reqId,Company,Tenant,ex);
+                        callback(ex, undefined);
+                    }
+
+                   // callback(undefined, resTCodes);
+                }
+
+
+
+            }).catch(function (errTCodes)
+            {
+
+                logger.error('[DVP-SIPUserEndpointService.UpdateTransferCodes] - [%s] - [PGSQL]  - Error in searching Company %s ',reqId,Company,errTCodes);
+                callback(errTCodes, undefined);
+
+            });
+
+        }
+        catch(ex)
+        {
+            logger.error('[DVP-SIPUserEndpointService.UpdateTransferCodes] - [%s] - [PGSQL]  - Exception in Adding TransferCodes ',reqId,ex);
+            callback(ex, undefined);
+        }
+    }
+}
+
 module.exports.ChangeUserAvailability = ChangeUserAvailability;
 module.exports.CreateExtension = CreateExtension;
 module.exports.AssignToSipUser = AssignToSipUser;
@@ -933,3 +1042,5 @@ module.exports.SetDodNumberToExtDB = SetDodNumberToExtDB;
 module.exports.AddEmergencyNumberDB = AddEmergencyNumberDB;
 module.exports.DeleteEmergencyNumberDB = DeleteEmergencyNumberDB;
 module.exports.GetEmergencyNumbersForCompany = GetEmergencyNumbersForCompany;
+module.exports.AddTransferCodes = AddTransferCodes;
+module.exports.UpdateTransferCodes = UpdateTransferCodes;

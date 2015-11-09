@@ -1,18 +1,8 @@
 /**
- * Created by Administrator on 1/27/2015.
+ * Created by Pawan on 11/9/2015.
  */
-
-
-var DbConn = require('dvp-dbmodels');
-var restify = require('restify');
-var strfy = require('stringify');
-var winston=require('winston');
-var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
-
-
-
-function AddOrUpdateContext(req,reqId,callback) {
+function AddOrUpdateContext(req,reqId,callback)
+{
     logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Method Hit',reqId);
     if(req)
     {
@@ -76,8 +66,8 @@ function AddOrUpdateContext(req,reqId,callback) {
                                         callback(errSave, undefined);
 
                                     });
-                                    
-                                    
+
+
 
 
 
@@ -133,15 +123,15 @@ function AddOrUpdateContext(req,reqId,callback) {
                             }
 
                         }
-                        
+
                     }).catch(function (errContext) {
 
                         logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Error occurred while searching Context %s ',reqId,ContextObj.Context,errContext);
                         callback(errContext, undefined);
-                        
+
                     });
-                    
-                    
+
+
 
 
             }
@@ -162,80 +152,6 @@ function AddOrUpdateContext(req,reqId,callback) {
     }
 
 }
-
-function  PickUserByUUID(reqId, uuid, companyId, tenantId, callback)
-{
-    logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Method Hit',reqId);
-   if(uuid)
-   {
-       try
-       {
-           DbConn.SipUACEndpoint.find({where: [{SipUserUuid: uuid},{CompanyId: companyId},{TenantId: tenantId}]})
-               .then(function (resSip) {
-
-                   logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query completed successfully',reqId);
-                   callback(undefined, resSip);
-
-               }).catch(function (errSip) {
-
-                   logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query failed',reqId, errSip);
-                   callback(errSip, undefined);
-               });
-
-
-
-       }
-       catch(ex)
-       {
-           logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - Method call failed ',reqId, ex);
-           callback(ex, undefined);
-       }
-   }
-    else
-   {
-       logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - UUID value Undefined ');
-       callback(new Error("UUID value Undefined"), undefined);
-   }
-
-}
-
-function  PickUserByName(Username,Company,Tenant,reqId, callback)
-{
-    logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Method Hit',reqId);
-    if(Username)
-    {
-        try
-        {
-            DbConn.SipUACEndpoint.find({where: [{SipUsername: Username},{CompanyId: Company},{TenantId: Tenant}]})
-                .then(function (resSip) {
-
-                    logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Query completed successfully',reqId);
-                    callback(undefined, resSip);
-
-                }).catch(function (errSip) {
-
-                    logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Query failed',reqId, errSip);
-                    callback(errSip, undefined);
-
-                });
-
-
-
-        }
-        catch(ex)
-        {
-            logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - Method call failed ',reqId, ex);
-            callback(ex, undefined);
-        }
-    }
-    else
-    {
-        logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - UUID value Undefined ');
-        callback(new Error("Username value Undefined"), undefined);
-    }
-
-}
-
 
 function GetCompanyContextDetails(CompanyId,reqId,callback)
 {
@@ -290,5 +206,3 @@ function GetCompanyContextDetails(CompanyId,reqId,callback)
 
 module.exports.AddOrUpdateContext = AddOrUpdateContext;
 module.exports.GetCompanyContextDetails = GetCompanyContextDetails;
-module.exports.PickUserByUUID = PickUserByUUID;
-module.exports.PickUserByName = PickUserByName;
