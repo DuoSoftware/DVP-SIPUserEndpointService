@@ -534,22 +534,35 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, nex
             reqBody.CompanyId = 1;
             reqBody.TenantId = 1;
 
-            PublicUser.UpdatePublicUser(reqId, reqBody, function (err, addResult)
-            {
-                if (err)
-                {
-                    var jsonString = messageFormatter.FormatMessage(err, "Add NewDidNumber Failed", false, false);
-                    logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                    res.end(jsonString);
-                }
-                else
-                {
-                    var jsonString = messageFormatter.FormatMessage(err, "Add DuoWorldUser Success", true, addResult);
-                    logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                    res.end(jsonString);
-                }
+            var tempUsername = reqBody.SipUsername;
 
-            })
+            var c2cRegExPattern = new RegExp('@');
+
+            if(tempUsername && !c2cRegExPattern.test(tempUsername))
+            {
+                PublicUser.UpdatePublicUser(reqId, reqBody, function (err, addResult)
+                {
+                    if (err)
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Add NewDidNumber Failed", false, false);
+                        logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+                    else
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Add DuoWorldUser Success", true, addResult);
+                        logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+
+                })
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(new Error('Username empty or contains @ sign'), "Username empty or contains @ sign", false, false);
+                logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
 
         }
         else
