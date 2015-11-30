@@ -306,7 +306,7 @@ var GetDidNumbersForCompanyDB = function(reqId, companyId, tenantId, callback)
     var emptyArr = [];
     try
     {
-        DbConn.DidNumber.findAll({where: [{CompanyId: companyId},{TenantId: tenantId}]})
+        DbConn.DidNumber.findAll({where: [{CompanyId: companyId},{TenantId: tenantId}], include : [{model: DbConn.Extension, as: 'Extension'}]})
             .then(function (didNumList)
             {
                 logger.debug('[DVP-SIPUserEndpointService.GetDidNumbersForCompanyDB] - [%s] - PGSQL get did numbers for company query success', reqId);
