@@ -387,11 +387,11 @@ var AssignDidNumberToExtDB = function(reqId, didNum, ext, companyId, tenantId, c
     }
 };
 
-var SetDidNumberActiveStatusDB = function(reqId, didNumId, companyId, tenantId, isActive, callback)
+var SetDidNumberActiveStatusDB = function(reqId, didNum, companyId, tenantId, isActive, callback)
 {
     try
     {
-        DbConn.DidNumber.find({where: [{TenantId: tenantId},{CompanyId: companyId},{id: didNumId}]}).then(function (didRec)
+        DbConn.DidNumber.find({where: [{TenantId: tenantId},{CompanyId: companyId},{DidNumber: didNum}]}).then(function (didRec)
         {
             if(didRec)
             {

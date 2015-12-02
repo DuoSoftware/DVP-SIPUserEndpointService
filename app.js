@@ -254,19 +254,19 @@ RestServer.post('/DVP/API/:version/SipUser/DodNumber', function(req, res, next) 
 
 });
 
-RestServer.post('/DVP/API/:version/SipUser/DidNumber/:id/Activate/:isActive', function(req, res, next) {
+RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/Activate/:isActive', function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
         var securityToken = req.header('authorization');
-        var didId = req.params.id;
+        var didNum = req.params.didNum;
         var isActive = req.params.isActive;
 
-        logger.debug('[DVP-SIPUserEndpointService.SetDidNumberStatus] - [%s] - HTTP Request Received - Req Params : DidId : %s, isActive " %s', reqId, didId, isActive);
+        logger.debug('[DVP-SIPUserEndpointService.SetDidNumberStatus] - [%s] - HTTP Request Received - Req Params : DidId : %s, isActive " %s', reqId, didNum, isActive);
 
         if(securityToken)
         {
-            Extmgt.SetDidNumberActiveStatusDB(reqId, didId, 1, 1, isActive, function (err, assignResult) {
+            Extmgt.SetDidNumberActiveStatusDB(reqId, didNum, 1, 1, isActive, function (err, assignResult) {
                 if (err)
                 {
                     var jsonString = messageFormatter.FormatMessage(err, "Set Did Number Status Failed", false, false);
