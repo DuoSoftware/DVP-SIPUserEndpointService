@@ -306,7 +306,7 @@ var GetDidNumbersForCompanyDB = function(reqId, companyId, tenantId, callback)
     var emptyArr = [];
     try
     {
-        DbConn.DidNumber.findAll({where: [{CompanyId: companyId},{TenantId: tenantId}]})
+        DbConn.DidNumber.findAll({where: [{CompanyId: companyId},{TenantId: tenantId}], include : [{model: DbConn.Extension, as: 'Extension'}]})
             .then(function (didNumList)
             {
                 logger.debug('[DVP-SIPUserEndpointService.GetDidNumbersForCompanyDB] - [%s] - PGSQL get did numbers for company query success', reqId);
@@ -387,11 +387,11 @@ var AssignDidNumberToExtDB = function(reqId, didNum, ext, companyId, tenantId, c
     }
 };
 
-var SetDidNumberActiveStatusDB = function(reqId, didNumId, companyId, tenantId, isActive, callback)
+var SetDidNumberActiveStatusDB = function(reqId, didNum, companyId, tenantId, isActive, callback)
 {
     try
     {
-        DbConn.DidNumber.find({where: [{TenantId: tenantId},{CompanyId: companyId},{id: didNumId}]}).then(function (didRec)
+        DbConn.DidNumber.find({where: [{TenantId: tenantId},{CompanyId: companyId},{DidNumber: didNum}]}).then(function (didRec)
         {
             if(didRec)
             {

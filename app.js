@@ -254,19 +254,19 @@ RestServer.post('/DVP/API/:version/SipUser/DodNumber', function(req, res, next) 
 
 });
 
-RestServer.post('/DVP/API/:version/SipUser/DidNumber/:id/Activate/:isActive', function(req, res, next) {
+RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/Activate/:isActive', function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
         var securityToken = req.header('authorization');
-        var didId = req.params.id;
+        var didNum = req.params.didNum;
         var isActive = req.params.isActive;
 
-        logger.debug('[DVP-SIPUserEndpointService.SetDidNumberStatus] - [%s] - HTTP Request Received - Req Params : DidId : %s, isActive " %s', reqId, didId, isActive);
+        logger.debug('[DVP-SIPUserEndpointService.SetDidNumberStatus] - [%s] - HTTP Request Received - Req Params : DidId : %s, isActive " %s', reqId, didNum, isActive);
 
         if(securityToken)
         {
-            Extmgt.SetDidNumberActiveStatusDB(reqId, didId, 1, 1, isActive, function (err, assignResult) {
+            Extmgt.SetDidNumberActiveStatusDB(reqId, didNum, 1, 1, isActive, function (err, assignResult) {
                 if (err)
                 {
                     var jsonString = messageFormatter.FormatMessage(err, "Set Did Number Status Failed", false, false);
@@ -522,22 +522,35 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, nex
             reqBody.CompanyId = 1;
             reqBody.TenantId = 1;
 
-            PublicUser.UpdatePublicUser(reqId, reqBody, function (err, addResult)
-            {
-                if (err)
-                {
-                    var jsonString = messageFormatter.FormatMessage(err, "Add NewDidNumber Failed", false, false);
-                    logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                    res.end(jsonString);
-                }
-                else
-                {
-                    var jsonString = messageFormatter.FormatMessage(err, "Add DuoWorldUser Success", true, addResult);
-                    logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                    res.end(jsonString);
-                }
+            var tempUsername = reqBody.SipUsername;
 
-            })
+            var c2cRegExPattern = new RegExp('@');
+
+            if(tempUsername && !c2cRegExPattern.test(tempUsername))
+            {
+                PublicUser.UpdatePublicUser(reqId, reqBody, function (err, addResult)
+                {
+                    if (err)
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Add NewDidNumber Failed", false, false);
+                        logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+                    else
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Add DuoWorldUser Success", true, addResult);
+                        logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+
+                })
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(new Error('Username empty or contains @ sign'), "Username empty or contains @ sign", false, false);
+                logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
 
         }
         else
