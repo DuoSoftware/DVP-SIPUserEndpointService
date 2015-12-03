@@ -342,11 +342,43 @@ function  PickUserByName(Username,Company,Tenant,reqId, callback) {
     }
     else
     {
-        logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - UUID value Undefined ');
+        logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - Username value Undefined ');
         callback(new Error("Username value Undefined"), undefined);
     }
 
 }
+
+function  PickAllUsers(Company,Tenant,reqId, callback) {
+    logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Method Hit',reqId);
+
+        try
+        {
+            DbConn.SipUACEndpoint.findAll({where: [{CompanyId: Company},{TenantId: Tenant}]})
+                .then(function (resSip) {
+
+                    logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                    callback(undefined, resSip);
+
+                }).catch(function (errSip) {
+
+                    logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                    callback(errSip, undefined);
+
+                });
+
+
+
+        }
+        catch(ex)
+        {
+            logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - Method call failed ',reqId, ex);
+            callback(ex, undefined);
+        }
+
+
+
+}
+
 
 function UpdateUser(Username,jobj,reqId,callback) {
 
@@ -992,6 +1024,7 @@ module.exports.PickUserByUUID = PickUserByUUID;
 module.exports.PickUserByName = PickUserByName;
 module.exports.UpdateUser = UpdateUser;
 module.exports.PickCompanyUsers = PickCompanyUsers;
+module.exports.PickAllUsers = PickAllUsers;
 
 //Sip user group
 
