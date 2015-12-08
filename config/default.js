@@ -27,7 +27,7 @@ module.exports = {
   "Host":
   {
     "domain": "localhost",
-    "port": 8085,
+    "port": 8086,
     "version":"6.0"
   }
 };

@@ -716,6 +716,51 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,ne
 
 });
 
+// no swagger
+RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',function(req,res,next) {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.UpdateUserStatus] - [%s] - [HTTP]  - Request received -  Data - Username %s Status %s ',reqId,req.params.Username,req.params.st);
+
+        SipbackendHandler.UpdateUserStatus(req.params.Username,req.params.st,reqId,function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateUserStatus] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateUserStatus] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.UpdateUserStatus] - [%s] - [HTTP]  - Exception in Request -  Data - Username %s Status %s ',reqId,req.params.Username,req.params.st,ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.UpdateUserStatus] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
 //no swagger
 RestServer.get('/DVP/API/'+version+'/SipUser/Users',function(req,res,next) {
     var reqId='';
