@@ -1037,6 +1037,54 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension',function(req,res,next) 
     return next();
 
 });
+//no swagger
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var Company=1;
+    var Tenant=1;
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req.body));
+
+        Extmgt.UpdateExtension(req.params.Extension,req.body,Company,Tenant,reqId,function (errExt, resExt) {
+            if(errExt)
+            {
+                var jsonString = messageFormatter.FormatMessage(errExt, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resExt);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - [HTTP]  - Exception in Request -  Data - %s',reqId,JSON.stringify(req.body),ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
 
 RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUser/:id',function(req,res,next) {
     var reqId='';
