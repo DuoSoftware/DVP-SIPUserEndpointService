@@ -660,6 +660,9 @@ function UpdateExtension(ext,reqExt,Company,Tenant,reqId,callback) {
 
 }
 
+
+
+
 function AssignToSipUser(Ext,UAC,Company,Tenant,reqId,callback) {
 
     try
