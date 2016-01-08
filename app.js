@@ -1636,6 +1636,8 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/User',function
 
 });
 
+
+// access taken company id problem
 RestServer.get('/DVP/API/'+version+'/SipUser/Extensions/OfCompany/:companyid',function(req,res,next) {
     var reqId='';
 

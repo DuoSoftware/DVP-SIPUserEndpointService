@@ -606,7 +606,8 @@ function UpdateExtension(ext,reqExt,Company,Tenant,reqId,callback) {
                             CompanyId: Company,
                             TenantId: Tenant,
                             AddUser: obj.AddUser,
-                            UpdateUser: obj.UpdateUser
+                            UpdateUser: obj.UpdateUser,
+                            Enabled:obj.Enabled
 
 
                         }).then(function (response) {
