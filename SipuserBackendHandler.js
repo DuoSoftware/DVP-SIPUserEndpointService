@@ -342,11 +342,43 @@ function  PickUserByName(Username,Company,Tenant,reqId, callback) {
     }
     else
     {
-        logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - UUID value Undefined ');
+        logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - Username value Undefined ');
         callback(new Error("Username value Undefined"), undefined);
     }
 
 }
+
+function  PickAllUsers(Company,Tenant,reqId, callback) {
+    logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Method Hit',reqId);
+
+        try
+        {
+            DbConn.SipUACEndpoint.findAll({where: [{CompanyId: Company},{TenantId: Tenant},{Enabled:"TRUE"}]})
+                .then(function (resSip) {
+
+                    logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                    callback(undefined, resSip);
+
+                }).catch(function (errSip) {
+
+                    logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                    callback(errSip, undefined);
+
+                });
+
+
+
+        }
+        catch(ex)
+        {
+            logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - Method call failed ',reqId, ex);
+            callback(ex, undefined);
+        }
+
+
+
+}
+
 
 function UpdateUser(Username,jobj,reqId,callback) {
 
@@ -355,7 +387,7 @@ function UpdateUser(Username,jobj,reqId,callback) {
         delete jobj.SipUserUuid;
         delete jobj.CompanyId;
         delete jobj.TenantId;
-
+console.log(JSON.stringify(jobj));
         try
         {
             DbConn.SipUACEndpoint
@@ -364,7 +396,7 @@ function UpdateUser(Username,jobj,reqId,callback) {
 
                     if (!resUser) {
 
-                        logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,jobj.SipUsername);
+                        logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,Username);
                         callback(new Error("No SipUser record found"), undefined);
 
                     }
@@ -375,32 +407,96 @@ function UpdateUser(Username,jobj,reqId,callback) {
 
                             resUser.updateAttributes(jobj).then(function (resUpdate) {
 
-                                logger.debug('[DVP-LimitHandler.UACManagement.UpdateUser] - [%s] - [PGSQL]  - Updating records of SipUser %s is succeeded ',reqId,jobj.SipUsername);
+                                logger.debug('[DVP-LimitHandler.UACManagement.UpdateUser] - [%s] - [PGSQL]  - Updating records of SipUser %s is succeeded ',reqId,Username);
                                 callback(undefined, resUpdate);
 
                             }).catch(function (errUpdate) {
 
                                 console.log("Project update failed ! " + errUpdate);
-                                logger.error('[DVP-LimitHandler.UACManagement.UpdateUser] - [%s] - [PGSQL]  - Updating records of SipUser %s is failed - Data %s ',reqId,jobj.SipUsername,JSON.stringify(jobj),errUpdate);
+                                logger.error('[DVP-LimitHandler.UACManagement.UpdateUser] - [%s] - [PGSQL]  - Updating records of SipUser %s is failed - Data %s ',reqId,Username,JSON.stringify(jobj),errUpdate);
                                 callback(errUpdate, undefined);
 
                             });
 
                         }
                         catch (ex) {
-                            logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [PGSQL]  - Exception in updating SipUser %s ',reqId,jobj.SipUsername,ex);
+                            logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [PGSQL]  - Exception in updating SipUser %s ',reqId,Username,ex);
                             callback(ex, undefined);
                         }
                     }
 
                 }).catch(function (errUser) {
-                    logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUser] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,jobj.SipUsername,errUser);
+                    logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUser] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,Username,errUser);
                     callback(errUser, undefined);
                 });
         }
         catch(ex)
         {
-            logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [PGSQL]  - Exception in Method starts : UpdateUser ',reqId,jobj.SipUsername,ex);
+            logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [PGSQL]  - Exception in Method starts : UpdateUser ',reqId,Username,ex);
+            callback(ex, undefined);
+        }
+    }
+    else
+    {
+        callback(new Error("Empty request Or Undefined Username"),undefined);
+    }
+
+
+}
+
+function UpdateUserStatus(Username,status,reqId,callback) {
+
+    if(Username && status)
+    {
+        var SipObj= {
+            Enabled:status
+        };
+
+        try
+        {
+            DbConn.SipUACEndpoint
+                .find({where: [{SipUsername: Username}, {CompanyId: 1}, {TenantId: 1}]})
+                .then(function (resUser) {
+
+                    if (!resUser) {
+
+                        logger.error('[DVP-SIPUserEndpointService.UpdateUserStatus] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,Username);
+                        callback(new Error("No SipUser record found"), undefined);
+
+                    }
+                    else {
+
+                        try {
+
+
+                            resUser.updateAttributes(SipObj).then(function (resUpdate) {
+
+                                logger.debug('[DVP-LimitHandler.UACManagement.UpdateUserStatus] - [%s] - [PGSQL]  - Updating records of SipUser %s is succeeded ',reqId,Username);
+                                callback(undefined, resUpdate);
+
+                            }).catch(function (errUpdate) {
+
+                                console.log("Project update failed ! " + errUpdate);
+                                logger.error('[DVP-LimitHandler.UACManagement.UpdateUserStatus] - [%s] - [PGSQL]  - Updating records of SipUser %s is failed - Status %s ',reqId,Username,status,errUpdate);
+                                callback(errUpdate, undefined);
+
+                            });
+
+                        }
+                        catch (ex) {
+                            logger.error('[DVP-SIPUserEndpointService.UpdateUserStatus] - [%s] - [PGSQL]  - Exception in updating SipUser %s ',reqId,Username,ex);
+                            callback(ex, undefined);
+                        }
+                    }
+
+                }).catch(function (errUser) {
+                    logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUserStatus] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,Username,errUser);
+                    callback(errUser, undefined);
+                });
+        }
+        catch(ex)
+        {
+            logger.error('[DVP-SIPUserEndpointService.UpdateUserStatus] - [%s] - [PGSQL]  - Exception in Method starts : UpdateUser ',reqId,Username,ex);
             callback(ex, undefined);
         }
     }
@@ -992,6 +1088,9 @@ module.exports.PickUserByUUID = PickUserByUUID;
 module.exports.PickUserByName = PickUserByName;
 module.exports.UpdateUser = UpdateUser;
 module.exports.PickCompanyUsers = PickCompanyUsers;
+module.exports.PickAllUsers = PickAllUsers;
+module.exports.UpdateUserStatus = UpdateUserStatus;
+
 
 //Sip user group
 

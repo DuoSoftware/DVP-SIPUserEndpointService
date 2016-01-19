@@ -40,8 +40,8 @@ var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, callback)
                         .then(function (saveRes)
                         {
 
-                                logger.debug('[DVP-SIPUserEndpointService.AddEmergencyNumbersDB] - [%s] - PGSQL query success', reqId);
-                                callback(undefined, true, emerNum.id);
+                            logger.debug('[DVP-SIPUserEndpointService.AddEmergencyNumbersDB] - [%s] - PGSQL query success', reqId);
+                            callback(undefined, true, emerNum.id);
 
 
                         }).catch(function(err)
@@ -115,8 +115,8 @@ var GetEmergencyNumbersForCompany = function(reqId, companyId, tenantId, callbac
             .then(function (eNumData)
             {
 
-                    logger.debug('[DVP-SIPUserEndpointService.GetEmergencyNumbersForCompany] - [%s] - Get emergency numbers PGSQL query success', reqId);
-                    callback(undefined, eNumData);
+                logger.debug('[DVP-SIPUserEndpointService.GetEmergencyNumbersForCompany] - [%s] - Get emergency numbers PGSQL query success', reqId);
+                callback(undefined, eNumData);
 
 
             }).catch(function(err)
@@ -564,6 +564,106 @@ function CreateExtension(reqExt,Company,Tenant,reqId,callback) {
 
 }
 
+function UpdateExtension(ext,reqExt,Company,Tenant,reqId,callback) {
+
+    if(reqExt)
+    {
+        try {
+            var obj = reqExt;
+
+        }
+        catch (ex) {
+            callback(ex,undefined);
+        }
+
+
+        if(ext)
+        {
+            try {
+                DbConn.Extension.find({where: [{Extension: ext}, {CompanyId: Company},{TenantId:Tenant}]}).then(function (resExt)
+                {
+
+                    if (!resExt) {
+
+
+                        logger.error('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,ext);
+                        callback(new Error("No Extension found"),undefined);
+
+
+
+                    }
+                    else  {
+
+                        resExt.updateAttributes({
+
+
+                            ExtensionName: obj.ExtensionName,
+                            ExtraData: obj.ExtraData,
+                            ExtRefId: obj.ExtRefId,
+                            ObjClass: "OBJCLZ",
+                            ObjType: "USER",
+                            ObjCategory: obj.ObjCategory,
+                            CompanyId: Company,
+                            TenantId: Tenant,
+                            AddUser: obj.AddUser,
+                            UpdateUser: obj.UpdateUser,
+                            Enabled:obj.Enabled
+
+
+                        }).then(function (response) {
+
+                            logger.debug('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - [PGSQL]  - Updating Extenstion  %s  is succeeded ',reqId,ext);
+                            callback(undefined, response);
+
+                        }).catch(function (errExt) {
+
+                            logger.error('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - [PGSQL]  -  Updating Extenstion  %s failed ',reqId,ext,errExt);
+                            callback(errExt, undefined);
+                        });
+
+
+
+                    }
+
+
+                }).catch(function (errExts)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,ext,errExts);
+                    callback(errExts, undefined);
+                });
+
+
+
+
+
+
+            }
+            catch (ex) {
+
+                logger.error('[DVP-SIPUserEndpointService.UpdateExtension] - [%s]   - Exception in searching Extension %s ',reqId,ext);
+                callback(ex,undefined);
+            }
+        }
+        else
+        {
+            logger.error('[DVP-SIPUserEndpointService.UpdateExtension] - [%s]   - Extension value is Undefined',reqId);
+            callback(new Error("Extension value is Undefined"),undefined);
+        }
+
+
+    }
+    else
+    {
+        callback(new Error("Empty request"),undefined);
+    }
+
+
+
+}
+
+
+
+
 function AssignToSipUser(Ext,UAC,Company,Tenant,reqId,callback) {
 
     try
@@ -1004,7 +1104,7 @@ function UpdateTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
                         callback(ex, undefined);
                     }
 
-                   // callback(undefined, resTCodes);
+                    // callback(undefined, resTCodes);
                 }
 
 
@@ -1044,3 +1144,4 @@ module.exports.DeleteEmergencyNumberDB = DeleteEmergencyNumberDB;
 module.exports.GetEmergencyNumbersForCompany = GetEmergencyNumbersForCompany;
 module.exports.AddTransferCodes = AddTransferCodes;
 module.exports.UpdateTransferCodes = UpdateTransferCodes;
+module.exports.UpdateExtension = UpdateExtension;
