@@ -152,6 +152,7 @@ function SaveUser(jobj,reqId,callback) {
                                                 ExtraData: jobj.ExtraData,
                                                 EmailAddress: jobj.EmailAddress,
                                                 GuRefId: jobj.GuRefId,
+                                                Pin:jobj.Pin,
                                                 CompanyId: 1,
                                                 TenantId: 1,
                                                 ObjClass: "OBJCLZ",
@@ -404,6 +405,10 @@ console.log(JSON.stringify(jobj));
 
                         try {
 
+                            delete jobj.SipUsername;
+                            delete jobj.SipUserUuid;
+                            delete jobj.CompanyId;
+                            delete jobj.TenantId;
 
                             resUser.updateAttributes(jobj).then(function (resUpdate) {
 

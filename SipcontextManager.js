@@ -214,16 +214,11 @@ function PickAllContexts(Company,Tenant,reqId,callback)
         .findAll({where:[{CompanyId:Company},{TenantId:Tenant}]})
         .then(function (resContext) {
 
-            if (!resContext) {
 
-                logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [PGSQL] - No Context record found ',reqId);
-                callback(new Error("No context record found"),undefined);
 
-            } else {
+            logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s]  - Context records found',reqId);
+            callback(undefined,resContext);
 
-                logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s]  - Context records found',reqId);
-                callback(undefined,resContext);
-            }
 
         }).catch(function (errContext) {
 
@@ -234,6 +229,39 @@ function PickAllContexts(Company,Tenant,reqId,callback)
 }
 
 
+
+function UpdateContext(company,tenant,contextObj,reqId,callback)
+{
+    logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [PGSQL] - Method Hit',reqId);
+
+    if(contextObj)
+    {
+        delete contextObj.Context;
+        delete contextObj.CompanyId;
+        delete contextObj.TenantId;
+
+        DbConn.Context
+            .find({where: [{Context: ContextObj.Context},{CompanyId:company},{TenantId:tenant}]})
+            .then(function (resContext) {
+
+                logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records found %s',reqId,ContextObj.Context);
+                callback(undefined,resContext);
+
+            }).catch(function (errContext) {
+                logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [PGSQL] - Error occurred while searching Contexts %s ',reqId,ContextObj.Context,errContext);
+                callback(errContext,undefined);
+            })
+    }
+    else
+    {
+        logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [PGSQL] - Body not found Contexts %s ',reqId,ContextObj.Context);
+        callback(new Error("Empty Body found"),undefined);
+    }
+
+}
+
+
 module.exports.AddOrUpdateContext = AddOrUpdateContext;
 module.exports.GetCompanyContextDetails = GetCompanyContextDetails;
 module.exports.PickAllContexts = PickAllContexts;
+module.exports.UpdateContext = UpdateContext;

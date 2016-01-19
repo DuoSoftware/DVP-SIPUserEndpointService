@@ -2,13 +2,13 @@
  * Created by pawan on 2/10/2015.
  */
 // TODO :- URL fixing (ex:- by Company)
-    // in saving add pin to db
-    // update pin also
-    // update context of user
-    // on get context was not sent
+// in saving add pin to db :- done
+// update pin also :- done
+// update context of user
+// on get context was not sent
 
-    // Transfer codes
-    //
+// Transfer codes
+//
 
 
 
@@ -686,6 +686,56 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Contexts',function(req,res,next) {
 
 });
 
+// no swagger
+RestServer.post('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,next) {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+    var company=1;
+    var tenant=1;
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [HTTP]  - Request received -  Context :%s Data - %s ',reqId,req.params.context,JSON.stringify(req.body));
+
+        context.UpdateContext(company,tenant,req.body,reqId, function (err, resz) {
+
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [HTTP]  - Exception on Request received - Context :%s Data - %s ',reqId,req.params.context,JSON.stringify(req.body));
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
 RestServer.post('/DVP/API/'+version+'/SipUser/User',function(req,res,next) {
     var reqId='';
 
@@ -774,6 +824,8 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,ne
     return next();
 
 });
+
+
 
 // no swagger
 RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',function(req,res,next) {
@@ -1852,23 +1904,23 @@ RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',function(req,
 
     try
     {
-      PublicUser.ActivatePublicUser(req.body.SipUsername,req.body.Pin,reqId,function(err,resz)
-      {
-          if(err)
-          {
+        PublicUser.ActivatePublicUser(req.body.SipUsername,req.body.Pin,reqId,function(err,resz)
+        {
+            if(err)
+            {
 
-              var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
-              logger.debug('[DVP-SIPUserEndpointService.ActivatePublicUser] - [%s] - Request response : %s ',reqId,jsonString);
-              res.end(jsonString);
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.ActivatePublicUser] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
 
-          }
-          else
-          {
-              var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
-              logger.debug('[DVP-SIPUserEndpointService.ActivatePublicUser] - [%s] - Request response : %s ',reqId,jsonString);
-              res.end(jsonString);
-          }
-      })
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.ActivatePublicUser] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        })
     }
     catch(ex)
     {
@@ -1878,7 +1930,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',function(req,
         res.end(jsonString);
     }
 
-next();
+    next();
 });
 
 RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/:User/Pin',function(req,res,next) {
@@ -2037,7 +2089,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint',function(req,res,next) {
         res.end(jsonString);
     }
 
-next();
+    next();
 });
 
 RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint/:user/Availability',function(req,res,next) {
