@@ -230,7 +230,7 @@ function PickAllContexts(Company,Tenant,reqId,callback)
 
 
 
-function UpdateContext(company,tenant,contextObj,reqId,callback)
+function UpdateContext(company,tenant,context,contextObj,reqId,callback)
 {
     logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [PGSQL] - Method Hit',reqId);
 
@@ -241,23 +241,43 @@ function UpdateContext(company,tenant,contextObj,reqId,callback)
         delete contextObj.TenantId;
 
         DbConn.Context
-            .find({where: [{Context: ContextObj.Context},{CompanyId:company},{TenantId:tenant}]})
+            .find({where: [{Context: context},{CompanyId:company},{TenantId:tenant}]})
             .then(function (resContext) {
 
-                logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records found %s',reqId,ContextObj.Context);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records found %s',reqId,context);
                 callback(undefined,resContext);
 
             }).catch(function (errContext) {
-                logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [PGSQL] - Error occurred while searching Contexts %s ',reqId,ContextObj.Context,errContext);
+                logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [PGSQL] - Error occurred while searching Contexts %s ',reqId,context,errContext);
                 callback(errContext,undefined);
             })
     }
     else
     {
-        logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [PGSQL] - Body not found Contexts %s ',reqId,ContextObj.Context);
+        logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [PGSQL] - Body not found Contexts %s ',reqId,context);
         callback(new Error("Empty Body found"),undefined);
     }
 
+}
+
+function PickContext(company,tenant,context,reqId,callback)
+{
+    DbConn.Context
+        .find({where:[{CompanyId:company},{TenantId:tenant},{Context:context}]})
+        .then(function (resContext) {
+
+
+
+            logger.debug('[DVP-SIPUserEndpointService.PickContext] - [%s]  - Context records found',reqId);
+            callback(undefined,resContext);
+
+
+        }).catch(function (errContext) {
+
+            logger.error('[DVP-SIPUserEndpointService.PickContext] - [%s] - [PGSQL] - Error occurred while searching Contexts %s ',reqId,errContext);
+            callback(errContext, undefined);
+
+        });
 }
 
 
@@ -265,3 +285,4 @@ module.exports.AddOrUpdateContext = AddOrUpdateContext;
 module.exports.GetCompanyContextDetails = GetCompanyContextDetails;
 module.exports.PickAllContexts = PickAllContexts;
 module.exports.UpdateContext = UpdateContext;
+module.exports.PickContext = PickContext;
