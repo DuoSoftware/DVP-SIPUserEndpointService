@@ -1,6 +1,11 @@
 /**
  * Created by Pawan on 11/9/2015.
  */
+
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var DbConn = require('dvp-dbmodels');
+
+
 function AddOrUpdateContext(req,reqId,callback)
 {
     logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Method Hit',reqId);
@@ -203,6 +208,32 @@ function GetCompanyContextDetails(CompanyId,reqId,callback)
 }
 
 
+function PickAllContexts(Company,Tenant,reqId,callback)
+{
+    DbConn.Context
+        .findAll({where:[{CompanyId:Company},{TenantId:Tenant}]})
+        .then(function (resContext) {
+
+            if (!resContext) {
+
+                logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [PGSQL] - No Context record found ',reqId);
+                callback(new Error("No context record found"),undefined);
+
+            } else {
+
+                logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s]  - Context records found',reqId);
+                callback(undefined,resContext);
+            }
+
+        }).catch(function (errContext) {
+
+            logger.error('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [PGSQL] - Error occurred while searching Contexts %s ',reqId,errContext);
+            callback(errContext, undefined);
+
+        });
+}
+
 
 module.exports.AddOrUpdateContext = AddOrUpdateContext;
 module.exports.GetCompanyContextDetails = GetCompanyContextDetails;
+module.exports.PickAllContexts = PickAllContexts;

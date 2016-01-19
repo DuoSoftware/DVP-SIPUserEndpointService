@@ -446,7 +446,7 @@ console.log(JSON.stringify(jobj));
 
 function UpdateUserStatus(Username,status,reqId,callback) {
 
-    if(Username && status)
+    if(Username)
     {
         var SipObj= {
             Enabled:status

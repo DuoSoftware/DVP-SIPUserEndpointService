@@ -1,3 +1,21 @@
+<<<<<<< HEAD
+=======
+/**
+ * Created by pawan on 2/10/2015.
+ */
+// TODO :- URL fixing (ex:- by Company)
+    // in saving add pin to db
+    // update pin also
+    // update context of user
+    // on get context was not sent
+
+    // Transfer codes
+    //
+
+
+
+
+>>>>>>> 3219126028785d910207c7847255f1a4100c5d79
 var restify = require('restify');
 var context=require('./SipcontextManager.js');
 var Extmgt=require('./ExtensionManagementAPI.js');
@@ -617,6 +635,54 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Context',function(req,res,next) {
         logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Exception on Request received -  Data - %s ',reqId,JSON.stringify(req.body));
         var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
         logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
+// no swagger
+RestServer.get('/DVP/API/'+version+'/SipUser/Contexts',function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+    var Company=1;
+    var Tenant=1;
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [HTTP]  - Request received ',reqId);
+
+        context.PickAllContexts(Company,Tenant,reqId,function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [HTTP]  - Exception in Request ',reqId,ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - Request response : %s ',reqId,jsonString);
         res.end(jsonString);
     }
     return next();
