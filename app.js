@@ -1,7 +1,3 @@
-/**
- * Created by pawan on 2/10/2015.
- */
-
 var restify = require('restify');
 var context=require('./SipcontextManager.js');
 var Extmgt=require('./ExtensionManagementAPI.js');
