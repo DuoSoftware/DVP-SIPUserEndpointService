@@ -87,45 +87,45 @@ function AddOrUpdateContext(company,tenant,req,reqId,callback)
 
                             logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Context found',reqId,JSON.stringify(resContext));
 
-                           /* try {
-                                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Updating picked Context data %s to %s',reqId,JSON.stringify(resContext),JSON.stringify(ContextObj));
-                                DbConn.Context
-                                    .update(
-                                    {
-                                        Description: ContextObj.Description,
-                                        ContextCat: ContextObj.ContextCat,
-                                        ObjClass: "OBJCLZ",
-                                        ObjType: "OBJTYP",
-                                        ObjCategory: "OBJCAT",
-                                        CompanyId: 1,
-                                        TenantId: 1,
-                                        AddUser: ContextObj.AddUser,
-                                        UpdateUser: ContextObj.UpdateUser
-                                    },
-                                    {
-                                        where: {
-                                            Context: ContextObj.Context
-                                        }
-                                    }
-                                ).then(function (resUpdate) {
+                            /* try {
+                             logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Updating picked Context data %s to %s',reqId,JSON.stringify(resContext),JSON.stringify(ContextObj));
+                             DbConn.Context
+                             .update(
+                             {
+                             Description: ContextObj.Description,
+                             ContextCat: ContextObj.ContextCat,
+                             ObjClass: "OBJCLZ",
+                             ObjType: "OBJTYP",
+                             ObjCategory: "OBJCAT",
+                             CompanyId: 1,
+                             TenantId: 1,
+                             AddUser: ContextObj.AddUser,
+                             UpdateUser: ContextObj.UpdateUser
+                             },
+                             {
+                             where: {
+                             Context: ContextObj.Context
+                             }
+                             }
+                             ).then(function (resUpdate) {
 
 
-                                        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s Updated successfully',reqId,ContextObj.Context);
-                                        callback(undefined, resUpdate);
+                             logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s Updated successfully',reqId,ContextObj.Context);
+                             callback(undefined, resUpdate);
 
-                                    }).catch(function (errUpdate) {
-
-
-                                        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s Updation failed',reqId,ContextObj.Context,errUpdate);
-                                        callback(errUpdate, undefined);
+                             }).catch(function (errUpdate) {
 
 
-                                    });
-                            }
-                            catch (ex) {
-                                logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Exception in updating context %s',reqId,ContextObj.Context,ex);
-                                callback(ex, undefined);
-                            }*/
+                             logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s Updation failed',reqId,ContextObj.Context,errUpdate);
+                             callback(errUpdate, undefined);
+
+
+                             });
+                             }
+                             catch (ex) {
+                             logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Exception in updating context %s',reqId,ContextObj.Context,ex);
+                             callback(ex, undefined);
+                             }*/
                             callback(new Error("Cannot override data"),undefined);
 
                         }
@@ -246,8 +246,12 @@ function UpdateContext(company,tenant,context,contextObj,reqId,callback)
             .then(function (resContext) {
 
                 logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records found %s',reqId,context);
-                
-                callback(undefined,resContext);
+                resContext.updateAttributes(contextObj).then(function (resUpdate) {
+                    callback(undefined,resUpdate);
+                }).catch(function (errUpdate) {
+                    callback(errUpdate,undefined);
+                })
+
 
             }).catch(function (errContext) {
                 logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [PGSQL] - Error occurred while searching Contexts %s ',reqId,context,errContext);
