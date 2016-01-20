@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 /**
  * Created by pawan on 2/10/2015.
  */
@@ -12,10 +10,6 @@
     // Transfer codes
     //
 
-
-
-
->>>>>>> 3219126028785d910207c7847255f1a4100c5d79
 var restify = require('restify');
 var context=require('./SipcontextManager.js');
 var Extmgt=require('./ExtensionManagementAPI.js');
