@@ -6,7 +6,7 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var DbConn = require('dvp-dbmodels');
 
 
-function AddOrUpdateContext(req,reqId,callback)
+function AddOrUpdateContext(company,tenant,req,reqId,callback)
 {
     logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Method Hit',reqId);
     if(req)
@@ -51,11 +51,11 @@ function AddOrUpdateContext(req,reqId,callback)
                                         Context: ContextObj.Context,
                                         Description: ContextObj.Description,
                                         ContextCat: ContextObj.ContextCat,
-                                        ObjClass: "OBJCLZ",
-                                        ObjType: "OBJTYP",
-                                        ObjCategory: "OBJCAT",
-                                        CompanyId: 1,
-                                        TenantId: 1,
+                                        ObjClass: ContextObj.ObjClass,
+                                        ObjType: ContextObj.ObjType,
+                                        ObjCategory: ContextObj.ObjCategory,
+                                        CompanyId: company,
+                                        TenantId: tenant,
                                         AddUser: ContextObj.AddUser,
                                         UpdateUser: ContextObj.UpdateUser
 
@@ -87,7 +87,7 @@ function AddOrUpdateContext(req,reqId,callback)
 
                             logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Context found',reqId,JSON.stringify(resContext));
 
-                            try {
+                           /* try {
                                 logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Updating picked Context data %s to %s',reqId,JSON.stringify(resContext),JSON.stringify(ContextObj));
                                 DbConn.Context
                                     .update(
@@ -125,7 +125,8 @@ function AddOrUpdateContext(req,reqId,callback)
                             catch (ex) {
                                 logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Exception in updating context %s',reqId,ContextObj.Context,ex);
                                 callback(ex, undefined);
-                            }
+                            }*/
+                            callback(new Error("Cannot override data"),undefined);
 
                         }
 
@@ -245,6 +246,7 @@ function UpdateContext(company,tenant,context,contextObj,reqId,callback)
             .then(function (resContext) {
 
                 logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records found %s',reqId,context);
+                
                 callback(undefined,resContext);
 
             }).catch(function (errContext) {

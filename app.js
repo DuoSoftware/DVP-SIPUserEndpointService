@@ -591,54 +591,6 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, nex
 //.......................................................................................................................
 
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Context',function(req,res,next) {
-    var reqId='';
-
-    try
-    {
-        reqId = uuid.v1();
-    }
-    catch(ex)
-    {
-
-    }
-
-
-
-    try {
-
-        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId,JSON.stringify(req.body));
-
-        context.AddOrUpdateContext(req.body,reqId, function (err, resz) {
-
-            if(err)
-            {
-
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false,undefined);
-                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
-                res.end(jsonString);
-            }
-            else
-            {
-                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
-                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
-                res.end(jsonString);
-
-            }
-
-        });
-    }
-    catch(ex)
-    {
-        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Exception on Request received -  Data - %s ',reqId,JSON.stringify(req.body));
-        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
-        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
-        res.end(jsonString);
-    }
-    return next();
-
-});
-
 
 
 RestServer.post('/DVP/API/'+version+'/SipUser/User',function(req,res,next) {
@@ -2480,7 +2432,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Contexts',function(req,res,next) {
 });
 
 // no swagger
-RestServer.post('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,next) {
+RestServer.put('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,next) {
     var reqId='';
 
     try
@@ -2572,6 +2524,57 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,
         logger.error('[DVP-SIPUserEndpointService.PickContext] - [%s] - [HTTP]  - Exception on Request received - Context :%s ',reqId,req.params.context);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
         logger.debug('[DVP-SIPUserEndpointService.PickContext] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
+// update swagger
+RestServer.post('/DVP/API/'+version+'/SipUser/Context',function(req,res,next) {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var company=1;
+    var tenant=1;
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId,JSON.stringify(req.body));
+
+        context.AddOrUpdateContext(company,tenant,req.body,reqId, function (err, resz) {
+
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Exception on Request received -  Data - %s ',reqId,JSON.stringify(req.body));
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
         res.end(jsonString);
     }
     return next();
