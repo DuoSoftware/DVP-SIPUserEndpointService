@@ -664,12 +664,9 @@ function AssignUserToGroup(SID,GID,reqId,callback) {
                     if(GID)
                     {
                         try {
-                            DbConn.UserGroup.find({where: [{id: GID}]}).complete(function (errGroup, resGroup) {
-                                if (errGroup) {
-                                    callback(errGroup, undefined);
-                                }
-                                else
-                                {
+                            DbConn.UserGroup.find({where: [{id: GID}]}).then(function (resGroup)
+                            {
+
                                     if(!resGroup)
                                     {
                                         callback(new Error("No group record found"), undefined);
@@ -694,8 +691,9 @@ function AssignUserToGroup(SID,GID,reqId,callback) {
                                         }
                                     }
 
-                                }
-
+                            }).catch(function(err)
+                            {
+                                callback(err, undefined);
                             })
 
                         }
