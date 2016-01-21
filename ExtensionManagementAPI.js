@@ -1159,7 +1159,7 @@ function GetTransferCode (Company,Tenant,reqId,callback)
     {
         try
         {
-            DbConn.TransferCode.find({where:[{where: [{CompanyId: Company}, {TenantId: Tenant}]}]}).then(function (resTc) {
+            DbConn.TransferCode.find({where: [{CompanyId: Company}, {TenantId: Tenant}]}).then(function (resTc) {
 
                 if(!resTc)
                 {
