@@ -319,7 +319,7 @@ function  PickUserByName(Username,Company,Tenant,reqId, callback) {
     {
         try
         {
-            DbConn.SipUACEndpoint.find({where: [{SipUsername: Username},{CompanyId: Company},{TenantId: Tenant}]})
+            DbConn.SipUACEndpoint.find({where: [{SipUsername: Username},{CompanyId: Company},{TenantId: Tenant}],include:[{model: DbConn.Extension, as:'Extension'}]})
                 .then(function (resSip) {
 
                     logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Query completed successfully',reqId);
