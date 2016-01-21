@@ -2385,7 +2385,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,
 //App design phase
 
 // no swagger
-RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode',function(req,res,next) {
 
     var reqId='';
 
@@ -2427,7 +2427,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,
 
     try
     {
-        Extmgt.GetTransferCode(Company,Tenant,req.params.id,reqId,function(err,resz)
+        Extmgt.GetTransferCode(Company,Tenant,reqId,function(err,resz)
         {
             if(err)
             {

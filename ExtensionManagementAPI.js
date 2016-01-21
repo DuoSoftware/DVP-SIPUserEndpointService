@@ -1153,33 +1153,33 @@ function UpdateTransferCodes(Company,Tenant,tID,Codeinfo,reqId,callback)
     }
 }
 
-function GetTransferCode (Company,Tenant,tID,reqId,callback)
+function GetTransferCode (Company,Tenant,reqId,callback)
 {
     if(!isNaN(Company) && !isNaN(Tenant))
     {
         try
         {
-            DbConn.TransferCode.find({where:[{where: [{CompanyId: Company}, {TenantId: Tenant},{id:tID}]}]}).then(function (resTc) {
+            DbConn.TransferCode.find({where:[{where: [{CompanyId: Company}, {TenantId: Tenant}]}]}).then(function (resTc) {
 
                 if(!resTc)
                 {
-                    logger.error('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - No TransferCode  found for ID %s ',reqId,tID);
+                    logger.error('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - No TransferCode  found  ',reqId);
                     callback(undefined,resTc);
                 }
                 else
                 {
-                    logger.debug('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - TransferCode  found for ID %s ',reqId,tID);
+                    logger.debug('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - TransferCode  found ',reqId);
                     callback(undefined,resTc);
                 }
 
             }).catch(function (errTc) {
-                logger.error('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - Error in searching TransferCode for ID %s ',reqId,tID,errTc);
+                logger.error('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - Error in searching TransferCode ',reqId,errTc);
                 callback(errTc,undefined);
             })
         }
         catch(ex)
         {
-            logger.error('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - Exception in searching TransferCode for ID %s ',reqId,tID,ex);
+            logger.error('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - Exception in searching TransferCode ',reqId,ex);
             callback(ex,undefined);
         }
     }
@@ -1190,17 +1190,17 @@ function GetTransferCode (Company,Tenant,tID,reqId,callback)
     }
 }
 
-function RemoveTransferCode (Company,Tenant,tID,reqId,callback)
+function RemoveTransferCode (Company,Tenant,reqId,callback)
 {
     if(!isNaN(Company) && !isNaN(Tenant))
     {
         try
         {
-            DbConn.TransferCode.find({where:[{where: [{CompanyId: Company}, {TenantId: Tenant},{id:tID}]}]}).then(function (resTc) {
+            DbConn.TransferCode.find({where:[{where: [{CompanyId: Company}, {TenantId: Tenant}]}]}).then(function (resTc) {
 
                 if(!resTc)
                 {
-                    logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - No TransferCode  found for ID %s ',reqId,tID);
+                    logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - No TransferCode  found for Company  %s and Tenant %s ',reqId,Co);
                     callback(undefined,resTc);
                 }
                 else
