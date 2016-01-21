@@ -2427,7 +2427,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,
 
     try
     {
-        Extmgt.UpdateTransferCodes(Company,Tenant,req.params.id,req.body,reqId,function(err,resz)
+        Extmgt.GetTransferCode(Company,Tenant,req.params.id,reqId,function(err,resz)
         {
             if(err)
             {
@@ -2457,7 +2457,76 @@ RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,
 });
 
 // no swagger
+RestServer.del('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,next) {
 
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var Company=1;
+    var Tenant=1;
+
+
+    try {
+        if(req.header('authorization'))
+        {
+            var auth = req.header('authorization');
+            var authInfo = auth.split("#");
+
+            if (authInfo.length >= 2) {
+                Tenant = authInfo[0];
+                Company = authInfo[1];
+            }
+        }
+        else
+        {
+            Tenant = 1;
+            Company = 1;
+        }
+
+    }
+    catch (ex) {
+        logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
+    }
+
+
+    try
+    {
+        Extmgt.UpdateTransferCodes(Company,Tenant,req.params.id,req.body,reqId,function(err,resz)
+        {
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [HTTP]  - Exception in Request ',ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+
+    next();
+});
 
 // App designing phase
 
