@@ -230,7 +230,6 @@ function PickAllContexts(Company,Tenant,reqId,callback)
 }
 
 
-
 function UpdateContext(company,tenant,context,contextObj,reqId,callback)
 {
     logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [PGSQL] - Method Hit',reqId);
@@ -247,8 +246,10 @@ function UpdateContext(company,tenant,context,contextObj,reqId,callback)
 
                 logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records found %s',reqId,context);
                 resContext.updateAttributes(contextObj).then(function (resUpdate) {
+                    logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records updated',reqId);
                     callback(undefined,resUpdate);
                 }).catch(function (errUpdate) {
+                    logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records updation Error',reqId,errUpdate);
                     callback(errUpdate,undefined);
                 })
 
@@ -286,9 +287,36 @@ function PickContext(company,tenant,context,reqId,callback)
         });
 }
 
+function DeleteContext(company,tenant,context,reqId,callback)
+{
+    DbConn.Context
+        .find({where:[{CompanyId:company},{TenantId:tenant},{Context:context}]})
+        .then(function (resContext) {
+
+
+
+            logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s]  - Context records found',reqId);
+            resContext.destroy().then(function (resDel) {
+                logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s]  - Context deleted successfully',reqId);
+                callback(undefined,resDel);
+            }).catch(function (errDel) {
+                logger.error('[DVP-SIPUserEndpointService.DeleteContext] - [%s]  - Context deletion error',reqId,errDel);
+                callback(errDel,undefined);
+            })
+
+
+
+        }).catch(function (errContext) {
+
+            logger.error('[DVP-SIPUserEndpointService.PickContext] - [%s] - [PGSQL] - Error occurred while searching Contexts %s ',reqId,errContext);
+            callback(errContext, undefined);
+
+        });
+}
 
 module.exports.AddOrUpdateContext = AddOrUpdateContext;
 module.exports.GetCompanyContextDetails = GetCompanyContextDetails;
 module.exports.PickAllContexts = PickAllContexts;
 module.exports.UpdateContext = UpdateContext;
 module.exports.PickContext = PickContext;
+module.exports.DeleteContext = DeleteContext;

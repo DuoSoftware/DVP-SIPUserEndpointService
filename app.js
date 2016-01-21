@@ -2580,3 +2580,53 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Context',function(req,res,next) {
     return next();
 
 });
+
+// no swagger
+RestServer.del('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,next) {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+    var company=1;
+    var tenant=1;
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s] - [HTTP]  - Request received -  Context :%s Data - %s ',reqId,req.params.context);
+
+        context.DeleteContext(company,tenant,req.params.context,reqId, function (err, resz) {
+
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.DeleteContext] - [%s] - [HTTP]  - Exception on Request received - Context :%s ',reqId,req.params.context);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
