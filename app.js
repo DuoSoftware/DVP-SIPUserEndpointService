@@ -2499,7 +2499,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,
 
     try
     {
-        Extmgt.UpdateTransferCodes(Company,Tenant,req.params.id,req.body,reqId,function(err,resz)
+        Extmgt.RemoveTransferCode(Company,Tenant,req.params.id,reqId,function(err,resz)
         {
             if(err)
             {

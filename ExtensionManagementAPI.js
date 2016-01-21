@@ -1190,6 +1190,51 @@ function GetTransferCode (Company,Tenant,tID,reqId,callback)
     }
 }
 
+function RemoveTransferCode (Company,Tenant,tID,reqId,callback)
+{
+    if(!isNaN(Company) && !isNaN(Tenant))
+    {
+        try
+        {
+            DbConn.TransferCode.find({where:[{where: [{CompanyId: Company}, {TenantId: Tenant},{id:tID}]}]}).then(function (resTc) {
+
+                if(!resTc)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - No TransferCode  found for ID %s ',reqId,tID);
+                    callback(undefined,resTc);
+                }
+                else
+                {
+                    logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - TransferCode  found for ID %s ',reqId,tID);
+                    // callback(undefined,resTc);
+
+                    resTc.destroy().then(function (resRemove) {
+                        logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - TransferCode  Removed successfully ID %s ',reqId,tID);
+                        callback(undefined,resRemove)
+                    }).catch(function (errRemove) {
+                        logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - TransferCode  Removing failed ID %s ',reqId,tID,errRemove);
+                        callback(errRemove,undefined);
+                    })
+                }
+
+            }).catch(function (errTc) {
+                logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - Error in searching TransferCode for ID %s ',reqId,tID,errTc);
+                callback(errTc,undefined);
+            })
+        }
+        catch(ex)
+        {
+            logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - Exception in searching TransferCode for ID %s ',reqId,tID,ex);
+            callback(ex,undefined);
+        }
+    }
+    else
+    {
+        logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - Invalid Values for Company and Tenant Data ',reqId);
+        callback(new Error("Invalid Company and Tenant Data"), undefined);
+    }
+}
+
 module.exports.ChangeUserAvailability = ChangeUserAvailability;
 module.exports.CreateExtension = CreateExtension;
 module.exports.AssignToSipUser = AssignToSipUser;
@@ -1210,3 +1255,4 @@ module.exports.AddTransferCodes = AddTransferCodes;
 module.exports.UpdateTransferCodes = UpdateTransferCodes;
 module.exports.UpdateExtension = UpdateExtension;
 module.exports.GetTransferCode = GetTransferCode;
+module.exports.RemoveTransferCode = RemoveTransferCode;
