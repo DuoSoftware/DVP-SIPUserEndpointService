@@ -14,7 +14,7 @@ var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, callback)
 {
     try
     {
-        DbConn.EmergencyNumber.find({where: [{EmergencyNum: emergencyNumInfo.EmergencyNumber},{TenantId: emergencyNumInfo.TenantId}]})
+        DbConn.EmergencyNumber.find({where: [{EmergencyNum: emergencyNumInfo.EmergencyNumber},{TenantId: 1}]})
             .then(function (numData)
             {
                 if(numData)
@@ -28,8 +28,8 @@ var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, callback)
                     var emerNum = DbConn.EmergencyNumber.build({
 
                         EmergencyNum: emergencyNumInfo.EmergencyNumber,
-                        CompanyId: emergencyNumInfo.CompanyId,
-                        TenantId: emergencyNumInfo.TenantId,
+                        CompanyId: 1,
+                        TenantId:1,
                         ObjClass: 'DVP',
                         ObjType: 'EMERGENCY_NUM',
                         ObjCategory: 'OUTBOUND'
@@ -77,7 +77,7 @@ var DeleteEmergencyNumberDB = function(reqId, emergencyNum, companyId, tenantId,
             {
                 eNumRec.destroy().then(function (result)
                 {
-                    logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success', err);
+                    logger.debug('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success');
                     callback(undefined, true);
                 }).catch(function(err)
                 {
