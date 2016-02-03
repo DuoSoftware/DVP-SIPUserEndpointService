@@ -2777,3 +2777,32 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,
     return next();
 
 });
+
+function Crossdomain(req,res,next){
+
+
+    var xml='<?xml version=""1.0""?><!DOCTYPE cross-domain-policy SYSTEM ""http://www.macromedia.com/xml/dtds/cross-domain-policy.dtd""> <cross-domain-policy>    <allow-access-from domain=""*"" />        </cross-domain-policy>';
+
+    /*var xml='<?xml version="1.0"?>\n';
+
+     xml+= '<!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">\n';
+     xml+='';
+     xml+=' \n';
+     xml+='\n';
+     xml+='';*/
+    req.setEncoding('utf8');
+    res.end(xml);
+
+}
+
+function Clientaccesspolicy(req,res,next){
+
+
+    var xml='<?xml version="1.0" encoding="utf-8" ?>       <access-policy>        <cross-domain-access>        <policy>        <allow-from http-request-headers="*">        <domain uri="*"/>        </allow-from>        <grant-to>        <resource include-subpaths="true" path="/"/>        </grant-to>        </policy>        </cross-domain-access>        </access-policy>';
+    req.setEncoding('utf8');
+    res.end(xml);
+
+}
+
+RestServer.get("/crossdomain.xml",Crossdomain);
+RestServer.get("/clientaccesspolicy.xml",Clientaccesspolicy);
