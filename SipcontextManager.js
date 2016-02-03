@@ -223,7 +223,7 @@ function PickAllContexts(Company,Tenant,reqId,callback)
 
         }).catch(function (errContext) {
 
-            logger.error('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [PGSQL] - Error occurred while searching Contexts %s ',reqId,errContext);
+            logger.error('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [PGSQL] - Error occurred while searching Contexts',reqId,errContext);
             callback(errContext, undefined);
 
         });
