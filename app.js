@@ -686,6 +686,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,ne
 
 // no swagger
 RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',function(req,res,next) {
+
     var reqId='';
 
     try

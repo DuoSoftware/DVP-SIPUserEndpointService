@@ -163,7 +163,8 @@ function SaveUser(jobj,reqId,callback) {
                                                 TransInternalEnable:jobj.TransInternalEnable,
                                                 TransExternalEnable:jobj.TransExternalEnable,
                                                 TransConferenceEnable:jobj.TransConferenceEnable,
-                                                TransGroupEnable:jobj.TransGroupEnable
+                                                TransGroupEnable:jobj.TransGroupEnable,
+                                                ContextId: jobj.ContextId
 
 
                                             }
