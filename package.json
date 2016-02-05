@@ -16,7 +16,7 @@
     "pg-hstore": "^2.3.2",
     "winston": "^1.0.0",
     "stringify": "^3.1.0",
-    "dvp-common": "^0.0.2"
+    "dvp-common": "^0.0.16"
   },
   "devDependencies": {},
   "scripts": {
