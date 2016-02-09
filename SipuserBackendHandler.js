@@ -136,7 +136,7 @@ function SaveUser(jobj,reqId,callback) {
                         {
                             try
                             {
-                                DbConn.Context.find({where: [{Context: jobj.Context}]}).then(function(resContext)
+                                DbConn.Context.find({where: [{Context: jobj.ContextId}]}).then(function(resContext)
                                 {
                                     if (resContext) {
 
