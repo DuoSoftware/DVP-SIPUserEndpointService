@@ -14,7 +14,7 @@ var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, callback)
 {
     try
     {
-        DbConn.EmergencyNumber.find({where: [{EmergencyNum: emergencyNumInfo.EmergencyNumber},{TenantId: emergencyNumInfo.TenantId}]})
+        DbConn.EmergencyNumber.find({where: [{EmergencyNum: emergencyNumInfo.EmergencyNumber},{TenantId: 1}]})
             .then(function (numData)
             {
                 if(numData)
@@ -28,8 +28,8 @@ var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, callback)
                     var emerNum = DbConn.EmergencyNumber.build({
 
                         EmergencyNum: emergencyNumInfo.EmergencyNumber,
-                        CompanyId: emergencyNumInfo.CompanyId,
-                        TenantId: emergencyNumInfo.TenantId,
+                        CompanyId: 1,
+                        TenantId:1,
                         ObjClass: 'DVP',
                         ObjType: 'EMERGENCY_NUM',
                         ObjCategory: 'OUTBOUND'
@@ -77,7 +77,7 @@ var DeleteEmergencyNumberDB = function(reqId, emergencyNum, companyId, tenantId,
             {
                 eNumRec.destroy().then(function (result)
                 {
-                    logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success', err);
+                    logger.debug('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success');
                     callback(undefined, true);
                 }).catch(function(err)
                 {
@@ -1073,60 +1073,80 @@ function AddTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
 {
     if(!isNaN(Company) && !isNaN(Tenant))
     {
-        try
-        {
-            DbConn.TransferCode
-                .create(
+        DbConn.TransferCode.find({where:[{CompanyId:Company},{TenantId:Tenant}]}).then(function (resTc) {
+
+            if(!resTc)
+            {
+                try
                 {
-                    InternalTransfer: Codeinfo.InternalTransfer,
-                    ExternalTransfer: Codeinfo.ExtensionName,
-                    GroupTransfer: Codeinfo.GroupTransfer,
-                    ConferenceTransfer: Codeinfo.ConferenceTransfer,
-                    CompanyId: Company,
-                    TenantId: Tenant,
-                    ObjClass: Codeinfo.ObjClass,
-                    ObjType: Codeinfo.jobj.ObjType,
-                    ObjCategory: Codeinfo.ObjCategory
+                    DbConn.TransferCode
+                        .create(
+                        {
+                            InternalTransfer: Codeinfo.InternalTransfer,
+                            ExternalTransfer: Codeinfo.ExtensionName,
+                            GroupTransfer: Codeinfo.GroupTransfer,
+                            ConferenceTransfer: Codeinfo.ConferenceTransfer,
+                            CompanyId: Company,
+                            TenantId: Tenant,
+                            ObjClass: Codeinfo.ObjClass,
+                            ObjType: Codeinfo.jobj.ObjType,
+                            ObjCategory: Codeinfo.ObjCategory
 
 
 
+
+                        }
+                    ).then(function (resCode)
+                        {
+                            logger.debug('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  -  Insertion succeeded for Company %d and Tenant %d',reqId,Company,Tenant);
+                            callback(undefined,resCode);
+
+                        }).catch(function (errCode)
+                        {
+                            logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  -  TransferCodes for Company %d and Tenant %d insertion failed ',reqId,Company,Tenant,errCode);
+                            callback(errCode,undefined);
+                        });
 
                 }
-            ).then(function (resCode)
+                catch(ex)
                 {
-                    logger.debug('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  -  Insertion succeeded for Company %d and Tenant %d',reqId,Company,Tenant);
-                    callback(undefined,resCode);
+                    logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  - Exception in Adding TransferCodes ',reqId,ex);
+                    callback(ex, undefined);
+                }
+            }
+            else
+            {
+                logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  -  TransferCodes for Company %d and Tenant %d Cannot be override  ',reqId,Company,Tenant);
+                callback(new Error("Already exist. Cannot override"),undefined);
+            }
 
-                }).catch(function (errCode)
-                {
-                    logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  -  TransferCodes for Company %d and Tenant %d insertion failed ',reqId,Company,Tenant,errCode);
-                    callback(errCode,undefined);
-                });
+        }).catch(function (errTc) {
+            logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  -  TransferCodes for Company %d and Tenant %d searching error  ',reqId,Company,Tenant,errTc);
+            callback(errTc,undefined);
+        });
 
-        }
-        catch(ex)
-        {
-            logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  - Exception in Adding TransferCodes ',reqId,ex);
-            callback(ex, undefined);
-        }
+
+    }
+    else
+    {
+        logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  - Invalid Values for Company and Tenant Data ',reqId);
+        callback(new Error("Invalid Company and Tenant Data"), undefined);
     }
 }
-function UpdateTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
+function UpdateTransferCodes(Company,Tenant,tID,Codeinfo,reqId,callback)
 {
     if(!isNaN(Company) && !isNaN(Tenant))
     {
         try
         {
-            DbConn.TransferCode.findAll({where: [{CompanyId: Company}, {TenantId: Tenant}]}).then(function (resTCodes)
+            DbConn.TransferCode.find({where: [{CompanyId: Company}, {TenantId: Tenant},{id:tID}]}).then(function (resTCodes)
             {
 
-                if (resTCodes.length==0) {
+                if(!resTCodes)
+                {
                     logger.error('[DVP-SIPUserEndpointService.UpdateTransferCodes] - [%s] - [PGSQL]  - No record found for Company %s ',reqId,Company);
                     callback(new Error("No record found for Company "+Company), undefined);
-
                 }
-
-
 
                 else  {
 
@@ -1136,6 +1156,7 @@ function UpdateTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
 
                         delete Codeinfo.CompanyId;
                         delete Codeinfo.TenantId;
+                        delete Codeinfo.id;
 
                         resTCodes.updateAttributes(Codeinfo).then(function (resUpdate) {
 
@@ -1176,6 +1197,94 @@ function UpdateTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
             callback(ex, undefined);
         }
     }
+
+    else
+    {
+        logger.error('[DVP-SIPUserEndpointService.UpdateTransferCodes] - [%s] - [PGSQL]  - Invalid Values for Company and Tenant Data ',reqId);
+        callback(new Error("Invalid Company and Tenant Data"), undefined);
+    }
+}
+
+function GetTransferCode (Company,Tenant,reqId,callback)
+{
+    if(!isNaN(Company) && !isNaN(Tenant))
+    {
+        try
+        {
+            DbConn.TransferCode.find({where: [{CompanyId: Company}, {TenantId: Tenant}]}).then(function (resTc) {
+
+                if(!resTc)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - No TransferCode  found  ',reqId);
+                    callback(undefined,resTc);
+                }
+                else
+                {
+                    logger.debug('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - TransferCode  found ',reqId);
+                    callback(undefined,resTc);
+                }
+
+            }).catch(function (errTc) {
+                logger.error('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - Error in searching TransferCode ',reqId,errTc);
+                callback(errTc,undefined);
+            })
+        }
+        catch(ex)
+        {
+            logger.error('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - Exception in searching TransferCode ',reqId,ex);
+            callback(ex,undefined);
+        }
+    }
+    else
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickTransferCode] - [%s] - [PGSQL]  - Invalid Values for Company and Tenant Data ',reqId);
+        callback(new Error("Invalid Company and Tenant Data"), undefined);
+    }
+}
+
+function RemoveTransferCode (Company,Tenant,reqId,callback)
+{
+    if(!isNaN(Company) && !isNaN(Tenant))
+    {
+        try
+        {
+            DbConn.TransferCode.find({where:[{where: [{CompanyId: Company}, {TenantId: Tenant}]}]}).then(function (resTc) {
+
+                if(!resTc)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - No TransferCode  found for Company  %s and Tenant %s ',reqId,Co);
+                    callback(undefined,resTc);
+                }
+                else
+                {
+                    logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - TransferCode  found for ID %s ',reqId,tID);
+                    // callback(undefined,resTc);
+
+                    resTc.destroy().then(function (resRemove) {
+                        logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - TransferCode  Removed successfully ID %s ',reqId,tID);
+                        callback(undefined,resRemove)
+                    }).catch(function (errRemove) {
+                        logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - TransferCode  Removing failed ID %s ',reqId,tID,errRemove);
+                        callback(errRemove,undefined);
+                    })
+                }
+
+            }).catch(function (errTc) {
+                logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - Error in searching TransferCode for ID %s ',reqId,tID,errTc);
+                callback(errTc,undefined);
+            })
+        }
+        catch(ex)
+        {
+            logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - Exception in searching TransferCode for ID %s ',reqId,tID,ex);
+            callback(ex,undefined);
+        }
+    }
+    else
+    {
+        logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - Invalid Values for Company and Tenant Data ',reqId);
+        callback(new Error("Invalid Company and Tenant Data"), undefined);
+    }
 }
 
 module.exports.ChangeUserAvailability = ChangeUserAvailability;
@@ -1197,4 +1306,6 @@ module.exports.GetEmergencyNumbersForCompany = GetEmergencyNumbersForCompany;
 module.exports.AddTransferCodes = AddTransferCodes;
 module.exports.UpdateTransferCodes = UpdateTransferCodes;
 module.exports.UpdateExtension = UpdateExtension;
+module.exports.GetTransferCode = GetTransferCode;
 module.exports.PickCompanyExtensionsByCategory = PickCompanyExtensionsByCategory;
+module.exports.RemoveTransferCode = RemoveTransferCode;

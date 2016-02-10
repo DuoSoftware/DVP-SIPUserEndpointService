@@ -1,6 +1,18 @@
 /**
  * Created by pawan on 2/10/2015.
  */
+// TODO :- URL fixing (ex:- by Company)
+// in saving add pin to db :- done
+// update pin also :- done
+// update context of user
+// on get context was not sent
+
+// Transfer codes
+//
+
+
+
+
 
 var restify = require('restify');
 var context=require('./SipcontextManager.js');
@@ -579,53 +591,7 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, nex
 //.......................................................................................................................
 
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Context',function(req,res,next) {
-    var reqId='';
 
-    try
-    {
-        reqId = uuid.v1();
-    }
-    catch(ex)
-    {
-
-    }
-
-
-
-    try {
-
-        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId,JSON.stringify(req.body));
-
-        context.AddOrUpdateContext(req.body,reqId, function (err, resz) {
-
-            if(err)
-            {
-
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false,undefined);
-                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
-                res.end(jsonString);
-            }
-            else
-            {
-                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
-                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
-                res.end(jsonString);
-
-            }
-
-        });
-    }
-    catch(ex)
-    {
-        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Exception on Request received -  Data - %s ',reqId,JSON.stringify(req.body));
-        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
-        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
-        res.end(jsonString);
-    }
-    return next();
-
-});
 
 RestServer.post('/DVP/API/'+version+'/SipUser/User',function(req,res,next) {
     var reqId='';
@@ -716,8 +682,11 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,ne
 
 });
 
+
+
 // no swagger
 RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',function(req,res,next) {
+
     var reqId='';
 
     try
@@ -1840,23 +1809,23 @@ RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',function(req,
 
     try
     {
-      PublicUser.ActivatePublicUser(req.body.SipUsername,req.body.Pin,reqId,function(err,resz)
-      {
-          if(err)
-          {
+        PublicUser.ActivatePublicUser(req.body.SipUsername,req.body.Pin,reqId,function(err,resz)
+        {
+            if(err)
+            {
 
-              var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
-              logger.debug('[DVP-SIPUserEndpointService.ActivatePublicUser] - [%s] - Request response : %s ',reqId,jsonString);
-              res.end(jsonString);
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.ActivatePublicUser] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
 
-          }
-          else
-          {
-              var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
-              logger.debug('[DVP-SIPUserEndpointService.ActivatePublicUser] - [%s] - Request response : %s ',reqId,jsonString);
-              res.end(jsonString);
-          }
-      })
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.ActivatePublicUser] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        })
     }
     catch(ex)
     {
@@ -1866,7 +1835,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',function(req,
         res.end(jsonString);
     }
 
-next();
+    next();
 });
 
 RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/:User/Pin',function(req,res,next) {
@@ -2025,7 +1994,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint',function(req,res,next) {
         res.end(jsonString);
     }
 
-next();
+    next();
 });
 
 RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint/:user/Availability',function(req,res,next) {
@@ -2318,6 +2287,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Endpoint/:user/:phone',function(req
 
 // Sprint 5 : Pawan
 
+//no swagger
 RestServer.post('/DVP/API/'+version+'/SipUser/TransferCodes',function(req,res,next) {
 
     var reqId='';
@@ -2388,8 +2358,8 @@ RestServer.post('/DVP/API/'+version+'/SipUser/TransferCodes',function(req,res,ne
 
     next();
 });
-
-RestServer.put('/DVP/API/'+version+'/SipUser/TransferCodes',function(req,res,next) {
+//no swagger
+RestServer.put('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,next) {
 
     var reqId='';
 
@@ -2431,7 +2401,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/TransferCodes',function(req,res,nex
 
     try
     {
-        Extmgt.UpdateTransferCodes(Company,Tenant,req.body,reqId,function(err,resz)
+        Extmgt.UpdateTransferCodes(Company,Tenant,req.params.id,req.body,reqId,function(err,resz)
         {
             if(err)
             {
@@ -2459,3 +2429,428 @@ RestServer.put('/DVP/API/'+version+'/SipUser/TransferCodes',function(req,res,nex
 
     next();
 });
+
+//App design phase
+
+// no swagger
+RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode',function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var Company=1;
+    var Tenant=1;
+
+
+    try {
+        if(req.header('authorization'))
+        {
+            var auth = req.header('authorization');
+            var authInfo = auth.split("#");
+
+            if (authInfo.length >= 2) {
+                Tenant = authInfo[0];
+                Company = authInfo[1];
+            }
+        }
+        else
+        {
+            Tenant = 1;
+            Company = 1;
+        }
+
+    }
+    catch (ex) {
+        logger.error('[DVP-SIPUserEndpointService.GetTransferCode] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
+    }
+
+
+    try
+    {
+        Extmgt.GetTransferCode(Company,Tenant,reqId,function(err,resz)
+        {
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.GetTransferCode] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.GetTransferCode] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.GetTransferCode] - [%s] - [HTTP]  - Exception in Request ',ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.GetTransferCode] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+
+    next();
+});
+
+// no swagger
+RestServer.del('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var Company=1;
+    var Tenant=1;
+
+
+    try {
+        if(req.header('authorization'))
+        {
+            var auth = req.header('authorization');
+            var authInfo = auth.split("#");
+
+            if (authInfo.length >= 2) {
+                Tenant = authInfo[0];
+                Company = authInfo[1];
+            }
+        }
+        else
+        {
+            Tenant = 1;
+            Company = 1;
+        }
+
+    }
+    catch (ex) {
+        logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
+    }
+
+
+    try
+    {
+        Extmgt.RemoveTransferCode(Company,Tenant,req.params.id,reqId,function(err,resz)
+        {
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [HTTP]  - Exception in Request ',ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+
+    next();
+});
+
+// App designing phase
+
+// no swagger
+RestServer.get('/DVP/API/'+version+'/SipUser/Contexts',function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+    var Company=1;
+    var Tenant=1;
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [HTTP]  - Request received ',reqId);
+
+        context.PickAllContexts(Company,Tenant,reqId,function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [HTTP]  - Exception in Request ',reqId,ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
+// no swagger
+RestServer.put('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,next) {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+    var company=1;
+    var tenant=1;
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [HTTP]  - Request received -  Context :%s Data - %s ',reqId,req.params.context,JSON.stringify(req.body));
+
+        context.UpdateContext(company,tenant,req.params.context,req.body,reqId, function (err, resz) {
+
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [HTTP]  - Exception on Request received - Context :%s Data - %s ',reqId,req.params.context,JSON.stringify(req.body));
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+// no swagger
+RestServer.get('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,next) {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+    var company=1;
+    var tenant=1;
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.PickContext] - [%s] - [HTTP]  - Request received -  Context :%s Data - %s ',reqId,req.params.context);
+
+        context.PickContext(company,tenant,req.params.context,reqId, function (err, resz) {
+
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.PickContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.PickContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickContext] - [%s] - [HTTP]  - Exception on Request received - Context :%s ',reqId,req.params.context);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.PickContext] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
+// update swagger
+RestServer.post('/DVP/API/'+version+'/SipUser/Context',function(req,res,next) {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    var company=1;
+    var tenant=1;
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId,JSON.stringify(req.body));
+
+        context.AddOrUpdateContext(company,tenant,req.body,reqId, function (err, resz) {
+
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Exception on Request received -  Data - %s ',reqId,JSON.stringify(req.body));
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
+// no swagger
+RestServer.del('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,next) {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+    var company=1;
+    var tenant=1;
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s] - [HTTP]  - Request received -  Context :%s Data - %s ',reqId,req.params.context);
+
+        context.DeleteContext(company,tenant,req.params.context,reqId, function (err, resz) {
+
+            if(err)
+            {
+
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.DeleteContext] - [%s] - [HTTP]  - Exception on Request received - Context :%s ',reqId,req.params.context);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
+function Crossdomain(req,res,next){
+
+
+    var xml='<?xml version=""1.0""?><!DOCTYPE cross-domain-policy SYSTEM ""http://www.macromedia.com/xml/dtds/cross-domain-policy.dtd""> <cross-domain-policy>    <allow-access-from domain=""*"" />        </cross-domain-policy>';
+
+    /*var xml='<?xml version="1.0"?>\n';
+
+     xml+= '<!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">\n';
+     xml+='';
+     xml+=' \n';
+     xml+='\n';
+     xml+='';*/
+    req.setEncoding('utf8');
+    res.end(xml);
+
+}
+
+function Clientaccesspolicy(req,res,next){
+
+
+    var xml='<?xml version="1.0" encoding="utf-8" ?>       <access-policy>        <cross-domain-access>        <policy>        <allow-from http-request-headers="*">        <domain uri="*"/>        </allow-from>        <grant-to>        <resource include-subpaths="true" path="/"/>        </grant-to>        </policy>        </cross-domain-access>        </access-policy>';
+    req.setEncoding('utf8');
+    res.end(xml);
+
+}
+
+RestServer.get("/crossdomain.xml",Crossdomain);
+RestServer.get("/clientaccesspolicy.xml",Clientaccesspolicy);

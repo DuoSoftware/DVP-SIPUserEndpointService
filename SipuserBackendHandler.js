@@ -136,7 +136,7 @@ function SaveUser(jobj,reqId,callback) {
                         {
                             try
                             {
-                                DbConn.Context.find({where: [{Context: jobj.Context}]}).then(function(resContext)
+                                DbConn.Context.find({where: [{Context: jobj.ContextId}]}).then(function(resContext)
                                 {
                                     if (resContext) {
 
@@ -152,6 +152,7 @@ function SaveUser(jobj,reqId,callback) {
                                                 ExtraData: jobj.ExtraData,
                                                 EmailAddress: jobj.EmailAddress,
                                                 GuRefId: jobj.GuRefId,
+                                                Pin:jobj.Pin,
                                                 CompanyId: 1,
                                                 TenantId: 1,
                                                 ObjClass: "OBJCLZ",
@@ -162,7 +163,8 @@ function SaveUser(jobj,reqId,callback) {
                                                 TransInternalEnable:jobj.TransInternalEnable,
                                                 TransExternalEnable:jobj.TransExternalEnable,
                                                 TransConferenceEnable:jobj.TransConferenceEnable,
-                                                TransGroupEnable:jobj.TransGroupEnable
+                                                TransGroupEnable:jobj.TransGroupEnable,
+                                                ContextId: jobj.ContextId
 
 
                                             }
@@ -318,7 +320,7 @@ function  PickUserByName(Username,Company,Tenant,reqId, callback) {
     {
         try
         {
-            DbConn.SipUACEndpoint.find({where: [{SipUsername: Username},{CompanyId: Company},{TenantId: Tenant}]})
+            DbConn.SipUACEndpoint.find({where: [{SipUsername: Username},{CompanyId: Company},{TenantId: Tenant}],include:[{model: DbConn.Extension, as:'Extension'}]})
                 .then(function (resSip) {
 
                     logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Query completed successfully',reqId);
@@ -404,6 +406,10 @@ console.log(JSON.stringify(jobj));
 
                         try {
 
+                            delete jobj.SipUsername;
+                            delete jobj.SipUserUuid;
+                            delete jobj.CompanyId;
+                            delete jobj.TenantId;
 
                             resUser.updateAttributes(jobj).then(function (resUpdate) {
 
@@ -446,7 +452,7 @@ console.log(JSON.stringify(jobj));
 
 function UpdateUserStatus(Username,status,reqId,callback) {
 
-    if(Username && status)
+    if(Username)
     {
         var SipObj= {
             Enabled:status
@@ -659,12 +665,9 @@ function AssignUserToGroup(SID,GID,reqId,callback) {
                     if(GID)
                     {
                         try {
-                            DbConn.UserGroup.find({where: [{id: GID}]}).complete(function (errGroup, resGroup) {
-                                if (errGroup) {
-                                    callback(errGroup, undefined);
-                                }
-                                else
-                                {
+                            DbConn.UserGroup.find({where: [{id: GID}]}).then(function (resGroup)
+                            {
+
                                     if(!resGroup)
                                     {
                                         callback(new Error("No group record found"), undefined);
@@ -689,8 +692,9 @@ function AssignUserToGroup(SID,GID,reqId,callback) {
                                         }
                                     }
 
-                                }
-
+                            }).catch(function(err)
+                            {
+                                callback(err, undefined);
                             })
 
                         }
