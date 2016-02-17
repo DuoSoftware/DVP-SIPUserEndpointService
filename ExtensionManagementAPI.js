@@ -10,11 +10,11 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 
 
 
-var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, callback)
+var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, companyId, tenantId, callback)
 {
     try
     {
-        DbConn.EmergencyNumber.find({where: [{EmergencyNum: emergencyNumInfo.EmergencyNumber},{TenantId: 1}]})
+        DbConn.EmergencyNumber.find({where: [{EmergencyNum: emergencyNumInfo.EmergencyNumber},{TenantId: tenantId}]})
             .then(function (numData)
             {
                 if(numData)
@@ -28,8 +28,8 @@ var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, callback)
                     var emerNum = DbConn.EmergencyNumber.build({
 
                         EmergencyNum: emergencyNumInfo.EmergencyNumber,
-                        CompanyId: 1,
-                        TenantId:1,
+                        CompanyId: companyId,
+                        TenantId: tenantId,
                         ObjClass: 'DVP',
                         ObjType: 'EMERGENCY_NUM',
                         ObjCategory: 'OUTBOUND'
@@ -245,11 +245,11 @@ var DeleteDidNumberDB = function(reqId, didNumId, companyId, tenantId, callback)
 
 };
 
-var AddDidNumberDB = function(reqId, didNumberInfo, callback)
+var AddDidNumberDB = function(reqId, didNumberInfo, companyId, tenantId, callback)
 {
     try
     {
-        DbConn.DidNumber.find({where: [{TenantId: didNumberInfo.TenantId},{DidNumber: didNumberInfo.DidNumber}]}).then(function (didRec)
+        DbConn.DidNumber.find({where: [{TenantId: tenantId},{DidNumber: didNumberInfo.DidNumber}]}).then(function (didRec)
         {
             if(didRec)
             {
@@ -264,8 +264,8 @@ var AddDidNumberDB = function(reqId, didNumberInfo, callback)
 
                     DidNumber: didNumberInfo.DidNumber,
                     DidActive: didNumberInfo.DidActive,
-                    CompanyId: didNumberInfo.CompanyId,
-                    TenantId: didNumberInfo.TenantId,
+                    CompanyId: companyId,
+                    TenantId: tenantId,
                     ObjClass: 'PBX',
                     ObjType: 'NUMBER_MAPPING',
                     ObjCategory: 'DID'
@@ -1031,13 +1031,13 @@ function AddTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
                         .create(
                         {
                             InternalTransfer: Codeinfo.InternalTransfer,
-                            ExternalTransfer: Codeinfo.ExtensionName,
+                            ExternalTransfer: Codeinfo.ExternalTransfer,
                             GroupTransfer: Codeinfo.GroupTransfer,
                             ConferenceTransfer: Codeinfo.ConferenceTransfer,
                             CompanyId: Company,
                             TenantId: Tenant,
                             ObjClass: Codeinfo.ObjClass,
-                            ObjType: Codeinfo.jobj.ObjType,
+                            ObjType: Codeinfo.ObjType,
                             ObjCategory: Codeinfo.ObjCategory
 
 

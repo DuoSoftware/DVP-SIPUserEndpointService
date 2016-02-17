@@ -18,8 +18,6 @@ function AddOrUpdateContext(company,tenant,req,reqId,callback)
             ContextObj.TenantId = 1;
             ContextObj.AddUser = "NAddUser";
             ContextObj.UpdateUser = "NUpdateUser";
-            ContextObj.AddTime = new Date(2013, 01, 13);
-            ContextObj.UpdateTime = new Date(2013, 01, 28);
 
         }
         catch (ex) {
@@ -52,7 +50,7 @@ function AddOrUpdateContext(company,tenant,req,reqId,callback)
                                         Description: ContextObj.Description,
                                         ContextCat: ContextObj.ContextCat,
                                         ObjClass: ContextObj.ObjClass,
-                                        ObjType: ContextObj.ObjType,
+                                        ObjType: ContextObj.ObjClass,
                                         ObjCategory: ContextObj.ObjCategory,
                                         CompanyId: company,
                                         TenantId: tenant,

@@ -9,11 +9,6 @@
 
 // Transfer codes
 //
-
-
-
-
-
 var restify = require('restify');
 var context=require('./SipcontextManager.js');
 var Extmgt=require('./ExtensionManagementAPI.js');
@@ -25,6 +20,9 @@ var config = require('config');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var uuid = require('node-uuid');
 var cors = require('cors');
+var jwt = require('restify-jwt');
+var secret = require('dvp-common/Authentication/Secret.js');
+var authorization = require('dvp-common/Authentication/Authorization.js');
 
 
 var port = config.Host.port || 3000;
@@ -40,21 +38,14 @@ var RestServer = restify.createServer({
 restify.CORS.ALLOW_HEADERS.push('authorization');
 RestServer.use(restify.CORS());
 RestServer.use(restify.fullResponse());
-
-RestServer.listen(port, function () {
-    console.log('%s listening at %s', RestServer.name, RestServer.url);
-});
-
-//Server listen
-
-//Enable request body parsing(access)
+RestServer.use(jwt({secret: secret.Secret}));
 RestServer.use(restify.bodyParser());
 RestServer.use(restify.acceptParser(RestServer.acceptable));
 RestServer.use(restify.queryParser());
 RestServer.use(cors());
 
 
-RestServer.post('/DVP/API/:version/SipUser/DidNumber', function(req, res, next) {
+RestServer.post('/DVP/API/:version/SipUser/DidNumber', authorization({resource:"number", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -63,12 +54,17 @@ RestServer.post('/DVP/API/:version/SipUser/DidNumber', function(req, res, next) 
 
         logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
 
-        if(reqBody && securityToken) {
-            reqBody.CompanyId = 1;
-            reqBody.TenantId = 1;
+        if(reqBody && securityToken)
+        {
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
 
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
 
-            Extmgt.AddDidNumberDB(reqId, reqBody, function (err, addResult)
+            Extmgt.AddDidNumberDB(reqId, reqBody, companyId, tenantId, function (err, addResult)
             {
                 if (err)
                 {
@@ -108,7 +104,7 @@ RestServer.post('/DVP/API/:version/SipUser/DidNumber', function(req, res, next) 
 
 });
 
-RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/AssignToExt/:ext', function(req, res, next) {
+RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/AssignToExt/:ext', authorization({resource:"number", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -121,7 +117,15 @@ RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/AssignToExt/:ext', 
 
         if(securityToken)
         {
-            Extmgt.AssignDidNumberToExtDB(reqId, didNum, ext, 1, 1, function (err, setResult)
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
+
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            Extmgt.AssignDidNumberToExtDB(reqId, didNum, ext, companyId, tenantId, function (err, setResult)
             {
                 if (err)
                 {
@@ -161,7 +165,7 @@ RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/AssignToExt/:ext', 
 
 });
 
-RestServer.post('/DVP/API/:version/SipUser/EmergencyNumber', function(req, res, next) {
+RestServer.post('/DVP/API/:version/SipUser/EmergencyNumber', authorization({resource:"user", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -172,10 +176,15 @@ RestServer.post('/DVP/API/:version/SipUser/EmergencyNumber', function(req, res, 
 
         if(reqBody && securityToken)
         {
-            reqBody.CompanyId = 1;
-            reqBody.TenantId = 1;
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
 
-            Extmgt.AddEmergencyNumberDB(reqId, reqBody, function (err, addResult)
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            Extmgt.AddEmergencyNumberDB(reqId, reqBody, companyId, tenantId, function (err, addResult)
             {
                 if (err)
                 {
@@ -215,7 +224,7 @@ RestServer.post('/DVP/API/:version/SipUser/EmergencyNumber', function(req, res, 
 
 });
 
-RestServer.post('/DVP/API/:version/SipUser/DodNumber', function(req, res, next) {
+RestServer.post('/DVP/API/:version/SipUser/DodNumber', authorization({resource:"user", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -226,9 +235,17 @@ RestServer.post('/DVP/API/:version/SipUser/DodNumber', function(req, res, next) 
 
         logger.debug('[DVP-SIPUserEndpointService.SetDodNumber] - [%s] - HTTP Request Received - Req Body : %s', reqId, req.body);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(securityToken)
         {
-            Extmgt.SetDodNumberToExtDB(reqId, dodNumber, extId, 1, 1, isActive, function (err, updateRes) {
+            Extmgt.SetDodNumberToExtDB(reqId, dodNumber, extId, companyId, tenantId, isActive, function (err, updateRes) {
                 if (err)
                 {
                     var jsonString = messageFormatter.FormatMessage(err, "Set Dod number Failed", false, false);
@@ -266,7 +283,7 @@ RestServer.post('/DVP/API/:version/SipUser/DodNumber', function(req, res, next) 
 
 });
 
-RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/Activate/:isActive', function(req, res, next) {
+RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/Activate/:isActive', authorization({resource:"number", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -276,9 +293,17 @@ RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/Activate/:isActive'
 
         logger.debug('[DVP-SIPUserEndpointService.SetDidNumberStatus] - [%s] - HTTP Request Received - Req Params : DidId : %s, isActive " %s', reqId, didNum, isActive);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(securityToken)
         {
-            Extmgt.SetDidNumberActiveStatusDB(reqId, didNum, 1, 1, isActive, function (err, assignResult) {
+            Extmgt.SetDidNumberActiveStatusDB(reqId, didNum, companyId, tenantId, isActive, function (err, assignResult) {
                 if (err)
                 {
                     var jsonString = messageFormatter.FormatMessage(err, "Set Did Number Status Failed", false, false);
@@ -316,7 +341,7 @@ RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/Activate/:isActive'
 
 });
 
-RestServer.del('/DVP/API/:version/SipUser/DidNumber/:id', function(req, res, next) {
+RestServer.del('/DVP/API/:version/SipUser/DidNumber/:id', authorization({resource:"number", action:"delete"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -325,10 +350,18 @@ RestServer.del('/DVP/API/:version/SipUser/DidNumber/:id', function(req, res, nex
 
         logger.debug('[DVP-SIPUserEndpointService.DeleteDidNumber] - [%s] - HTTP Request Received - Req Params - didId : %s', reqId, didId);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(securityToken)
         {
 
-            Extmgt.DeleteDidNumberDB(reqId, didId, 1, 1, function (err, delResult)
+            Extmgt.DeleteDidNumberDB(reqId, didId, companyId, tenantId, function (err, delResult)
             {
                 if (err)
                 {
@@ -367,7 +400,7 @@ RestServer.del('/DVP/API/:version/SipUser/DidNumber/:id', function(req, res, nex
 
 });
 
-RestServer.del('/DVP/API/:version/SipUser/EmergencyNumber/:emergencyNum', function(req, res, next) {
+RestServer.del('/DVP/API/:version/SipUser/EmergencyNumber/:emergencyNum', authorization({resource:"user", action:"delete"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -376,10 +409,18 @@ RestServer.del('/DVP/API/:version/SipUser/EmergencyNumber/:emergencyNum', functi
 
         logger.debug('[DVP-SIPUserEndpointService.DeleteEmergencyNumber] - [%s] - HTTP Request Received - Req Params - emergencyNum : %s', reqId, emergencyNum);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(securityToken && emergencyNum)
         {
 
-            Extmgt.DeleteEmergencyNumberDB(reqId, emergencyNum, 1, 1, function (err, delResult)
+            Extmgt.DeleteEmergencyNumberDB(reqId, emergencyNum, companyId, tenantId, function (err, delResult)
             {
                 if (err)
                 {
@@ -418,7 +459,7 @@ RestServer.del('/DVP/API/:version/SipUser/EmergencyNumber/:emergencyNum', functi
 
 });
 
-RestServer.get('/DVP/API/:version/SipUser/EmergencyNumbers', function(req, res, next) {
+RestServer.get('/DVP/API/:version/SipUser/EmergencyNumbers', authorization({resource:"user", action:"read"}), function(req, res, next) {
     var emptyArr = [];
     var reqId = uuid.v1();
     try
@@ -427,10 +468,18 @@ RestServer.get('/DVP/API/:version/SipUser/EmergencyNumbers', function(req, res, 
 
         logger.debug('[DVP-SIPUserEndpointService.EmergencyNumbers] - [%s] - HTTP Request Received', reqId);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(securityToken)
         {
 
-            Extmgt.GetEmergencyNumbersForCompany(reqId, 1, 1, function (err, eNums)
+            Extmgt.GetEmergencyNumbersForCompany(reqId, companyId, tenantId, function (err, eNums)
             {
                 if (err)
                 {
@@ -469,7 +518,7 @@ RestServer.get('/DVP/API/:version/SipUser/EmergencyNumbers', function(req, res, 
 
 });
 
-RestServer.get('/DVP/API/:version/SipUser/DidNumbers', function(req, res, next) {
+RestServer.get('/DVP/API/:version/SipUser/DidNumbers', authorization({resource:"number", action:"read"}), function(req, res, next) {
     var emptyArr = [];
     var reqId = uuid.v1();
     try
@@ -478,10 +527,18 @@ RestServer.get('/DVP/API/:version/SipUser/DidNumbers', function(req, res, next) 
 
         logger.debug('[DVP-SIPUserEndpointService.DidNumbers] - [%s] - HTTP Request Received', reqId);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(securityToken)
         {
 
-            Extmgt.GetDidNumbersForCompanyDB(reqId, 1, 1, function (err, didNums)
+            Extmgt.GetDidNumbersForCompanyDB(reqId, companyId, tenantId, function (err, didNums)
             {
                 if (err)
                 {
@@ -520,7 +577,7 @@ RestServer.get('/DVP/API/:version/SipUser/DidNumbers', function(req, res, next) 
 
 });
 
-RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, next) {
+RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', authorization({resource:"user", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -529,18 +586,23 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', function(req, res, nex
 
         logger.debug('[DVP-SIPUserEndpointService.DuoWorldUser] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(reqBody && securityToken)
         {
-            reqBody.CompanyId = 1;
-            reqBody.TenantId = 1;
-
             var tempUsername = reqBody.SipUsername;
 
             var c2cRegExPattern = new RegExp('@');
 
             if(tempUsername && !c2cRegExPattern.test(tempUsername))
             {
-                PublicUser.UpdatePublicUser(reqId, reqBody, function (err, addResult)
+                PublicUser.UpdatePublicUser(reqId, reqBody, companyId, tenantId, function (err, addResult)
                 {
                     if (err)
                     {
@@ -2241,7 +2303,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Endpoint/:user/:phone',function(req
 // Sprint 5 : Pawan
 
 //no swagger
-RestServer.post('/DVP/API/'+version+'/SipUser/TransferCodes',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/TransferCode',function(req,res,next) {
 
     var reqId='';
 
@@ -2807,3 +2869,7 @@ function Clientaccesspolicy(req,res,next){
 
 RestServer.get("/crossdomain.xml",Crossdomain);
 RestServer.get("/clientaccesspolicy.xml",Clientaccesspolicy);
+
+RestServer.listen(port, function () {
+    console.log('%s listening at %s', RestServer.name, RestServer.url);
+});

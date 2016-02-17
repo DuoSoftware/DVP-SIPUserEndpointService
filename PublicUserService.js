@@ -88,7 +88,7 @@ var AddOrUpdateLbUser = function(reqId, usrInfo, callback)
     }
 }
 
-var UpdatePublicUser = function(reqId, publicUserInfo, callback)
+var UpdatePublicUser = function(reqId, publicUserInfo, companyId, tenantId, callback)
 {
     try
     {
@@ -99,7 +99,7 @@ var UpdatePublicUser = function(reqId, publicUserInfo, callback)
             {
                 //check for company tenant
 
-                if(publicUserInfo.CompanyId === sipUsr.CompanyId && publicUserInfo.TenantId === sipUsr.TenantId)
+                if(publicUserInfo.CompanyId == companyId && publicUserInfo.TenantId == tenantId)
                 {
                     //ok to update
 
@@ -154,8 +154,8 @@ var UpdatePublicUser = function(reqId, publicUserInfo, callback)
                     ExtraData: publicUserInfo.ExtraData,
                     EmailAddress: publicUserInfo.EmailAddress,
                     GuRefId: publicUserInfo.GuRefId,
-                    CompanyId: 1,
-                    TenantId: 1,
+                    CompanyId: companyId,
+                    TenantId: tenantId,
                     ObjClass: null,
                     ObjType: null,
                     ObjCategory: null,
@@ -262,7 +262,7 @@ function AddPublicUser(req,reqId,callback)
                                     PinGenTime:NowDt,
                                     TryCount:0,
                                     UpdateUser: req.UpdateUser,
-                                    UserPublic: false
+                                    UsePublic: false
                                 }
                             );
 
