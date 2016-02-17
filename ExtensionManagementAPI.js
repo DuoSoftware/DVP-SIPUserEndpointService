@@ -966,12 +966,64 @@ function PickExtensionUser(Ext,Company,Tenant,reqId,callback)
 
 }
 
+//ObjCategory
 function PickCompanyExtensions(Company,Tenant,reqId,callback)
 {
     if(!isNaN(Company) && Company)
     {
         try {
             DbConn.Extension.findAll({where: [{CompanyId: Company}, {TenantId: Tenant}]}).then(function (resExt)
+            {
+
+                if (resExt.length==0) {
+                    logger.error('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - No record found for Company %s ',reqId,Company);
+                    callback(new Error("No extension record found for Company "+Company), undefined);
+
+                }
+
+
+
+                else  {
+
+                    logger.debug('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - Extension records found for Company %s ',reqId,Company);
+                    callback(undefined, resExt);
+                }
+
+
+
+            }).catch(function (errExt)
+            {
+
+                logger.error('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - Error in searching Company %s ',reqId,Company,errExt);
+                callback(errExt, undefined);
+
+            });
+
+
+
+
+        }
+        catch (ex) {
+            logger.error('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - Exception occurred  %s ',reqId,Company,ex);
+            callback(ex,undefined);
+        }
+    }
+    else
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - CompanyID is Undefined');
+        callback(new Error("CompanyID is Undefined"),undefined);
+    }
+
+
+
+}
+
+function PickCompanyExtensionsByCategory(Company,Tenant,category, reqId,callback)
+{
+    if(!isNaN(Company) && Company)
+    {
+        try {
+            DbConn.Extension.findAll({where: [{CompanyId: Company}, {TenantId: Tenant}, {ObjCategory: category}]}).then(function (resExt)
             {
 
                 if (resExt.length==0) {
@@ -1255,4 +1307,5 @@ module.exports.AddTransferCodes = AddTransferCodes;
 module.exports.UpdateTransferCodes = UpdateTransferCodes;
 module.exports.UpdateExtension = UpdateExtension;
 module.exports.GetTransferCode = GetTransferCode;
+module.exports.PickCompanyExtensionsByCategory = PickCompanyExtensionsByCategory;
 module.exports.RemoveTransferCode = RemoveTransferCode;
