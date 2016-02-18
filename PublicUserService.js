@@ -197,7 +197,7 @@ var UpdatePublicUser = function(reqId, publicUserInfo, companyId, tenantId, call
 };
 
 
-function AddPublicUser(req,reqId,callback)
+function AddPublicUser(req,Company,Tenant,reqId,callback)
 {
 
     logger.debug('[DVP-SIPUserEndpointService.AddPublicUser] - [%s] - Public user adding started Username -  %s ',reqId,req.SipUsername);
@@ -207,7 +207,7 @@ function AddPublicUser(req,reqId,callback)
 
         var User=req.AreaCode.concat(req.Phone);
 
-        ValidateUserName(User, reqId,function(errValid,resValid)
+        ValidateUserName(User,Company,Tenant, reqId,function(errValid,resValid)
         {
             if(errValid)
             {
@@ -322,14 +322,14 @@ function CloudEnduserDetails(reqId,callback)
 
 }
 
-function ValidateUserName(Usname,reqId,callback)
+function ValidateUserName(Usname,Company,Tenant,reqId,callback)
 {
 
     logger.debug('[DVP-SIPUserEndpointService.ValidateUserName] - [%s] - Searching for Existing UserNames ',reqId);
 
     try
     {
-        DbConn.SipUACEndpoint.find({where:[{SipUsername:Usname}]}).then(function(resUser)
+        DbConn.SipUACEndpoint.find({where:[{SipUsername:Usname},{CompanyId: Company}, {TenantId: Tenant}]}).then(function(resUser)
         {
             if(!resUser)
             {
@@ -356,13 +356,13 @@ function ValidateUserName(Usname,reqId,callback)
     }
 }
 
-function ActivatePublicUser(Usname,Pin,reqId,callback)
+function ActivatePublicUser(Usname,Pin,Company,Tenant,reqId,callback)
 {
     logger.debug('[DVP-SIPUserEndpointService.ActivatePublicUser] - [%s] - Searching for Existing UserNames ',reqId);
 
     try
     {
-        DbConn.SipUACEndpoint.find({where:[{SipUsername:Usname}]}).then(function(resUser)
+        DbConn.SipUACEndpoint.find({where:[{SipUsername:Usname},{CompanyId: Company}, {TenantId: Tenant}]}).then(function(resUser)
         {
             if(!resUser)
             {
@@ -382,7 +382,7 @@ function ActivatePublicUser(Usname,Pin,reqId,callback)
                             UsePublic: true
                         },
                         {
-                            where: [{SipUsername: Usname}, {Pin: resUser.Pin}]
+                            where: [{SipUsername: Usname}, {Pin: resUser.Pin},{CompanyId: Company}, {TenantId: Tenant}]
                         }
                     ).then(function(resValid)
                         {
@@ -413,7 +413,7 @@ function ActivatePublicUser(Usname,Pin,reqId,callback)
                                 TryCount: NewTryCount
                             },
                             {
-                                where: [{SipUsername: Usname}, {Pin: resUser.Pin}]
+                                where: [{SipUsername: Usname}, {Pin: resUser.Pin},{CompanyId: Company}, {TenantId: Tenant}]
                             }
                         ).then(function (resInvalid) {
 
@@ -453,13 +453,13 @@ function ActivatePublicUser(Usname,Pin,reqId,callback)
 
 }
 
-function PinOfUser(Usnm,reqId,callback)
+function PinOfUser(Usnm,Company,Tenant,reqId,callback)
 {
     logger.debug('[DVP-SIPUserEndpointService.PinOfUser] - [%s] - Searching pin of %s ',reqId,Usnm);
     try
     {
 
-        ValidateUserName(Usnm,reqId,function(errUser,resUser)
+        ValidateUserName(Usnm,Company,Tenant,reqId,function(errUser,resUser)
         {
             if(errUser)
             {
@@ -478,12 +478,12 @@ function PinOfUser(Usnm,reqId,callback)
     }
 }
 
-function ReGeneratePin(Usnm,reqId,callback)
+function ReGeneratePin(Usnm,Company,Tenant,reqId,callback)
 {
     var chance = new Chance();
     logger.debug('[DVP-SIPUserEndpointService.ResetAttempts] - [%s] -Pin ReGenerating of %s started ',reqId,Usnm);
 
-        DbConn.SipUACEndpoint.find({where:[{SipUsername:Usnm}]}).then(function(resUser)
+        DbConn.SipUACEndpoint.find({where:[{SipUsername:Usnm},{CompanyId: Company}, {TenantId: Tenant}]}).then(function(resUser)
         {
             if(resUser )
             {
@@ -492,7 +492,7 @@ function ReGeneratePin(Usnm,reqId,callback)
                 {
 
                     var NewPin=chance.zip();
-                    ResetPin(Usnm,NewPin,reqId,function(errPin,resPin)
+                    ResetPin(Usnm,NewPin,Company,Tenant,reqId,function(errPin,resPin)
                     {
                         if(errPin)
                         {
@@ -500,7 +500,7 @@ function ReGeneratePin(Usnm,reqId,callback)
                         }
                         else
                         {
-                            ResetAttempts(Usnm,reqId,function(errAtmpt,resAtmpt)
+                            ResetAttempts(Usnm,Company,Tenant,reqId,function(errAtmpt,resAtmpt)
                             {
                                 if(errAtmpt)
                                 {
@@ -551,7 +551,7 @@ function ReGeneratePin(Usnm,reqId,callback)
 
 }
 
-function ResetAttempts(Usnm,reqId,callback)
+function ResetAttempts(Usnm,Company,Tenant,reqId,callback)
 {
     logger.debug('[DVP-SIPUserEndpointService.ResetAttempts] - [%s] - Attempt resetting of %s started ',reqId,Usnm);
     try
@@ -563,7 +563,7 @@ function ResetAttempts(Usnm,reqId,callback)
 
             },
             {
-                where: [{SipUsername: Usnm}, {Pin: resUser.Pin}]
+                where: [{SipUsername: Usnm}, {Pin: resUser.Pin},{CompanyId: Company}, {TenantId: Tenant}]
 
             }).then(function(resUpdate)
             {
@@ -582,7 +582,7 @@ function ResetAttempts(Usnm,reqId,callback)
     }
 }
 
-function ResetPin(Usnm,Pin,reqId,callback)
+function ResetPin(Usnm,Pin,Company,Tenant,reqId,callback)
 {
     logger.debug('[DVP-SIPUserEndpointService.ResetPin] - [%s] - Pin resetting of %s',reqId,Usnm);
     try
@@ -594,7 +594,7 @@ function ResetPin(Usnm,Pin,reqId,callback)
 
             },
             {
-                where: [{SipUsername: Usnm}]
+                where: [{SipUsername: Usnm},{CompanyId: Company}, {TenantId: Tenant}]
 
             }).then(function(resUpdate)
             {

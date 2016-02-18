@@ -14,7 +14,7 @@ function AddEndPoint(req,Company,Tenant,reqId,callback)
         if(PhoneNumberValidation(num))
         {
 
-            DbConn.SipUACEndpoint.find({where:[{SipUsername:req.SipUsername}]}).then(function(resSip)
+            DbConn.SipUACEndpoint.find({where:[{SipUsername:req.SipUsername},{CompanyId: Company}, {TenantId: Tenant}]}).then(function(resSip)
             {
                 if(!resSip)
                 {
@@ -78,11 +78,11 @@ function AddEndPoint(req,Company,Tenant,reqId,callback)
 
 }
 
-function EndpointAvailabilityUpdation(User,Phone,St,reqId,callback)
+function EndpointAvailabilityUpdation(User,Phone,St,Company,Tenant,reqId,callback)
 {
     try
     {
-        DbConn.Endpoint.update({Availability:St},{where:[{SipUACEndpointId:User},{Phone:Phone}]}).then(function(resUpdate)
+        DbConn.Endpoint.update({Availability:St},{where:[{SipUACEndpointId:User},{Phone:Phone},{CompanyId: Company}, {TenantId: Tenant}]}).then(function(resUpdate)
         {
             callback(undefined,resUpdate);
         }).catch(function(errUpdate)
@@ -98,11 +98,11 @@ function EndpointAvailabilityUpdation(User,Phone,St,reqId,callback)
 
 }
 
-function RemoveEndpoint(User,Phone,reqId,callback)
+function RemoveEndpoint(User,Phone,Company,Tenant,reqId,callback)
 {
     try
     {
-        DbConn.Endpoint.destroy({where: [{SipUACEndpointId:User},{Phone:Phone},{Availability:false}]}).then(function (resDel)
+        DbConn.Endpoint.destroy({where: [{SipUACEndpointId:User},{Phone:Phone},{Availability:false},{CompanyId: Company}, {TenantId: Tenant}]}).then(function (resDel)
         {
             callback(undefined,resDel);
 
@@ -118,11 +118,11 @@ function RemoveEndpoint(User,Phone,reqId,callback)
 
 }
 
-function AllEndpointsOfuser(User,reqId,callback)
+function AllEndpointsOfuser(User,Company,Tenant,reqId,callback)
 {
     try
     {
-        DbConn.Endpoint.findAll({include: [{model: DbConn.SipUACEndpoint, as: "SipUACEndpoint",where:[{SipUsername:User}]}]}).then(function(resEndPoints)
+        DbConn.Endpoint.findAll({include: [{model: DbConn.SipUACEndpoint, as: "SipUACEndpoint",where:[{SipUsername:User},{CompanyId: Company}, {TenantId: Tenant}]}]}).then(function(resEndPoints)
         {
             callback(undefined,resEndPoints);
 
@@ -138,11 +138,11 @@ function AllEndpointsOfuser(User,reqId,callback)
 
 }
 
-function GetEndpointDetails(User,phone,reqId,callback)
+function GetEndpointDetails(User,phone,Company,Tenant,reqId,callback)
 {
     try
     {
-        DbConn.Endpoint.find({where:[{Phone:phone}],include: [{model: DbConn.SipUACEndpoint, as: "SipUACEndpoint",where:[{SipUsername:User}]}]})
+        DbConn.Endpoint.find({where:[{Phone:phone}],include: [{model: DbConn.SipUACEndpoint, as: "SipUACEndpoint",where:[{SipUsername:User},{CompanyId: Company}, {TenantId: Tenant}]}]})
             .then(function (resEndpoint) {
 
                 callback(undefined,resEndpoint);
