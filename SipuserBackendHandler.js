@@ -117,7 +117,6 @@ function CreateUser(req,Company,Tenant,reqId,callback) {
 function SaveUser(jobj,Company,Tenant,reqId,callback) {
 
 
-
     if (jobj) {
 
         logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s]  - Searching Records of CloudEndUser %s ',reqId,jobj.CloudEndUserId);
@@ -136,7 +135,7 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                         {
                             try
                             {
-                                DbConn.Context.find({where: [{Context: jobj.ContextId},{CompanyId:Company},{TenantId:Tenant}]}).then(function(resContext)
+                                DbConn.Context.find({where: [{Context: jobj.Context},{CompanyId:Company},{TenantId:Tenant}]}).then(function(resContext)
                                 {
                                     if (resContext) {
 
@@ -164,7 +163,7 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                 TransExternalEnable:jobj.TransExternalEnable,
                                                 TransConferenceEnable:jobj.TransConferenceEnable,
                                                 TransGroupEnable:jobj.TransGroupEnable,
-                                                ContextId: jobj.ContextId
+                                                ContextId: jobj.Context
 
 
                                             }
