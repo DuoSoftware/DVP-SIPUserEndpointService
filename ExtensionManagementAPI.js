@@ -205,6 +205,47 @@ var SetDodNumberToExtDB = function(reqId, dodNumber, extId, companyId, tenantId,
     }
 };
 
+var SetRecordingStatus = function(reqId, recordingEnabled, extension, companyId, tenantId, callback)
+{
+    try
+    {
+        DbConn.Extension.find({where: [{TenantId: tenantId},{CompanyId: companyId},{Extension: extension}]}).then(function (ext)
+        {
+            if(ext)
+            {
+                logger.debug('[DVP-SIPUserEndpointService.SetRecordingStatus] - [%s] - Get Extension PGSQL query success', reqId);
+
+                ext.updateAttributes({RecordingEnabled: recordingEnabled}).then(function (updtRes)
+                {
+                    callback(undefined, true);
+
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.SetRecordingStatus] PGSQL Update extension with recording status failed', err);
+                    callback(err, false);
+                });
+
+            }
+            else
+            {
+                callback(new Error('Extension record not found'), false);
+            }
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-SIPUserEndpointService.SetRecordingStatus] - [%s] - Get Extension PGSQL query failed', reqId, err);
+            callback(err, false);
+        });
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.SetRecordingStatus] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+};
+
 var DeleteDidNumberDB = function(reqId, didNumId, companyId, tenantId, callback)
 {
     try
@@ -1309,3 +1350,4 @@ module.exports.UpdateExtension = UpdateExtension;
 module.exports.GetTransferCode = GetTransferCode;
 module.exports.PickCompanyExtensionsByCategory = PickCompanyExtensionsByCategory;
 module.exports.RemoveTransferCode = RemoveTransferCode;
+module.exports.SetRecordingStatus = SetRecordingStatus;

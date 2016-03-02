@@ -649,6 +649,53 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', authorization({resourc
 
 });
 
+RestServer.put('/DVP/API/:version/SipUser/Extension/:extension/RecordingStatus/:status', authorization({resource:"user", action:"write"}), function(req, res, next) {
+
+    var reqId = uuid.v1();
+    try
+    {
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        var extension = req.params.extension;
+        var status = req.params.status;
+
+        logger.debug('[DVP-SIPUserEndpointService.SetRecordingStatus] - [%s] - HTTP Request Received - PARAMS - Extension : %s, RecordongStatus : %s', reqId, extension, status);
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        Extmgt.SetRecordingStatus(reqId, status, extension, companyId, tenantId, function (err, resp)
+        {
+            if (err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Set recording status failed", false, false);
+                logger.debug('[DVP-SIPUserEndpointService.SetRecordingStatus] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Set recording status success", true, resp);
+                logger.debug('[DVP-SIPUserEndpointService.SetRecordingStatus] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
+
+        })
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.SetRecordingStatus] - [%s] - Exception Occurred', reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, emptyArr);
+        logger.debug('[DVP-SIPUserEndpointService.SetRecordingStatus] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
 
 //.......................................................................................................................
 
