@@ -472,11 +472,11 @@ var SetDidNumberActiveStatusDB = function(reqId, didNum, companyId, tenantId, is
 };
 
 
-function ChangeUserAvailability(tenant,ext,st,reqId,callback) {
+function ChangeUserAvailability(ext,st,Company,Tenant,reqId,callback) {
 
 
     try {
-        DbConn.Extension.find({where: [{Extension: ext},{TenantId:tenant}]}).then(function (resExt)
+        DbConn.Extension.find({where: [{Extension: ext},{TenantId:Tenant},{CompanyId:Company}]}).then(function (resExt)
         {
             if (resExt) {
 
@@ -670,6 +670,78 @@ function UpdateExtension(ext,reqExt,Company,Tenant,reqId,callback) {
                 }).catch(function (errExts)
                 {
                     logger.error('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - [PGSQL]  - Error in searching Extension %s ',reqId,ext,errExts);
+                    callback(errExts, undefined);
+                });
+
+
+
+
+
+
+            }
+            catch (ex) {
+
+                logger.error('[DVP-SIPUserEndpointService.UpdateExtension] - [%s]   - Exception in searching Extension %s ',reqId,ext);
+                callback(ex,undefined);
+            }
+        }
+        else
+        {
+            logger.error('[DVP-SIPUserEndpointService.UpdateExtension] - [%s]   - Extension value is Undefined',reqId);
+            callback(new Error("Extension value is Undefined"),undefined);
+        }
+
+
+    }
+    else
+    {
+        callback(new Error("Empty request"),undefined);
+    }
+
+
+
+}
+
+function DeleteExtension(ext,reqExt,Company,Tenant,reqId,callback) {
+
+    if(reqExt)
+    {
+        try {
+            var obj = reqExt;
+
+        }
+        catch (ex) {
+            callback(ex,undefined);
+        }
+
+
+        if(ext)
+        {
+            try {
+                DbConn.Extension.destroy({where: [{Extension: ext}, {CompanyId: Company},{TenantId:Tenant}]}).then(function (resExt)
+                {
+
+                    if (!resExt) {
+
+
+                        logger.error('[DVP-SIPUserEndpointService.DeleteExtension] - [%s] - [PGSQL]  - No record found for Extension %s ',reqId,ext);
+                        callback(new Error("No Extension found"),undefined);
+
+
+
+                    }
+                    else  {
+
+                        callback(undefined,resExt);
+
+
+
+                    }
+
+
+                }).catch(function (errExts)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.DeleteExtension] - [%s] - [PGSQL]  - Error in deleting Extension %s ',reqId,ext,errExts);
                     callback(errExts, undefined);
                 });
 
@@ -1347,6 +1419,7 @@ module.exports.GetEmergencyNumbersForCompany = GetEmergencyNumbersForCompany;
 module.exports.AddTransferCodes = AddTransferCodes;
 module.exports.UpdateTransferCodes = UpdateTransferCodes;
 module.exports.UpdateExtension = UpdateExtension;
+module.exports.DeleteExtension = DeleteExtension;
 module.exports.GetTransferCode = GetTransferCode;
 module.exports.PickCompanyExtensionsByCategory = PickCompanyExtensionsByCategory;
 module.exports.RemoveTransferCode = RemoveTransferCode;

@@ -10,7 +10,7 @@ var nodeUuid = require('node-uuid');
 
 
 //Sipuser
-function CreateUser(req,reqId,callback) {
+function CreateUser(req,Company,Tenant,reqId,callback) {
 
 
     logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Searching for SipUACEndPoint %s ',reqId,req.SipUsername);
@@ -33,7 +33,7 @@ function CreateUser(req,reqId,callback) {
 
             try {
                 DbConn.SipUACEndpoint
-                    .find({where: [{SipUsername: SipObj.SipUsername}, {CompanyId: 1}, {TenantId: 1}]})
+                    .find({where: [{SipUsername: SipObj.SipUsername}, {CompanyId: Company}, {TenantId: Tenant}]})
                     .then(function (resUser) {
                         if(!resUser)
                         {
@@ -44,7 +44,7 @@ function CreateUser(req,reqId,callback) {
 
                                 logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Saving new sip user %s',reqId,JSON.stringify(SipObj));
 
-                                SaveUser(SipObj,reqId,function (error, st) {
+                                SaveUser(SipObj,Company,Tenant,reqId,function (error, st) {
 
                                     if(error)
                                     {
@@ -114,8 +114,7 @@ function CreateUser(req,reqId,callback) {
 }
 
 
-function SaveUser(jobj,reqId,callback) {
-
+function SaveUser(jobj,Company,Tenant,reqId,callback) {
 
 
     if (jobj) {
@@ -125,7 +124,7 @@ function SaveUser(jobj,reqId,callback) {
         if(!isNaN(jobj.CloudEndUserId))
         {
             try{
-                DbConn.CloudEndUser.find({where: [{id: jobj.CloudEndUserId}]}).then(function(resCloudUser)
+                DbConn.CloudEndUser.find({where: [{id: jobj.CloudEndUserId},{CompanyId:Company},{TenantId:Tenant}]}).then(function(resCloudUser)
                 {
                     if (resCloudUser) {
 
@@ -136,7 +135,7 @@ function SaveUser(jobj,reqId,callback) {
                         {
                             try
                             {
-                                DbConn.Context.find({where: [{Context: jobj.ContextId}]}).then(function(resContext)
+                                DbConn.Context.find({where: [{Context: jobj.Context},{CompanyId:Company},{TenantId:Tenant}]}).then(function(resContext)
                                 {
                                     if (resContext) {
 
@@ -153,8 +152,8 @@ function SaveUser(jobj,reqId,callback) {
                                                 EmailAddress: jobj.EmailAddress,
                                                 GuRefId: jobj.GuRefId,
                                                 Pin:jobj.Pin,
-                                                CompanyId: 1,
-                                                TenantId: 1,
+                                                CompanyId: Company,
+                                                TenantId: Tenant,
                                                 ObjClass: "OBJCLZ",
                                                 ObjType: "OBJTYP",
                                                 ObjCategory: "OBJCAT",
@@ -164,7 +163,7 @@ function SaveUser(jobj,reqId,callback) {
                                                 TransExternalEnable:jobj.TransExternalEnable,
                                                 TransConferenceEnable:jobj.TransConferenceEnable,
                                                 TransGroupEnable:jobj.TransGroupEnable,
-                                                ContextId: jobj.ContextId
+                                                ContextId: jobj.Context
 
 
                                             }
@@ -280,6 +279,7 @@ function SaveUser(jobj,reqId,callback) {
 }
 
 function  PickUserByUUID(reqId, uuid, companyId, tenantId, callback) {
+
     logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Method Hit',reqId);
     if(uuid)
     {
@@ -315,6 +315,7 @@ function  PickUserByUUID(reqId, uuid, companyId, tenantId, callback) {
 }
 
 function  PickUserByName(Username,Company,Tenant,reqId, callback) {
+
     logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Method Hit',reqId);
     if(Username)
     {
@@ -351,49 +352,52 @@ function  PickUserByName(Username,Company,Tenant,reqId, callback) {
 }
 
 function  PickAllUsers(Company,Tenant,reqId, callback) {
+
     logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Method Hit',reqId);
 
-        try
-        {
-            DbConn.SipUACEndpoint.findAll({where: [{CompanyId: Company},{TenantId: Tenant},{Enabled:"TRUE"}]})
-                .then(function (resSip) {
+    try
+    {
+        DbConn.SipUACEndpoint.findAll({where: [{CompanyId: Company},{TenantId: Tenant},{Enabled:"TRUE"}]})
+            .then(function (resSip) {
 
-                    logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query completed successfully',reqId);
-                    callback(undefined, resSip);
+                logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                callback(undefined, resSip);
 
-                }).catch(function (errSip) {
+            }).catch(function (errSip) {
 
-                    logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query failed',reqId, errSip);
-                    callback(errSip, undefined);
+                logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                callback(errSip, undefined);
 
-                });
+            });
 
 
 
-        }
-        catch(ex)
-        {
-            logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - Method call failed ',reqId, ex);
-            callback(ex, undefined);
-        }
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - Method call failed ',reqId, ex);
+        callback(ex, undefined);
+    }
 
 
 
 }
 
 
-function UpdateUser(Username,jobj,reqId,callback) {
+function UpdateUser(Username,jobj,Company,Tenant,reqId,callback) {
 
     if(Username && jobj)
     {
         delete jobj.SipUserUuid;
         delete jobj.CompanyId;
         delete jobj.TenantId;
-console.log(JSON.stringify(jobj));
+
+        console.log(JSON.stringify(jobj));
+
         try
         {
             DbConn.SipUACEndpoint
-                .find({where: [{SipUsername: Username}, {CompanyId: 1}, {TenantId: 1}]})
+                .find({where: [{SipUsername: Username}, {CompanyId: Company}, {TenantId: Tenant}]})
                 .then(function (resUser) {
 
                     if (!resUser) {
@@ -450,7 +454,7 @@ console.log(JSON.stringify(jobj));
 
 }
 
-function UpdateUserStatus(Username,status,reqId,callback) {
+function UpdateUserStatus(Username,status,Company,Tenant,reqId,callback) {
 
     if(Username)
     {
@@ -461,7 +465,7 @@ function UpdateUserStatus(Username,status,reqId,callback) {
         try
         {
             DbConn.SipUACEndpoint
-                .find({where: [{SipUsername: Username}, {CompanyId: 1}, {TenantId: 1}]})
+                .find({where: [{SipUsername: Username}, {CompanyId: Company}, {TenantId: Tenant}]})
                 .then(function (resUser) {
 
                     if (!resUser) {
@@ -514,14 +518,14 @@ function UpdateUserStatus(Username,status,reqId,callback) {
 
 }
 
-function PickCompanyUsers(Company,reqId,callback) {
+function PickCompanyUsers(Company,Tenant,reqId,callback) {
 
     if(!isNaN(Company)&& Company)
     {
         try
         {
             DbConn.SipUACEndpoint
-                .findAll({where: {CompanyId: Company}})
+                .findAll({where:[{CompanyId: Company},{TenantId:Tenant}]})
                 .then(function (resSip) {
 
                     if (resSip.length==0) {
@@ -561,12 +565,12 @@ function PickCompanyUsers(Company,reqId,callback) {
 
 
 //Sipuser group
-function CreateUserGroup(obj,reqId,callback) {
+function CreateUserGroup(obj,Company,Tenant,reqId,callback) {
     if(obj)
     {
         if(obj.GroupName) {
             try {
-                DbConn.UserGroup.find({where: [{GroupName: obj.GroupName}]}).then(function (resGroup) {
+                DbConn.UserGroup.find({where: [{GroupName: obj.GroupName},{CompanyId:Company},{TenantId:Tenant}]}).then(function (resGroup) {
 
                     if (resGroup) {
                         logger.debug('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - Already in DB Group %s', reqId, obj.GroupName);
@@ -585,8 +589,8 @@ function CreateUserGroup(obj,reqId,callback) {
                                     ObjClass: "OBJCLZ",
                                     ObjType: "OBJTYP",
                                     ObjCategory: "OBJCAT",
-                                    CompanyId: 1,
-                                    TenantId: 1
+                                    CompanyId:Company,
+                                    TenantId: Tenant
 
 
                                 }
@@ -647,12 +651,12 @@ function CreateUserGroup(obj,reqId,callback) {
 
 }
 
-function AssignUserToGroup(SID,GID,reqId,callback) {
+function AssignUserToGroup(SID,GID,Company,Tenant,reqId,callback) {
 
     if(!isNaN(SID)&& SID &&!isNaN(GID)&& GID)
     {
         try {
-            DbConn.SipUACEndpoint.find({where: [{id: SID}]}).then(function (resSip) {
+            DbConn.SipUACEndpoint.find({where: [{id: SID},{CompanyId:Company},{TenantId:Tenant}]}).then(function (resSip) {
 
                 if(!resSip)
                 {
@@ -665,32 +669,32 @@ function AssignUserToGroup(SID,GID,reqId,callback) {
                     if(GID)
                     {
                         try {
-                            DbConn.UserGroup.find({where: [{id: GID}]}).then(function (resGroup)
+                            DbConn.UserGroup.find({where: [{id: GID},{CompanyId:Company},{TenantId:Tenant}]}).then(function (resGroup)
                             {
 
-                                    if(!resGroup)
+                                if(!resGroup)
+                                {
+                                    callback(new Error("No group record found"), undefined);
+                                }
+                                else
+                                {
                                     {
-                                        callback(new Error("No group record found"), undefined);
-                                    }
-                                    else
-                                    {
-                                        {
-                                            try {
-                                                resGroup.addSipUACEndpoint(resSip).then(function (resMapGroup) {
+                                        try {
+                                            resGroup.addSipUACEndpoint(resSip).then(function (resMapGroup) {
 
-                                                    callback(undefined, resMapGroup)
+                                                callback(undefined, resMapGroup)
 
-                                                }).catch(function (resMapGroup) {
-                                                    callback(resMapGroup, undefined)
-                                                });
+                                            }).catch(function (resMapGroup) {
+                                                callback(resMapGroup, undefined)
+                                            });
 
 
-                                            }
-                                            catch (ex) {
-                                                callback(ex, undefined);
-                                            }
+                                        }
+                                        catch (ex) {
+                                            callback(ex, undefined);
                                         }
                                     }
+                                }
 
                             }).catch(function(err)
                             {
@@ -816,7 +820,7 @@ function FillUserGroup(obj,reqId,callback) {
 
 }
 
-function UpdateUserGroup(GID,obj,reqId,callback) {
+function UpdateUserGroup(GID,obj,Company,Tenant,reqId,callback) {
     if(obj)
     {
         if(!isNaN(GID)&&GID)
@@ -831,13 +835,13 @@ function UpdateUserGroup(GID,obj,reqId,callback) {
                         ObjClass: "OBJCLZ",
                         ObjType: "OBJTYP",
                         ObjCategory: "OBJCAT",
-                        CompanyId: 1,
-                        TenantId: 1
+                        CompanyId: Company,
+                        TenantId: Tenant
 
 
                     },
                     {
-                        where: [{id: GID}]
+                        where: [{id: GID},{CompanyId:Company},{TenantId:Tenant}]
                     }
                 ).then(function (resGrpUpdate) {
                         logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [PGSQL]  - Updation succeeded -  Data - %s',reqId,JSON.stringify(obj));
@@ -898,11 +902,6 @@ function PickUserGroup(GroupID,Company,Tenant,reqId,callback) {
                     callback(errGrp, undefined);
                 });
 
-
-
-
-
-
         }
         catch(ex)
         {
@@ -955,6 +954,7 @@ function GetGroupEndpoints(obj,Company,Tenant,reqId,callback) {
 }
 
 function PickUsersGroup(SipID,Company,Tenant,reqId,callback) {
+
     if(!isNaN(SipID)&& SipID)
     {
         try {
@@ -1003,12 +1003,13 @@ function PickUsersGroup(SipID,Company,Tenant,reqId,callback) {
 
 }
 
-function PickCompayGroups(Company,reqId,callback) {
+function PickCompayGroups(Company,Tenant,reqId,callback) {
+
     if(!isNaN(Company)&&Company)
     {
         try{
             DbConn.UserGroup
-                .findAll({where : {CompanyId:Company}
+                .findAll({where : [{CompanyId:Company},{TenantId:TenantId}]
                 }
             ).then(function(resGroup)
                 {

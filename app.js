@@ -702,7 +702,7 @@ RestServer.put('/DVP/API/:version/SipUser/Extension/:extension/RecordingStatus/:
 
 
 
-RestServer.post('/DVP/API/'+version+'/SipUser/User',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/User',authorization({resource:"user", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -718,9 +718,18 @@ RestServer.post('/DVP/API/'+version+'/SipUser/User',function(req,res,next) {
 
     try {
 
+
         logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId,JSON.stringify(req.body));
 
-        SipbackendHandler.CreateUser(req,reqId,function (err,resz) {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        SipbackendHandler.CreateUser(req,Company,Tenant,reqId,function (err,resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -746,7 +755,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/User',function(req,res,next) {
     return next();
 });
 
-RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,next) {
+RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',authorization({resource:"user", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -764,7 +773,15 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,ne
 
         logger.debug('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [HTTP]  - Request received -  Data - Username %s Body %s ',reqId,req.params.Username,JSON.stringify(req.body));
 
-        SipbackendHandler.UpdateUser(req.params.Username,req.body,reqId,function (err, resz) {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        SipbackendHandler.UpdateUser(req.params.Username,req.body,Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
@@ -794,7 +811,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,ne
 
 
 // no swagger
-RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',function(req,res,next) {
+RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',authorization({resource:"user", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -812,7 +829,16 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',function
 
         logger.debug('[DVP-SIPUserEndpointService.UpdateUserStatus] - [%s] - [HTTP]  - Request received -  Data - Username %s Status %s ',reqId,req.params.Username,req.params.st);
 
-        SipbackendHandler.UpdateUserStatus(req.params.Username,req.params.st,reqId,function (err, resz) {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+
+        SipbackendHandler.UpdateUserStatus(req.params.Username,req.params.st,Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
@@ -840,7 +866,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',function
 });
 
 //no swagger
-RestServer.get('/DVP/API/'+version+'/SipUser/Users',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Users',authorization({resource:"user", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -851,13 +877,19 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Users',function(req,res,next) {
     {
 
     }
-    var Company=1;
-    var Tenant=1;
 
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [HTTP]  - Request received -  Data - Body %s ',reqId,JSON.stringify(req.body));
+
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
         SipbackendHandler.PickAllUsers(Company,Tenant,reqId,function (err, resz) {
             if(err)
@@ -886,7 +918,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Users',function(req,res,next) {
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/User/:Username',authorization({resource:"user", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -897,13 +929,20 @@ RestServer.get('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,ne
     {
 
     }
-    var Company=1;
-    var Tenant=1;
 
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [HTTP]  - Request received -  Data - Username %s Body %s ',reqId,req.params.Username,JSON.stringify(req.body));
+
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
 
         SipbackendHandler.PickUserByName(req.params.Username,Company,Tenant,reqId,function (err, resz) {
             if(err)
@@ -932,7 +971,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/User/:Username',function(req,res,ne
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/User/ByUUID/:uuid',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/User/ByUUID/:uuid',authorization({resource:"user", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -950,7 +989,15 @@ RestServer.get('/DVP/API/'+version+'/SipUser/User/ByUUID/:uuid',function(req,res
 
         logger.debug('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [HTTP]  - Request received -  Uuid - %s ',reqId,sipUuid);
 
-        SipbackendHandler.PickUserByUUID(reqId,sipUuid, 1, 1, function (err, sipUsr) {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        SipbackendHandler.PickUserByUUID(reqId,sipUuid, Company, Tenant, function (err, sipUsr) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -977,7 +1024,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/User/ByUUID/:uuid',function(req,res
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',authorization({resource:"extention", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -989,12 +1036,19 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',function(req,
 
     }
     var ext = req.params.extention;
-    var Tenant=1;
-    var Company=1;
+
     try
     {
 
         logger.debug('[DVP-SIPUserEndpointService.GetUsersOfExtension] - [%s] - [HTTP]  - Request received -  ext - %s ',reqId,ext);
+
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
         Extmgt.GetUsersOfExtension(reqId,ext, Tenant,Company, function (err, extInfo) {
             if(err)
@@ -1023,7 +1077,8 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',function(req,
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',authorization({resource:"extention", action:"write"}),function(req,res,next) {
+
     var reqId='';
 
     try
@@ -1035,14 +1090,22 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',f
 
     }
 
-    var Tenant=1;
-    var Company=1;
+
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [HTTP]  - Request received -  Data - Tenant %s Id %s Status %s ',reqId,req.params.tenant,req.params.extension,req.params.st);
 
-        Extmgt.ChangeUserAvailability(Tenant,req.params.extension,req.params.st,reqId,function (err, resz) {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+
+        Extmgt.ChangeUserAvailability(req.params.extension,req.params.st,Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1069,7 +1132,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',f
     return next();
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension',authorization({resource:"extention", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1081,12 +1144,20 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension',function(req,res,next) 
 
     }
 
-    var Company=1;
-    var Tenant=1;
+
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.CreateExtension] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req.body));
+
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
 
         Extmgt.CreateExtension(req.body,Company,Tenant,reqId,function (errExt, resExt) {
             if(errExt)
@@ -1116,7 +1187,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension',function(req,res,next) 
 
 });
 //no swagger
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"extention", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1129,12 +1200,19 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',function(req
 
     }
 
-    var Company=1;
-    var Tenant=1;
+
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req.body));
+
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
         Extmgt.UpdateExtension(req.params.Extension,req.body,Company,Tenant,reqId,function (errExt, resExt) {
             if(errExt)
@@ -1164,7 +1242,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',function(req
 
 });
 //no swagger
-RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',function(req,res,next) {
+RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"extention", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1177,24 +1255,31 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',function(req,
 
     }
 
-    var Company=1;
-    var Tenant=1;
+
 
     try {
 
-        logger.debug('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req.body));
+        logger.debug('[DVP-SIPUserEndpointService.DeleteExtension] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req.body));
 
-        Extmgt.UpdateExtension(req.params.Extension,req.body,Company,Tenant,reqId,function (errExt, resExt) {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        Extmgt.DeleteExtension(req.params.Extension,req.body,Company,Tenant,reqId,function (errExt, resExt) {
             if(errExt)
             {
                 var jsonString = messageFormatter.FormatMessage(errExt, "ERROR/Exception", false, undefined);
-                logger.debug('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - Request response : %s ',reqId,jsonString);
+                logger.debug('[DVP-SIPUserEndpointService.DeleteExtension] - [%s] - Request response : %s ',reqId,jsonString);
                 res.end(jsonString);
             }
             else
             {
                 var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resExt);
-                logger.debug('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - Request response : %s ',reqId,jsonString);
+                logger.debug('[DVP-SIPUserEndpointService.DeleteExtension] - [%s] - Request response : %s ',reqId,jsonString);
                 res.end(jsonString);
             }
 
@@ -1203,16 +1288,16 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',function(req,
     }
     catch(ex)
     {
-        logger.error('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - [HTTP]  - Exception in Request -  Data - %s',reqId,JSON.stringify(req.body),ex);
+        logger.error('[DVP-SIPUserEndpointService.DeleteExtension] - [%s] - [HTTP]  - Exception in Request -  Data - %s',reqId,JSON.stringify(req.body),ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
-        logger.debug('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - Request response : %s ',reqId,jsonString);
+        logger.debug('[DVP-SIPUserEndpointService.DeleteExtension] - [%s] - Request response : %s ',reqId,jsonString);
         res.end(jsonString);
     }
     return next();
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUser/:id',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUser/:id',authorization({resource:"extention", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1223,13 +1308,19 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUs
     {
 
     }
-    var Company=1;
-    var Tenant=1;
 
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.Extension.AssignToSipUser] - [%s] - [HTTP]  - Request received -  Data - Ext %s UAC %s Data %s',reqId,req.params.extension,req.params.id,JSON.stringify(req.body));
+
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
         Extmgt.AssignToSipUser(req.params.extension,req.params.id,Company,Tenant,reqId,function (err, resz) {
             if(err)
@@ -1258,7 +1349,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUs
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToGroup/:grpid',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToGroup/:grpid',authorization({resource:"extention", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1271,12 +1362,19 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToGroup
 
     }
 
-    var Company=1;
-    var Tenant=1;
+
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.AssignToGroup] - [%s] - [HTTP]  - Request received -  Extension %s Group %',reqId,req.params.extension,req.params.grpid);
+
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
         Extmgt.AssignToGroup(req.params.extension,req.params.grpid,Company,Tenant,reqId,function (err, resz) {
             if(err)
@@ -1304,7 +1402,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToGroup
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Group',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Group',authorization({resource:"group", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1321,8 +1419,15 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Group',function(req,res,next) {
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req.body));
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
-        SipbackendHandler.CreateUserGroup(req.body,reqId, function (err, resz) {
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        SipbackendHandler.CreateUserGroup(req.body,Company,Tenant,reqId, function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1348,7 +1453,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Group',function(req,res,next) {
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Group/:id',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Group/:id',authorization({resource:"group", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1365,8 +1470,15 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Group/:id',function(req,res,next) 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [HTTP]  - Request received -  Data - ID %s Other %s',reqId,req.params.id,JSON.stringify(req.body));
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
-        SipbackendHandler.UpdateUserGroup(req.params.id,req.body,reqId,function (err, resz) {
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        SipbackendHandler.UpdateUserGroup(req.params.id,req.body,Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1392,7 +1504,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Group/:id',function(req,res,next) 
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Context/ByCompany/:companyid',function(req,res,next){
+RestServer.get('/DVP/API/'+version+'/SipUser/Context/ByCompany/:companyid',authorization({resource:"context", action:"read"}),function(req,res,next){
     var reqId='';
 
     try
@@ -1409,8 +1521,15 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Context/ByCompany/:companyid',funct
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.companyid);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
-        context.GetCompanyContextDetails(parseInt(req.params.companyid),reqId, function (err, resz) {
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        context.GetCompanyContextDetails(Company,Tenant,reqId, function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, resz);
@@ -1437,7 +1556,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Context/ByCompany/:companyid',funct
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Group/:id',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Group/:id',authorization({resource:"group", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1448,14 +1567,18 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Group/:id',function(req,res,next) {
     {
 
     }
-    var Company=1;
-    var Tenant=1;
 
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.id);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
         SipbackendHandler.PickUserGroup(req.params.id,Company,Tenant,reqId, function (err, resz) {
             if(err)
             {
@@ -1486,7 +1609,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Group/:id',function(req,res,next) {
 
 //.......................................................................................................................
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Group/User/:sipid',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Group/User/:sipid',authorization({resource:"group", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1498,14 +1621,19 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Group/User/:sipid',function(req,res
     {
 
     }
-    var Company=1;
-    var Tenant=1;
+
 
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickUsersGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.sipid);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
         SipbackendHandler.PickUsersGroup(req.params.sipid,Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
@@ -1531,7 +1659,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Group/User/:sipid',function(req,res
     return next();
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Groups/Company/:companyid',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Groups/Company/:companyid',authorization({resource:"group", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1548,8 +1676,15 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Groups/Company/:companyid',function
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.companyid);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
-        SipbackendHandler.PickCompayGroups(req.params.companyid,reqId, function (err, resz) {
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        SipbackendHandler.PickCompayGroups(Company,Tenant,reqId, function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1577,7 +1712,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Groups/Company/:companyid',function
 });
 //.......................................................................................................................
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Users/InGroup/:groupid',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Users/InGroup/:groupid',authorization({resource:"group", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1589,13 +1724,18 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Users/InGroup/:groupid',function(re
 
     }
 
-    var Company=1;
-    var Tenant=1;
+
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickUsersInGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.groupid);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
         SipbackendHandler.PickUsersInGroup(req.params.groupid,Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
@@ -1623,7 +1763,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Users/InGroup/:groupid',function(re
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Users/OfCompany/:compid',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Users/OfCompany/:compid',authorization({resource:"group", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1640,8 +1780,14 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Users/OfCompany/:compid',function(r
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.compid);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
-        SipbackendHandler.PickCompanyUsers(req.params.compid,reqId,function (err, resz) {
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+        SipbackendHandler.PickCompanyUsers(Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1668,7 +1814,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Users/OfCompany/:compid',function(r
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/User',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/User',authorization({resource:"group", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1680,12 +1826,17 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/User',function
 
     }
 
-    var Tenant=1;
-    var Company=1;
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickExtensionUsers] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.extension);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
         Extmgt.PickExtensionUser(req.params.extension,Company,Tenant,reqId,function (err, resz) {
             if(err)
@@ -1716,7 +1867,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/User',function
 
 
 // access taken company id problem
-RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',authorization({resource:"extention", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1728,13 +1879,20 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',function(req,res,next) 
 
     }
 
-    var Tenant=1;
+
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.companyid);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
-        Extmgt.PickCompanyExtensions(1,Tenant,reqId,function (err, resz) {
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        Extmgt.PickCompanyExtensions(Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1762,7 +1920,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',function(req,res,next) 
 });
 
 
-RestServer.get('/DVP/API/'+version+'/SipUser/ExtensionsByCategory/:category',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/ExtensionsByCategory/:category',authorization({resource:"extention", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1774,13 +1932,19 @@ RestServer.get('/DVP/API/'+version+'/SipUser/ExtensionsByCategory/:category',fun
 
     }
 
-    var Tenant=1;
+
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.companyid);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
-        Extmgt.PickCompanyExtensionsByCategory(1,Tenant,req.params.category,reqId,function (err, resz) {
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+        Extmgt.PickCompanyExtensionsByCategory(Company,Tenant,req.params.category,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1808,7 +1972,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/ExtensionsByCategory/:category',fun
 });
 
 
-RestServer.post('/DVP/API/'+version+'/SipUser/:SipID/AssignToGroup/:grpid',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/:SipID/AssignToGroup/:grpid',authorization({resource:"group", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1821,15 +1985,20 @@ RestServer.post('/DVP/API/'+version+'/SipUser/:SipID/AssignToGroup/:grpid',funct
 
     }
 
-    var Company=1;
-    var Tenant=1;
+
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.AssignToGroup] - [%s] - [HTTP]  - Request received -  Extension %s Group %',reqId,req.params.extension,req.params.grpid);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
-        SipbackendHandler.AssignUserToGroup(req.params.SipID,req.params.grpid,reqId,function (err, resz) {
+        SipbackendHandler.AssignUserToGroup(req.params.SipID,req.params.grpid,Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -1855,7 +2024,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/:SipID/AssignToGroup/:grpid',funct
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser',function(req,res,next){
+RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser',authorization({resource:"user", action:"write"}),function(req,res,next){
 
     var reqId='';
 
@@ -1872,7 +2041,15 @@ RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser',function(req,res,next)
     {
         logger.debug('[DVP-SIPUserEndpointService.PublicUser] - [%s] - [HTTP]  - Request received  ');
 
-        PublicUser.AddPublicUser(req.body,reqId,function(err,resp)
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        PublicUser.AddPublicUser(req.body,Company,Tenant,reqId,function(err,resp)
         {
             if(err)
             {
@@ -1903,7 +2080,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser',function(req,res,next)
     next();
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',authorization({resource:"user", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1918,7 +2095,15 @@ RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',function(req,
 
     try
     {
-        PublicUser.ActivatePublicUser(req.body.SipUsername,req.body.Pin,reqId,function(err,resz)
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        PublicUser.ActivatePublicUser(req.body.SipUsername,req.body.Pin,Company,Tenant,reqId,function(err,resz)
         {
             if(err)
             {
@@ -1947,7 +2132,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',function(req,
     next();
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/:User/Pin',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/:User/Pin',authorization({resource:"user", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1962,7 +2147,15 @@ RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/:User/Pin',function(req,
 
     try
     {
-        PublicUser.PinOfUser(req.params.User,reqId,function(err,resz)
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        PublicUser.PinOfUser(req.params.User,Company,Tenant,reqId,function(err,resz)
         {
             if(err)
             {
@@ -1991,7 +2184,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/:User/Pin',function(req,
     next();
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/RegeneratePin',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/RegeneratePin',authorization({resource:"user", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2006,7 +2199,15 @@ RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/RegeneratePin',function(
 
     try
     {
-        PublicUser.ReGeneratePin(req.body.SipUsername,reqId,function(err,resz)
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        PublicUser.ReGeneratePin(req.body.SipUsername,Company,Tenant,reqId,function(err,resz)
         {
             if(err)
             {
@@ -2035,7 +2236,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/RegeneratePin',function(
     next();
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint',authorization({resource:"user", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2048,35 +2249,18 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint',function(req,res,next) {
 
     }
 
-    var Company=1;
-    var Tenant=1;
-
-
-    try {
-        if(req.header('authorization'))
-        {
-            var auth = req.header('authorization');
-            var authInfo = auth.split("#");
-
-            if (authInfo.length >= 2) {
-                Tenant = authInfo[0];
-                Company = authInfo[1];
-            }
-        }
-        else
-        {
-            Tenant = 1;
-            Company = 1;
-        }
-
-    }
-    catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.AddEndpoint] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
-    }
-
 
     try
     {
+
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
         EndPoint.AddEndPoint(req.body,Company,Tenant,reqId,function(err,resz)
         {
             if(err)
@@ -2106,7 +2290,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint',function(req,res,next) {
     next();
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint/:user/Availability',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint/:user/Availability',authorization({resource:"user", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2119,36 +2303,17 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint/:user/Availability',funct
 
     }
 
-    var Company=1;
-    var Tenant=1;
-
-
-    try {
-        if(req.header('authorization'))
-        {
-            var auth = req.header('authorization');
-            var authInfo = auth.split("#");
-
-            if (authInfo.length >= 2) {
-                Tenant = authInfo[0];
-                Company = authInfo[1];
-            }
-        }
-        else
-        {
-            Tenant = 1;
-            Company = 1;
-        }
-
-    }
-    catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.UpdateAvailability] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
-    }
-
-
     try
     {
-        EndPoint.EndpointAvailabilityUpdation(req.params.user,req.body.Phone,req.body.Availability,reqId,function(err,resz)
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        EndPoint.EndpointAvailabilityUpdation(req.params.user,req.body.Phone,req.body.Availability,Company,Tenant,reqId,function(err,resz)
         {
             if(err)
             {
@@ -2177,7 +2342,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint/:user/Availability',funct
     next();
 });
 
-RestServer.del('/DVP/API/'+version+'/SipUser/Endpoint/:user',function(req,res,next) {
+RestServer.del('/DVP/API/'+version+'/SipUser/Endpoint/:user',authorization({resource:"user", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2190,37 +2355,19 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Endpoint/:user',function(req,res,ne
 
     }
 
-    var Company=1;
-    var Tenant=1;
-
-
-
-    try {
-        if(req.header('authorization'))
-        {
-            var auth = req.header('authorization');
-            var authInfo = auth.split("#");
-
-            if (authInfo.length >= 2) {
-                Tenant = authInfo[0];
-                Company = authInfo[1];
-            }
-        }
-        else
-        {
-            Tenant = 1;
-            Company = 1;
-        }
-
-    }
-    catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.RemoveEndPoint] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
-    }
 
 
     try
     {
-        EndPoint.RemoveEndpoint(req.params.user,req.body.Phone,reqId,function(err,resz)
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        EndPoint.RemoveEndpoint(req.params.user,req.body.Phone,Company,Tenant,reqId,function(err,resz)
         {
             if(err)
             {
@@ -2249,7 +2396,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Endpoint/:user',function(req,res,ne
     next();
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Endpoints/:user',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Endpoints/:user',authorization({resource:"user", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2262,37 +2409,20 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Endpoints/:user',function(req,res,n
 
     }
 
-    var Company=1;
-    var Tenant=1;
 
-
-
-    try {
-        if(req.header('authorization'))
-        {
-            var auth = req.header('authorization');
-            var authInfo = auth.split("#");
-
-            if (authInfo.length >= 2) {
-                Tenant = authInfo[0];
-                Company = authInfo[1];
-            }
-        }
-        else
-        {
-            Tenant = 1;
-            Company = 1;
-        }
-
-    }
-    catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.AllEndpoints] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
-    }
 
 
     try
     {
-        EndPoint.AllEndpointsOfuser(req.params.user,reqId,function(err,resz)
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        EndPoint.AllEndpointsOfuser(req.params.user,Company,Tenant,reqId,function(err,resz)
         {
             if(err)
             {
@@ -2321,7 +2451,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Endpoints/:user',function(req,res,n
     next();
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Endpoint/:user/:phone',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Endpoint/:user/:phone',authorization({resource:"user", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2334,37 +2464,17 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Endpoint/:user/:phone',function(req
 
     }
 
-    var Company=1;
-    var Tenant=1;
-
-
-
-    try {
-        if(req.header('authorization'))
-        {
-            var auth = req.header('authorization');
-            var authInfo = auth.split("#");
-
-            if (authInfo.length >= 2) {
-                Tenant = authInfo[0];
-                Company = authInfo[1];
-            }
-        }
-        else
-        {
-            Tenant = 1;
-            Company = 1;
-        }
-
-    }
-    catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.AllEndpoints] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
-    }
-
-
     try
     {
-        EndPoint.GetEndpointDetails(req.params.user,req.params.phone,reqId,function(err,resz)
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        EndPoint.GetEndpointDetails(req.params.user,req.params.phone,Company,Tenant,reqId,function(err,resz)
         {
             if(err)
             {
@@ -2397,7 +2507,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Endpoint/:user/:phone',function(req
 // Sprint 5 : Pawan
 
 //no swagger
-RestServer.post('/DVP/API/'+version+'/SipUser/TransferCode',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/TransferCode',authorization({resource:"user", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2410,35 +2520,17 @@ RestServer.post('/DVP/API/'+version+'/SipUser/TransferCode',function(req,res,nex
 
     }
 
-    var Company=1;
-    var Tenant=1;
-
-
-    try {
-        if(req.header('authorization'))
-        {
-            var auth = req.header('authorization');
-            var authInfo = auth.split("#");
-
-            if (authInfo.length >= 2) {
-                Tenant = authInfo[0];
-                Company = authInfo[1];
-            }
-        }
-        else
-        {
-            Tenant = 1;
-            Company = 1;
-        }
-
-    }
-    catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
-    }
-
 
     try
     {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
         Extmgt.AddTransferCodes(Company,Tenant,req.body,reqId,function(err,resz)
         {
             if(err)
@@ -2468,7 +2560,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/TransferCode',function(req,res,nex
     next();
 });
 //no swagger
-RestServer.put('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,next) {
+RestServer.put('/DVP/API/'+version+'/SipUser/TransferCode/:id',authorization({resource:"user", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2481,35 +2573,16 @@ RestServer.put('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,
 
     }
 
-    var Company=1;
-    var Tenant=1;
-
-
-    try {
-        if(req.header('authorization'))
-        {
-            var auth = req.header('authorization');
-            var authInfo = auth.split("#");
-
-            if (authInfo.length >= 2) {
-                Tenant = authInfo[0];
-                Company = authInfo[1];
-            }
-        }
-        else
-        {
-            Tenant = 1;
-            Company = 1;
-        }
-
-    }
-    catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.UpdateTransferCodes] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
-    }
-
-
     try
     {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
         Extmgt.UpdateTransferCodes(Company,Tenant,req.params.id,req.body,reqId,function(err,resz)
         {
             if(err)
@@ -2542,7 +2615,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,
 //App design phase
 
 // no swagger
-RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode',authorization({resource:"user", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2555,35 +2628,16 @@ RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode',function(req,res,next
 
     }
 
-    var Company=1;
-    var Tenant=1;
-
-
-    try {
-        if(req.header('authorization'))
-        {
-            var auth = req.header('authorization');
-            var authInfo = auth.split("#");
-
-            if (authInfo.length >= 2) {
-                Tenant = authInfo[0];
-                Company = authInfo[1];
-            }
-        }
-        else
-        {
-            Tenant = 1;
-            Company = 1;
-        }
-
-    }
-    catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.GetTransferCode] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
-    }
-
-
     try
     {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
         Extmgt.GetTransferCode(Company,Tenant,reqId,function(err,resz)
         {
             if(err)
@@ -2614,48 +2668,21 @@ RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode',function(req,res,next
 });
 
 // no swagger
-RestServer.del('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,next) {
+RestServer.del('/DVP/API/'+version+'/SipUser/TransferCode/:id',authorization({resource:"user", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
-    try
-    {
-        reqId = uuid.v1();
-    }
-    catch(ex)
-    {
-
-    }
-
-    var Company=1;
-    var Tenant=1;
-
-
-    try {
-        if(req.header('authorization'))
-        {
-            var auth = req.header('authorization');
-            var authInfo = auth.split("#");
-
-            if (authInfo.length >= 2) {
-                Tenant = authInfo[0];
-                Company = authInfo[1];
-            }
-        }
-        else
-        {
-            Tenant = 1;
-            Company = 1;
-        }
-
-    }
-    catch (ex) {
-        logger.error('[DVP-SIPUserEndpointService.RemoveTransferCode] - [HTTP]  - Exception occurred -  Data - %s ', "authorization", ex);
-    }
-
 
     try
     {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
         Extmgt.RemoveTransferCode(Company,Tenant,req.params.id,reqId,function(err,resz)
         {
             if(err)
@@ -2688,7 +2715,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/TransferCode/:id',function(req,res,
 // App designing phase
 
 // no swagger
-RestServer.get('/DVP/API/'+version+'/SipUser/Contexts',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Contexts',authorization({resource:"context", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2700,13 +2727,17 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Contexts',function(req,res,next) {
     {
 
     }
-    var Company=1;
-    var Tenant=1;
-
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [HTTP]  - Request received ',reqId);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
         context.PickAllContexts(Company,Tenant,reqId,function (err, resz) {
             if(err)
@@ -2736,7 +2767,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Contexts',function(req,res,next) {
 });
 
 // no swagger
-RestServer.put('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,next) {
+RestServer.put('/DVP/API/'+version+'/SipUser/Context/:context',authorization({resource:"context", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -2747,15 +2778,20 @@ RestServer.put('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,
     {
 
     }
-    var company=1;
-    var tenant=1;
-
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [HTTP]  - Request received -  Context :%s Data - %s ',reqId,req.params.context,JSON.stringify(req.body));
 
-        context.UpdateContext(company,tenant,req.params.context,req.body,reqId, function (err, resz) {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        context.UpdateContext(Company,Tenant,req.params.context,req.body,reqId, function (err, resz) {
 
             if(err)
             {
@@ -2785,7 +2821,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,
 
 });
 // no swagger
-RestServer.get('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Context/:context',authorization({resource:"context", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -2796,15 +2832,18 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,
     {
 
     }
-    var company=1;
-    var tenant=1;
-
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.PickContext] - [%s] - [HTTP]  - Request received -  Context :%s Data - %s ',reqId,req.params.context);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
-        context.PickContext(company,tenant,req.params.context,reqId, function (err, resz) {
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+        context.PickContext(Company,Tenant,req.params.context,reqId, function (err, resz) {
 
             if(err)
             {
@@ -2835,7 +2874,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,
 });
 
 // update swagger
-RestServer.post('/DVP/API/'+version+'/SipUser/Context',function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"context", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -2847,15 +2886,20 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Context',function(req,res,next) {
 
     }
 
-    var company=1;
-    var tenant=1;
-
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId,JSON.stringify(req.body));
 
-        context.AddOrUpdateContext(company,tenant,req.body,reqId, function (err, resz) {
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        context.AddOrUpdateContext(Company,Tenant,req.body,reqId, function (err, resz) {
 
             if(err)
             {
@@ -2886,7 +2930,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Context',function(req,res,next) {
 });
 
 // no swagger
-RestServer.del('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,next) {
+RestServer.del('/DVP/API/'+version+'/SipUser/Context/:context',authorization({resource:"context", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -2897,15 +2941,19 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Context/:context',function(req,res,
     {
 
     }
-    var company=1;
-    var tenant=1;
-
 
     try {
 
         logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s] - [HTTP]  - Request received -  Context :%s Data - %s ',reqId,req.params.context);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
-        context.DeleteContext(company,tenant,req.params.context,reqId, function (err, resz) {
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        context.DeleteContext(Company,Tenant,req.params.context,reqId, function (err, resz) {
 
             if(err)
             {
