@@ -1024,7 +1024,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/User/ByUUID/:uuid',authorization({r
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',authorization({resource:"extention", action:"write"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',authorization({resource:"user", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1077,7 +1077,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',authorization
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',authorization({resource:"extention", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',authorization({resource:"user", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1132,7 +1132,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',a
     return next();
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension',authorization({resource:"extention", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension',authorization({resource:"user", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1187,7 +1187,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension',authorization({resource
 
 });
 //no swagger
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"extention", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"user", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1242,7 +1242,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorizatio
 
 });
 //no swagger
-RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"extention", action:"write"}),function(req,res,next) {
+RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"user", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1297,7 +1297,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUser/:id',authorization({resource:"extention", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUser/:id',authorization({resource:"user", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1349,7 +1349,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUs
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToGroup/:grpid',authorization({resource:"extention", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToGroup/:grpid',authorization({resource:"user", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1867,7 +1867,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/User',authoriz
 
 
 // access taken company id problem
-RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',authorization({resource:"extention", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',authorization({resource:"user", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1920,7 +1920,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',authorization({resource
 });
 
 
-RestServer.get('/DVP/API/'+version+'/SipUser/ExtensionsByCategory/:category',authorization({resource:"extention", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/ExtensionsByCategory/:category',authorization({resource:"user", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
