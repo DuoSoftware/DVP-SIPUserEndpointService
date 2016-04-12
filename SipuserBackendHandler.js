@@ -1007,7 +1007,7 @@ function PickCompayGroups(Company,Tenant,reqId,callback) {
     {
         try{
             DbConn.UserGroup
-                .findAll({where : [{CompanyId:Company},{TenantId:TenantId}]
+                .findAll({where : [{CompanyId:Company},{TenantId:Tenant}]
                 }
             ).then(function(resGroup)
                 {
