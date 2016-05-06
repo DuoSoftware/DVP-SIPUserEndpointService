@@ -129,16 +129,16 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                         logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Record found for CloudEndUser %s and searching for Context %s',reqId,jobj.CloudEndUserId,jobj.Context);
 
 
-                        if(jobj.Context)
+                        if(jobj.ContextId)
                         {
                             try
                             {
-                                DbConn.Context.find({where: [{Context: jobj.Context},{CompanyId:Company},{TenantId:Tenant}]}).then(function(resContext)
+                                DbConn.Context.find({where: [{Context: jobj.ContextId},{CompanyId:Company},{TenantId:Tenant}]}).then(function(resContext)
                                 {
                                     if (resContext) {
 
                                         var sipUserUuid = nodeUuid.v1();
-                                        logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - Record found for Context %s and saving SipUser',reqId,jobj.Context);
+                                        logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - Record found for Context %s and saving SipUser',reqId,jobj.ContextId);
                                         var SIPObject = DbConn.SipUACEndpoint
                                             .build(
                                             {
@@ -161,7 +161,7 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                 TransExternalEnable:jobj.TransExternalEnable,
                                                 TransConferenceEnable:jobj.TransConferenceEnable,
                                                 TransGroupEnable:jobj.TransGroupEnable,
-                                                ContextId: jobj.Context
+                                                ContextId: jobj.ContextId
 
 
                                             }
@@ -206,14 +206,14 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
 
                                     }
                                     else  {
-                                        logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - No record found for context %s',reqId,jobj.Context);
+                                        logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - No record found for context %s',reqId,jobj.ContextId);
                                         callback(new Error("No context Found"),undefined);
 
 
                                     }
                                 }).catch(function(errContext)
                                 {
-                                    logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in Searching Records of Context %s ',reqId,jobj.Context,errContext);
+                                    logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in Searching Records of Context %s ',reqId,jobj.ContextId,errContext);
                                     callback(errContext,undefined);
                                 });
 
