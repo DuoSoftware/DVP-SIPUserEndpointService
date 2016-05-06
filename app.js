@@ -1504,7 +1504,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Group/:id',authorization({resource
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Context/ByCompany/:companyid',authorization({resource:"context", action:"read"}),function(req,res,next){
+RestServer.get('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"context", action:"read"}),function(req,res,next){
     var reqId='';
 
     try
@@ -1659,7 +1659,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Group/User/:sipid',authorization({r
     return next();
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Groups/Company/:companyid',authorization({resource:"group", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Groups',authorization({resource:"group", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
