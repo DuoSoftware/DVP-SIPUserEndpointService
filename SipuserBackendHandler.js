@@ -126,7 +126,7 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                 {
                     if (resCloudUser) {
 
-                        logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Record found for CloudEndUser %s and searching for Context %s',reqId,jobj.CloudEndUserId,jobj.Context);
+                        logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Record found for CloudEndUser %s and searching for Context %s',reqId,jobj.CloudEndUserId,jobj.ContextId);
 
 
                         if(jobj.ContextId)
