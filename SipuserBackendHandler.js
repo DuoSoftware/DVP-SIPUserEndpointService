@@ -871,13 +871,51 @@ function UpdateUserGroup(GID,obj,Company,Tenant,reqId,callback) {
 
 }
 
+var DeleteGroupDB = function(reqId, grpId, companyId, tenantId, callback)
+{
+    try
+    {
+        DbConn.UserGroup.find({where: [{id: grpId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (grpRec)
+        {
+            if(grpRec)
+            {
+                grpRec.destroy().then(function (result)
+                {
+                    callback(undefined, true);
+
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-SIPUserEndpointService.DeleteGroupDB] - [%s] - Exception occurred', reqId, err);
+                    callback(err, false);
+                });
+            }
+            else
+            {
+                callback(new Error('Did record not found'), false);
+            }
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-SIPUserEndpointService.DeleteGroupDB] - [%s] - Exception occurred', reqId, err);
+            callback(err, false);
+        })
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.DeleteGroupDB] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+
+};
+
 function PickUserGroup(GroupID,Company,Tenant,reqId,callback) {
     if(!isNaN(GroupID)&& GroupID)
     {
         try {
             DbConn.UserGroup
                 .find({
-                    where: [{id: GroupID},{CompanyId:Company},{TenantId:Tenant}]
+                    where: [{id: GroupID},{CompanyId:Company},{TenantId:Tenant}], include:[{model: DbConn.Extension, as: "Extension"}]
                 }
             ).then(function (resGrp) {
 
@@ -1007,7 +1045,7 @@ function PickCompayGroups(Company,Tenant,reqId,callback) {
     {
         try{
             DbConn.UserGroup
-                .findAll({where : [{CompanyId:Company},{TenantId:Tenant}]
+                .findAll({where : [{CompanyId:Company},{TenantId:Tenant}], include:[{model: DbConn.Extension, as: "Extension"}]
                 }
             ).then(function(resGroup)
                 {
@@ -1107,4 +1145,6 @@ module.exports.GetGroupEndpoints = GetGroupEndpoints;
 module.exports.PickUsersGroup = PickUsersGroup;
 module.exports.PickCompayGroups = PickCompayGroups;
 module.exports.PickUsersInGroup = PickUsersInGroup;
+
+module.exports.DeleteGroupDB = DeleteGroupDB;
 

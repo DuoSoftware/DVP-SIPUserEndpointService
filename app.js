@@ -400,6 +400,65 @@ RestServer.del('/DVP/API/:version/SipUser/DidNumber/:id', authorization({resourc
 
 });
 
+RestServer.del('/DVP/API/:version/SipUser/Group/:id', authorization({resource:"group", action:"delete"}), function(req, res, next) {
+    var reqId = uuid.v1();
+    try
+    {
+        var securityToken = req.header('authorization');
+        var grpId = req.params.id;
+
+        logger.debug('[DVP-SIPUserEndpointService.DeleteGroup] - [%s] - HTTP Request Received - Req Params - grpId : %s', reqId, grpId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        if(securityToken)
+        {
+
+            SipbackendHandler.DeleteGroup(reqId, grpId, companyId, tenantId, function (err, delResult)
+            {
+                if (err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Delete Group Record Failed", false, false);
+                    logger.debug('[DVP-SIPUserEndpointService.DeleteGroup] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Delete Group Record Success", true, delResult);
+                    logger.debug('[DVP-SIPUserEndpointService.DeleteGroup] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+
+            })
+
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error('Empty request params or no authorization token set'), "Empty request body or no authorization token set", false, false);
+            logger.debug('[DVP-SIPUserEndpointService.DeleteGroup] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.DeleteGroup] - [%s] - Exception Occurred', reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, false);
+        logger.debug('[DVP-SIPUserEndpointService.DeleteGroup] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
 RestServer.del('/DVP/API/:version/SipUser/EmergencyNumber/:emergencyNum', authorization({resource:"user", action:"delete"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
