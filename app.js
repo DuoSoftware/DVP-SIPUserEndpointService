@@ -400,7 +400,7 @@ RestServer.del('/DVP/API/:version/SipUser/DidNumber/:id', authorization({resourc
 
 });
 
-RestServer.del('/DVP/API/:version/SipUser/GroupDel/:id', authorization({resource:"group", action:"delete"}), function(req, res, next) {
+RestServer.del('/DVP/API/:version/SipUser/Group/:id', authorization({resource:"group", action:"delete"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -1512,7 +1512,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Group',authorization({resource:"gr
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Group/:id',authorization({resource:"group", action:"write"}),function(req,res,next) {
+RestServer.put('/DVP/API/'+version+'/SipUser/Group/:id',authorization({resource:"group", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -2077,6 +2077,57 @@ RestServer.post('/DVP/API/'+version+'/SipUser/:SipID/AssignToGroup/:grpid',autho
         logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [HTTP]  - Exception in Request -  User %s Group % Other %s',reqId,req.params.SipID,req.params.grpid,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
         logger.debug('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
+RestServer.post('/DVP/API/'+version+'/SipUser/:SipID/RemoveFromGroup/:grpid',authorization({resource:"group", action:"delete"}),function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    try
+    {
+
+        logger.debug('[DVP-SIPUserEndpointService.RemoveFromGroup] - [%s] - [HTTP]  - Request received', reqId);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        SipbackendHandler.UnAssignUserFromGroup(req.params.SipID,req.params.grpid,Company,Tenant,reqId,function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.Extension.RemoveFromGroup] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true,resz);
+                logger.debug('[DVP-SIPUserEndpointService.Extension.RemoveFromGroup] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.Extension.RemoveFromGroup] - [%s] - [HTTP]  - Exception in Request -  User %s Group % Other %s',reqId,req.params.SipID,req.params.grpid,ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.Extension.RemoveFromGroup] - [%s] - Request response : %s ',reqId,jsonString);
         res.end(jsonString);
     }
     return next();

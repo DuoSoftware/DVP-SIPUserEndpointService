@@ -649,6 +649,87 @@ function CreateUserGroup(obj,Company,Tenant,reqId,callback) {
 
 }
 
+function UnAssignUserFromGroup(SID,GID,Company,Tenant,callback) {
+
+    if(!isNaN(SID)&& SID &&!isNaN(GID)&& GID)
+    {
+        try {
+            DbConn.SipUACEndpoint.find({where: [{id: SID},{CompanyId:Company},{TenantId:Tenant}]}).then(function (resSip) {
+
+                if(!resSip)
+                {
+                    callback(new Error("No SipUser Record Found"), undefined);
+                }
+                else
+                {
+
+
+                    if(GID)
+                    {
+                        try {
+                            DbConn.UserGroup.find({where: [{id: GID},{CompanyId:Company},{TenantId:Tenant}]}).then(function (resGroup)
+                            {
+
+                                if(!resGroup)
+                                {
+                                    callback(new Error("No group record found"), undefined);
+                                }
+                                else
+                                {
+                                    {
+                                        try {
+                                            resGroup.removeSipUACEndpoint(resSip).then(function (resMapGroup) {
+
+                                                callback(undefined, resMapGroup)
+
+                                            }).catch(function (resMapGroup) {
+                                                callback(resMapGroup, undefined)
+                                            });
+
+
+                                        }
+                                        catch (ex) {
+                                            callback(ex, undefined);
+                                        }
+                                    }
+                                }
+
+                            }).catch(function(err)
+                            {
+                                callback(err, undefined);
+                            })
+
+                        }
+                        catch (ex) {
+                            callback(ex, undefined);
+                        }
+                    }
+                    else
+                    {
+                        callback(new Error("GroupID is Undefined"),undefined);
+                    }
+
+
+                }
+
+            }).catch(function (errSip) {
+                callback(errSip, undefined);
+            });
+
+
+        }
+        catch(ex)
+        {
+            callback(ex,undefined);
+        }
+    }
+    else
+    {
+        callback(new Error("UserID or GroupId is Undefined"),undefined);
+    }
+
+}
+
 function AssignUserToGroup(SID,GID,Company,Tenant,reqId,callback) {
 
     if(!isNaN(SID)&& SID &&!isNaN(GID)&& GID)
@@ -1147,4 +1228,5 @@ module.exports.PickCompayGroups = PickCompayGroups;
 module.exports.PickUsersInGroup = PickUsersInGroup;
 
 module.exports.DeleteGroupDB = DeleteGroupDB;
+module.exports.UnAssignUserFromGroup = UnAssignUserFromGroup;
 
