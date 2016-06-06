@@ -1259,7 +1259,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization
 
     try {
 
-        logger.debug('[DVP-SIPUserEndpointService.DeleteExtension] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req.body));
+        logger.debug('[DVP-SIPUserEndpointService.DeleteExtension] - [%s] - [HTTP]  - Request received -  Data - %s',reqId);
 
         if (!req.user.company || !req.user.tenant)
         {
@@ -1269,7 +1269,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization
         var Company=req.user.company;
         var Tenant=req.user.tenant;
 
-        Extmgt.DeleteExtension(req.params.Extension,req.body,Company,Tenant,reqId,function (errExt, resExt) {
+        Extmgt.DeleteExtension(req.params.Extension,Company,Tenant,reqId,function (errExt, resExt) {
             if(errExt)
             {
                 var jsonString = messageFormatter.FormatMessage(errExt, "ERROR/Exception", false, undefined);

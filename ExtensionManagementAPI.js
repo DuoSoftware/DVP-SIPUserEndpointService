@@ -700,17 +700,7 @@ function UpdateExtension(ext,reqExt,Company,Tenant,reqId,callback) {
 
 }
 
-function DeleteExtension(ext,reqExt,Company,Tenant,reqId,callback) {
-
-    if(reqExt)
-    {
-        try {
-            var obj = reqExt;
-
-        }
-        catch (ex) {
-            callback(ex,undefined);
-        }
+function DeleteExtension(ext,Company,Tenant,reqId,callback) {
 
 
         if(ext)
@@ -762,11 +752,6 @@ function DeleteExtension(ext,reqExt,Company,Tenant,reqId,callback) {
         }
 
 
-    }
-    else
-    {
-        callback(new Error("Empty request"),undefined);
-    }
 
 
 
