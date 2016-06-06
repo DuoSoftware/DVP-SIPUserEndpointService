@@ -1453,160 +1453,6 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Group',authorization({resource:"gr
 
 });
 
-RestServer.put('/DVP/API/'+version+'/SipUser/Group/:id',authorization({resource:"group", action:"write"}),function(req,res,next) {
-    var reqId='';
-
-    try
-    {
-        reqId = uuid.v1();
-    }
-    catch(ex)
-    {
-
-    }
-
-
-
-    try {
-
-        logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [HTTP]  - Request received -  Data - ID %s Other %s',reqId,req.params.id,JSON.stringify(req.body));
-        if (!req.user.company || !req.user.tenant)
-        {
-            throw new Error("Invalid company or tenant");
-        }
-
-        var Company=req.user.company;
-        var Tenant=req.user.tenant;
-
-        SipbackendHandler.UpdateUserGroup(req.params.id,req.body,Company,Tenant,reqId,function (err, resz) {
-            if(err)
-            {
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
-                logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
-                res.end(jsonString);
-            }
-            else
-            {
-                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
-                logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
-                res.end(jsonString);
-            }
-        });
-    }
-    catch(ex)
-    {
-        logger.error('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [HTTP]  - Exception in Request  - Data - ID %s Other %s',reqId,req.params.id,JSON.stringify(req.body),ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
-        logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
-        res.end(jsonString);
-    }
-    return next();
-
-});
-
-RestServer.get('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"context", action:"read"}),function(req,res,next){
-    var reqId='';
-
-    try
-    {
-        reqId = uuid.v1();
-    }
-    catch(ex)
-    {
-
-    }
-
-
-
-    try {
-
-        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.companyid);
-        if (!req.user.company || !req.user.tenant)
-        {
-            throw new Error("Invalid company or tenant");
-        }
-
-        var Company=req.user.company;
-        var Tenant=req.user.tenant;
-
-        context.GetCompanyContextDetails(Company,Tenant,reqId, function (err, resz) {
-            if(err)
-            {
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, resz);
-                logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Request response : %s ',reqId,jsonString);
-                res.end(jsonString);
-            }
-            else
-            {
-                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
-                logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Request response : %s ',reqId,jsonString);
-                res.end(jsonString);
-            }
-        });
-    }
-    catch(ex)
-    {
-        logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [HTTP]  - Exception in Request  -  Data - %s',reqId,req.params.companyid);
-        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
-        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Request response : %s ',reqId,jsonString);
-        res.end(jsonString);
-    }
-    next();
-
-
-});
-
-RestServer.get('/DVP/API/'+version+'/SipUser/Group/:id',authorization({resource:"group", action:"read"}),function(req,res,next) {
-    var reqId='';
-
-    try
-    {
-        reqId = uuid.v1();
-    }
-    catch(ex)
-    {
-
-    }
-
-
-    try {
-
-        logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.id);
-        if (!req.user.company || !req.user.tenant)
-        {
-            throw new Error("Invalid company or tenant");
-        }
-
-        var Company=req.user.company;
-        var Tenant=req.user.tenant;
-        SipbackendHandler.PickUserGroup(req.params.id,Company,Tenant,reqId, function (err, resz) {
-            if(err)
-            {
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
-                logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
-                res.end(jsonString);
-            }
-            else
-            {
-                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
-                logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
-                res.end(jsonString);
-            }
-        });
-
-    }
-    catch(ex)
-    {
-        logger.error('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [HTTP]  - Exception in Request  -  Data - %s',reqId,req.params.id);
-        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
-        logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
-        res.end(jsonString);
-    }
-    return next();
-
-
-});
-
 RestServer.del('/DVP/API/'+version+'/SipUser/Group/:id', authorization({resource:"group", action:"delete"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
@@ -1665,6 +1511,110 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Group/:id', authorization({resource
     return next();
 
 });
+
+RestServer.put('/DVP/API/'+version+'/SipUser/Group/:id',authorization({resource:"group", action:"write"}),function(req,res,next) {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [HTTP]  - Request received -  Data - ID %s Other %s',reqId,req.params.id,JSON.stringify(req.body));
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        SipbackendHandler.UpdateUserGroup(req.params.id,req.body,Company,Tenant,reqId,function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [HTTP]  - Exception in Request  - Data - ID %s Other %s',reqId,req.params.id,JSON.stringify(req.body),ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
+RestServer.get('/DVP/API/'+version+'/SipUser/Group/:id',authorization({resource:"group", action:"read"}),function(req,res,next) {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.id);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+        SipbackendHandler.PickUserGroup(req.params.id,Company,Tenant,reqId, function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
+                logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        });
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [HTTP]  - Exception in Request  -  Data - %s',reqId,req.params.id);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+
+});
+
+
 
 //.......................................................................................................................
 
@@ -1766,6 +1716,58 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Groups',authorization({resource:"gr
         res.end(jsonString);
     }
     return next();
+
+
+});
+
+RestServer.get('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"context", action:"read"}),function(req,res,next){
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,req.params.companyid);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        context.GetCompanyContextDetails(Company,Tenant,reqId, function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, resz);
+                logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [HTTP]  - Exception in Request  -  Data - %s',reqId,req.params.companyid);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    next();
 
 
 });
