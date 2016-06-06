@@ -1473,7 +1473,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Group/:id', authorization({resource
         if(securityToken)
         {
 
-            SipbackendHandler.DeleteGroup(reqId, grpId, companyId, tenantId, function (err, delResult)
+            SipbackendHandler.DeleteGroupDB(reqId, grpId, companyId, tenantId, function (err, delResult)
             {
                 if (err)
                 {
