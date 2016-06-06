@@ -1153,7 +1153,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',a
 
     try {
 
-        logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [HTTP]  - Request received -  Data - Tenant %s Id %s Status %s ',reqId,req.params.tenant,req.params.extension,req.params.st);
+        logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [HTTP]  - Request received -  Data - Extenstion %s Status %s ',reqId,req.params.extension,req.params.st);
 
         if (!req.user.company || !req.user.tenant)
         {

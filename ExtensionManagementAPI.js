@@ -1013,9 +1013,6 @@ function SaveExtension(jobj,Company,Tenant,reqId,callback)
             });
 
 
-
-
-
     }
     catch (ex)
     {
