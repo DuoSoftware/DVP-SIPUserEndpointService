@@ -355,7 +355,7 @@ function  PickAllUsers(Company,Tenant,reqId, callback) {
 
     try
     {
-        DbConn.SipUACEndpoint.findAll({where: [{CompanyId: Company},{TenantId: Tenant},{Enabled:"TRUE"}]})
+        DbConn.SipUACEndpoint.findAll({where: [{CompanyId: Company},{TenantId: Tenant},{Enabled:"TRUE"}], include:[{model: DbConn.Extension, as:"Extension"}]})
             .then(function (resSip) {
 
                 logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query completed successfully',reqId);
