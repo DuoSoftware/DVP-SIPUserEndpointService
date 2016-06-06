@@ -1607,7 +1607,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Group/:id',authorization({resource:
 
 });
 
-RestServer.del('/DVP/API/:version/SipUser/DeleteGroup/:id', authorization({resource:"group", action:"delete"}), function(req, res, next) {
+RestServer.del('/DVP/API/'+version+'/SipUser/Group/:id', authorization({resource:"group", action:"delete"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
