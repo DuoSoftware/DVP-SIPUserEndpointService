@@ -3008,8 +3008,8 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"
             throw new Error("Invalid company or tenant");
         }
 
-        var Company=req.user.company;
-        var Tenant=req.user.tenant;
+        var Company=req.body.ClientCompany;
+        var Tenant=req.body.ClientTenant;
 
         context.AddOrUpdateContext(Company,Tenant,req.body,reqId, function (err, resz) {
 
