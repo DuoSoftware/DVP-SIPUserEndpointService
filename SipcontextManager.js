@@ -128,19 +128,9 @@ function GetCompanyContextDetails(CompanyId,Tenant,reqId,callback)
                 .findAll({where: [{CompanyId: CompanyId},{TenantId:Tenant}]})
                 .then(function (resContext) {
 
-                    if (resContext.length==0) {
-
-                        logger.error('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL]  - No record found for Context %s ',reqId,CompanyId);
-                        callback(new Error("No Context record found"), undefined);
-                    }
-                    else {
-
-                        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL] - Record found for Context %s ',reqId,CompanyId);
+                        logger.debug('[DVP-SIPUserEndpointService.FindContextByCompany] - [%s] - [PGSQL] - %s Records found for Context %s ',reqId,resContext.length,CompanyId);
                         callback(undefined, resContext);
 
-
-
-                    }
 
                 }).catch(function (errContext) {
 
@@ -173,7 +163,6 @@ function PickAllContexts(Company,Tenant,reqId,callback)
     DbConn.Context
         .findAll({where:[{CompanyId:Company},{TenantId:Tenant}]})
         .then(function (resContext) {
-
 
 
             logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s]  - Context records found',reqId);

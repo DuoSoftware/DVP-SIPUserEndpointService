@@ -526,18 +526,8 @@ function PickCompanyUsers(Company,Tenant,reqId,callback) {
                 .findAll({where:[{CompanyId: Company},{TenantId:Tenant}]})
                 .then(function (resSip) {
 
-                    if (resSip.length==0) {
-
-                        logger.error('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [PGSQL]  - No record found for SipUser of Company %s ',reqId,Company);
-                        callback(new Error("No SipUser record found For Company "+Company), undefined);
-                    }
-                    else {
-
-                        logger.debug('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [PGSQL]  - Record found for Context %s ',reqId,Company);
+                        logger.debug('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [PGSQL]  - %s Record found for Context %s ',reqId,resSip.length,Company);
                         callback(undefined, resSip);
-
-
-                    }
 
 
                 }).catch(function (errSip) {
@@ -1130,16 +1120,9 @@ function PickCompayGroups(Company,Tenant,reqId,callback) {
                 }
             ).then(function(resGroup)
                 {
-                    if (resGroup.length==0) {
-                        logger.error('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - No Group records found for company %s ',reqId,Company);
-                        callback(new Error("No group record found"), undefined);
-
-                    } else {
-
-                        logger.debug('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - Records found for company %s ',reqId,Company);
+                        logger.debug('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - %s Records found for company %s ',reqId,resGroup.length,Company);
                         callback(undefined, resGroup);
 
-                    }
                 }).catch(function (errGroup) {
                     logger.error('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - Error in searching Group records of company %s ',reqId,Company,errGroup);
                     callback(errGroup, undefined);
