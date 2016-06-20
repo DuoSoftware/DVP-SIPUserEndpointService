@@ -165,7 +165,7 @@ RestServer.post('/DVP/API/:version/SipUser/DidNumber/:didNum/AssignToExt/:ext', 
 
 });
 
-RestServer.post('/DVP/API/:version/SipUser/EmergencyNumber', authorization({resource:"user", action:"write"}), function(req, res, next) {
+RestServer.post('/DVP/API/:version/SipUser/EmergencyNumber', authorization({resource:"sipuser", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -224,7 +224,7 @@ RestServer.post('/DVP/API/:version/SipUser/EmergencyNumber', authorization({reso
 
 });
 
-RestServer.post('/DVP/API/:version/SipUser/DodNumber', authorization({resource:"user", action:"write"}), function(req, res, next) {
+RestServer.post('/DVP/API/:version/SipUser/DodNumber', authorization({resource:"sipuser", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -400,7 +400,7 @@ RestServer.del('/DVP/API/:version/SipUser/DidNumber/:id', authorization({resourc
 
 });
 
-RestServer.del('/DVP/API/:version/SipUser/EmergencyNumber/:emergencyNum', authorization({resource:"user", action:"delete"}), function(req, res, next) {
+RestServer.del('/DVP/API/:version/SipUser/EmergencyNumber/:emergencyNum', authorization({resource:"sipuser", action:"delete"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -459,7 +459,7 @@ RestServer.del('/DVP/API/:version/SipUser/EmergencyNumber/:emergencyNum', author
 
 });
 
-RestServer.get('/DVP/API/:version/SipUser/EmergencyNumbers', authorization({resource:"user", action:"read"}), function(req, res, next) {
+RestServer.get('/DVP/API/:version/SipUser/EmergencyNumbers', authorization({resource:"sipuser", action:"read"}), function(req, res, next) {
     var emptyArr = [];
     var reqId = uuid.v1();
     try
@@ -577,7 +577,7 @@ RestServer.get('/DVP/API/:version/SipUser/DidNumbers', authorization({resource:"
 
 });
 
-RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', authorization({resource:"user", action:"write"}), function(req, res, next) {
+RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', authorization({resource:"sipuser", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     try
     {
@@ -649,7 +649,7 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', authorization({resourc
 
 });
 
-RestServer.put('/DVP/API/:version/SipUser/Extension/:extension/RecordingStatus/:status', authorization({resource:"user", action:"write"}), function(req, res, next) {
+RestServer.put('/DVP/API/:version/SipUser/Extension/:extension/RecordingStatus/:status', authorization({resource:"sipuser", action:"write"}), function(req, res, next) {
 
     var reqId = uuid.v1();
     try
@@ -702,7 +702,7 @@ RestServer.put('/DVP/API/:version/SipUser/Extension/:extension/RecordingStatus/:
 
 
 
-RestServer.post('/DVP/API/'+version+'/SipUser/User',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/User',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -755,7 +755,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/User',authorization({resource:"use
     return next();
 });
 
-RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -811,7 +811,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',authorization({reso
 
 
 // no swagger
-RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -866,7 +866,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',authoriz
 });
 
 //no swagger
-RestServer.get('/DVP/API/'+version+'/SipUser/Users',authorization({resource:"user", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Users',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -918,7 +918,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Users',authorization({resource:"use
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/User/:Username',authorization({resource:"user", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/User/:Username',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -971,7 +971,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/User/:Username',authorization({reso
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/User/ByUUID/:uuid',authorization({resource:"user", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/User/ByUUID/:uuid',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1024,7 +1024,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/User/ByUUID/:uuid',authorization({r
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1077,7 +1077,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',authorization
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1132,7 +1132,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',a
     return next();
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1187,7 +1187,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension',authorization({resource
 
 });
 //no swagger
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1242,7 +1242,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorizatio
 
 });
 //no swagger
-RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1297,7 +1297,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUser/:id',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUser/:id',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1349,7 +1349,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUs
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToGroup/:grpid',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToGroup/:grpid',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1928,7 +1928,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/User',authoriz
 
 
 // access taken company id problem
-RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',authorization({resource:"user", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1981,7 +1981,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',authorization({resource
 });
 
 
-RestServer.get('/DVP/API/'+version+'/SipUser/ExtensionsByCategory/:category',authorization({resource:"user", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/ExtensionsByCategory/:category',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -2136,7 +2136,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/:SipID/RemoveFromGroup/:grpid',aut
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser',authorization({resource:"user", action:"write"}),function(req,res,next){
+RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser',authorization({resource:"sipuser", action:"write"}),function(req,res,next){
 
     var reqId='';
 
@@ -2192,7 +2192,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser',authorization({resourc
     next();
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2244,7 +2244,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/PublicUser/Activate',authorization
     next();
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/:User/Pin',authorization({resource:"user", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/:User/Pin',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2296,7 +2296,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/:User/Pin',authorization
     next();
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/RegeneratePin',authorization({resource:"user", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/RegeneratePin',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2348,7 +2348,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/PublicUser/RegeneratePin',authoriza
     next();
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2402,7 +2402,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint',authorization({resource:
     next();
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint/:user/Availability',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint/:user/Availability',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2454,7 +2454,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Endpoint/:user/Availability',autho
     next();
 });
 
-RestServer.del('/DVP/API/'+version+'/SipUser/Endpoint/:user',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.del('/DVP/API/'+version+'/SipUser/Endpoint/:user',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2508,7 +2508,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Endpoint/:user',authorization({reso
     next();
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Endpoints/:user',authorization({resource:"user", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Endpoints/:user',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2563,7 +2563,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Endpoints/:user',authorization({res
     next();
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Endpoint/:user/:phone',authorization({resource:"user", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Endpoint/:user/:phone',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2619,7 +2619,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Endpoint/:user/:phone',authorizatio
 // Sprint 5 : Pawan
 
 //no swagger
-RestServer.post('/DVP/API/'+version+'/SipUser/TransferCode',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/TransferCode',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2672,7 +2672,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/TransferCode',authorization({resou
     next();
 });
 //no swagger
-RestServer.put('/DVP/API/'+version+'/SipUser/TransferCode/:id',authorization({resource:"user", action:"write"}),function(req,res,next) {
+RestServer.put('/DVP/API/'+version+'/SipUser/TransferCode/:id',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2727,7 +2727,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/TransferCode/:id',authorization({re
 //App design phase
 
 // no swagger
-RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode',authorization({resource:"user", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
@@ -2780,7 +2780,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/TransferCode',authorization({resour
 });
 
 // no swagger
-RestServer.del('/DVP/API/'+version+'/SipUser/TransferCode/:id',authorization({resource:"user", action:"read"}),function(req,res,next) {
+RestServer.del('/DVP/API/'+version+'/SipUser/TransferCode/:id',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
 
     var reqId='';
 
