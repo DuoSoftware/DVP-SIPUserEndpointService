@@ -1068,21 +1068,8 @@ function PickCompanyExtensions(Company,Tenant,reqId,callback)
             DbConn.Extension.findAll({where: [{CompanyId: Company}, {TenantId: Tenant}]}).then(function (resExt)
             {
 
-                if (resExt.length==0) {
-                    logger.error('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - No record found for Company %s ',reqId,Company);
-                    callback(new Error("No extension record found for Company "+Company), undefined);
-
-                }
-
-
-
-                else  {
-
-                    logger.debug('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - Extension records found for Company %s ',reqId,Company);
+                    logger.debug('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - %s Extension records found for Company %s ',reqId,resExt.length,Company);
                     callback(undefined, resExt);
-                }
-
-
 
             }).catch(function (errExt)
             {
@@ -1119,20 +1106,8 @@ function PickCompanyExtensionsByCategory(Company,Tenant,category, reqId,callback
             DbConn.Extension.findAll({where: [{CompanyId: Company}, {TenantId: Tenant}, {ObjCategory: category}]}).then(function (resExt)
             {
 
-                if (resExt.length==0) {
-                    logger.error('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - No record found for Company %s ',reqId,Company);
-                    callback(new Error("No extension record found for Company "+Company), undefined);
-
-                }
-
-
-
-                else  {
-
-                    logger.debug('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - Extension records found for Company %s ',reqId,Company);
+                    logger.debug('[DVP-SIPUserEndpointService.PickCompanyExtensions] - [%s] - [PGSQL]  - %s Extension records found for Company %s ',reqId,resExt.length,Company);
                     callback(undefined, resExt);
-                }
-
 
 
             }).catch(function (errExt)
