@@ -649,7 +649,7 @@ RestServer.post('/DVP/API/:version/SipUser/DuoWorldUser', authorization({resourc
 
 });
 
-RestServer.put('/DVP/API/:version/SipUser/Extension/:extension/RecordingStatus/:status', authorization({resource:"sipuser", action:"write"}), function(req, res, next) {
+RestServer.put('/DVP/API/:version/SipUser/Extension/:extension/RecordingStatus/:status', authorization({resource:"extension", action:"write"}), function(req, res, next) {
 
     var reqId = uuid.v1();
     try
@@ -1024,7 +1024,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/User/ByUUID/:uuid',authorization({r
 
 });
 
-RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',authorization({resource:"extension", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1077,7 +1077,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extention',authorization
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',authorization({resource:"extension", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1132,7 +1132,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/Status/:st',a
     return next();
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension',authorization({resource:"extension", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1187,7 +1187,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension',authorization({resource
 
 });
 //no swagger
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"extension", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1242,7 +1242,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorizatio
 
 });
 //no swagger
-RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
+RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization({resource:"extension", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1297,7 +1297,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Extension/:Extension',authorization
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUser/:id',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUser/:id',authorization({resource:"extension", action:"write"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1349,7 +1349,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToSipUs
 
 });
 
-RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToGroup/:grpid',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Extension/:extension/AssignToGroup/:grpid',authorization({resource:"extension", action:"write"}),function(req,res,next) {
 
     var reqId='';
 
@@ -1928,7 +1928,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extension/:extension/User',authoriz
 
 
 // access taken company id problem
-RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',authorization({resource:"extension", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
@@ -1981,7 +1981,7 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Extensions',authorization({resource
 });
 
 
-RestServer.get('/DVP/API/'+version+'/SipUser/ExtensionsByCategory/:category',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
+RestServer.get('/DVP/API/'+version+'/SipUser/ExtensionsByCategory/:category',authorization({resource:"extension", action:"read"}),function(req,res,next) {
     var reqId='';
 
     try
