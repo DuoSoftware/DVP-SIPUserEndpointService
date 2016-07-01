@@ -54,7 +54,7 @@ RestServer.post('/DVP/API/:version/SipUser/DidNumber', authorization({resource:"
 
         logger.debug('[DVP-SIPUserEndpointService.NewDidNumber] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
 
-        if(reqBody && securityToken)
+        if(reqBody!=null && securityToken)
         {
             var companyId = req.user.company;
             var tenantId = req.user.tenant;
