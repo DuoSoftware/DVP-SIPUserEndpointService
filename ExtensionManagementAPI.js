@@ -307,12 +307,11 @@ var AddDidNumberDB = function(reqId, didNumberInfo, companyId, tenantId, callbac
                     TenantId: tenantId,
                     ObjClass: 'PBX',
                     ObjType: 'NUMBER_MAPPING',
-                    ObjCategory: 'DID'
+                    ObjCategory: 'DID',
+                    ExtensionId:didNumberInfo.ExtensionId
                 });
 
-                didNum
-                    .save()
-                    .then(function (saveRes)
+                didNum.save().then(function (saveRes)
                     {
                         logger.debug('[DVP-SIPUserEndpointService.AddDidNumber] - [%s] - PGSQL query success', reqId);
                         callback(undefined, true, didNum.id);
