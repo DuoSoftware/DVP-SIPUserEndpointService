@@ -12,7 +12,7 @@ var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, companyId, tenantId
 {
     try
     {
-        DbConn.EmergencyNumber.find({where: [{EmergencyNum: emergencyNumInfo.EmergencyNumber},{TenantId: tenantId}]})
+        DbConn.EmergencyNumber.find({where: [{EmergencyNum: emergencyNumInfo.EmergencyNum},{TenantId: tenantId}]})
             .then(function (numData)
             {
                 if(numData)
