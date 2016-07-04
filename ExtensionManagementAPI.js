@@ -1183,6 +1183,23 @@ function AddTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
             }
             else
             {
+                delete Codeinfo.CompanyId;
+                delete Codeinfo.TenantId;
+                delete Codeinfo.id;
+                resTc.updateAttributes(Codeinfo).then(function (resUpdate)
+                {
+
+                    logger.debug('[DVP-LimitHandler.UACManagement.UpdateTransferCodes] - [%s] - [PGSQL]  - Updating records of Company %s Tenant %s',reqId,Company,Tenant);
+                    callback(undefined, resUpdate);
+
+                }).catch(function (errUpdate) {
+
+
+                    logger.error('[DVP-LimitHandler.UACManagement.UpdateTransferCodes] - [%s] - [PGSQL]  - Updating records of Company %s Tenant %s',reqId,Company,Tenant,errUpdate);
+                    callback(errUpdate, undefined);
+
+                });
+
                 logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  -  TransferCodes for Company %d and Tenant %d Cannot be override  ',reqId,Company,Tenant);
                 callback(new Error("Already exist. Cannot override"),undefined);
             }
