@@ -25,7 +25,7 @@ var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, companyId, tenantId
                     logger.debug('[DVP-SIPUserEndpointService.AddEmergencyNumbersDB] - [%s] - Get Emergency Numbers PGSQL query success', reqId);
                     var emerNum = DbConn.EmergencyNumber.build({
 
-                        EmergencyNum: emergencyNumInfo.EmergencyNumber,
+                        EmergencyNum: emergencyNumInfo.EmergencyNum,
                         CompanyId: companyId,
                         TenantId: tenantId,
                         ObjClass: 'DVP',
@@ -1199,9 +1199,6 @@ function AddTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
                     callback(errUpdate, undefined);
 
                 });
-
-                logger.error('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  -  TransferCodes for Company %d and Tenant %d Cannot be override  ',reqId,Company,Tenant);
-                callback(new Error("Already exist. Cannot override"),undefined);
             }
 
         }).catch(function (errTc) {
