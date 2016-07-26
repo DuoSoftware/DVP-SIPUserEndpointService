@@ -2986,7 +2986,8 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Context/:context',authorization({re
 });
 
 // update swagger
-RestServer.post('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"context", action:"write"}),function(req,res,next) {
+RestServer.post('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"context", action:"write"}),function(req,res,next)
+{
     var reqId='';
 
     try
@@ -3008,8 +3009,19 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"
             throw new Error("Invalid company or tenant");
         }
 
-        var Company=req.body.ClientCompany;
-        var Tenant=req.body.ClientTenant;
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        if(req.body.ClientCompany)
+        {
+            Company=req.body.ClientCompany;
+        }
+
+        if(req.body.ClientTenant)
+        {
+            Tenant=req.body.ClientTenant;
+        }
+
 
         context.AddOrUpdateContext(Company,Tenant,req.body,reqId, function (err, resz) {
 

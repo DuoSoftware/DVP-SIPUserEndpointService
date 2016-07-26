@@ -4,68 +4,63 @@
 
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var DbConn = require('dvp-dbmodels');
+var redisHandler = require('./RedisHandler.js');
+
+var redisCallback = function(err, resp)
+{
+
+};
 
 
-function AddOrUpdateContext(company,tenant,req,reqId,callback)
+function AddOrUpdateContext(company, tenant, ctxt, reqId, callback)
 {
     logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Method Hit',reqId);
-    if(req)
+    if(ctxt)
     {
-        try {
-            var ContextObj = req;
-
-            ContextObj.CompanyId = company;
-            ContextObj.TenantId = tenant;
-            ContextObj.AddUser = "NAddUser";
-            ContextObj.UpdateUser = "NUpdateUser";
-
-        }
-        catch (ex) {
-
-            logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - Error occurred while Creating request Object ',reqId,ex);
-            callback(ex,undefined);
-
-        }
-
-
-
-
-        if(ContextObj.Context) {
-            try {
+        if(ctxt.Context)
+        {
+            try
+            {
                 DbConn.Context
-                    .find({where: {Context: ContextObj.Context}})
-                    .then(function (resContext) {
+                    .find({where: {Context: ctxt.Context}})
+                    .then(function (resContext)
+                    {
 
-                        if (!resContext) {
+                        if (!resContext)
+                        {
 
-                            logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - No record found for Context %s ',reqId,ContextObj.Context);
+                            try
+                            {
 
-                            try {
-
-                                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Creating new record of Context %s ',reqId,ContextObj.Context);
+                                logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Creating new record of Context %s ',reqId, ctxt.Context);
                                 DbConn.Context
                                     .create(
                                     {
-                                        Context: ContextObj.Context,
-                                        Description: ContextObj.Description,
-                                        ContextCat: ContextObj.ContextCat,
-                                        ObjClass: ContextObj.ObjClass,
-                                        ObjType: ContextObj.ObjClass,
-                                        ObjCategory: ContextObj.ObjCategory,
+                                        Context: ctxt.Context,
+                                        Description: ctxt.Description,
+                                        ContextCat: ctxt.ContextCat,
+                                        ObjClass: ctxt.ObjClass,
+                                        ObjType: ctxt.ObjClass,
+                                        ObjCategory: ctxt.ObjCategory,
                                         CompanyId: company,
-                                        TenantId: tenant,
-                                        AddUser: ContextObj.AddUser,
-                                        UpdateUser: ContextObj.UpdateUser
+                                        TenantId: tenant
 
                                     }
-                                ).then(function (resSave) {
+                                ).then(function (resSave)
+                                    {
 
-                                        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s inserted successfully - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj));
+                                        if(resSave)
+                                        {
+                                            redisHandler.SetObject('CONTEXT:' + resSave.Context, JSON.stringify(resSave), redisCallback)
+                                        }
+
+                                        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s inserted successfully - Data %s',reqId, ctxt.Context,JSON.stringify(ctxt));
                                         callback(undefined, resSave);
 
-                                    }).catch(function (errSave) {
+                                    }).catch(function (errSave)
+                                    {
 
-                                        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s insertion  failed - Data %s',reqId,ContextObj.Context,JSON.stringify(ContextObj),errSave);
+                                        logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s insertion  failed - Data %s',reqId, ctxt.Context,JSON.stringify(ctxt), errSave);
                                         callback(errSave, undefined);
 
                                     });
@@ -75,15 +70,18 @@ function AddOrUpdateContext(company,tenant,req,reqId,callback)
 
 
                             }
-                            catch (ex) {
-                                logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Exception in detail creation of Context %s',reqId,ContextObj.Context,ex);
+                            catch (ex)
+                            {
+                                logger.error('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Exception in detail creation of Context %s', reqId, ctxt.Context, ex);
                                 callback(ex, undefined);
 
                             }
 
-                        } else {
+                        }
+                        else
+                        {
 
-                            logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Context found',reqId,JSON.stringify(resContext));
+                            logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s]  - Context found', reqId, JSON.stringify(resContext));
 
                             callback(new Error("Cannot override data"),undefined);
 
@@ -190,19 +188,38 @@ function UpdateContext(company,tenant,context,contextObj,reqId,callback)
 
         DbConn.Context
             .find({where: [{Context: context},{CompanyId:company},{TenantId:tenant}]})
-            .then(function (resContext) {
+            .then(function (resContext)
+            {
+                if(resContext)
+                {
+                    logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records found %s',reqId,context);
+                    resContext.updateAttributes(contextObj).then(function (resUpdate)
+                    {
 
-                logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records found %s',reqId,context);
-                resContext.updateAttributes(contextObj).then(function (resUpdate) {
-                    logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records updated',reqId);
-                    callback(undefined,resUpdate);
-                }).catch(function (errUpdate) {
-                    logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records updation Error',reqId,errUpdate);
-                    callback(errUpdate,undefined);
-                })
+                        if(resUpdate)
+                        {
+                            redisHandler.SetObject('CONTEXT:' + resUpdate.Context, JSON.stringify(resUpdate), redisCallback)
+                        }
+
+                        logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records updated',reqId);
+                        callback(undefined,resUpdate);
+
+                    }).catch(function (errUpdate)
+                    {
+                        logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records updation Error',reqId,errUpdate);
+                        callback(errUpdate,undefined);
+                    })
+                }
+                else
+                {
+                    callback(new Error('Context not found'), null);
+                }
 
 
-            }).catch(function (errContext) {
+
+
+            }).catch(function (errContext)
+            {
                 logger.error('[DVP-SIPUserEndpointService.UpdateContext] - [%s] - [PGSQL] - Error occurred while searching Contexts %s ',reqId,context,errContext);
                 callback(errContext,undefined);
             })
@@ -244,10 +261,13 @@ function DeleteContext(company,tenant,context,reqId,callback)
 
 
             logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s]  - Context records found',reqId);
-            resContext.destroy().then(function (resDel) {
+            resContext.destroy().then(function (resDel)
+            {
+                redisHandler.DeleteObject('CONTEXT:' + context, redisCallback);
                 logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s]  - Context deleted successfully',reqId);
                 callback(undefined,resDel);
-            }).catch(function (errDel) {
+            }).catch(function (errDel)
+            {
                 logger.error('[DVP-SIPUserEndpointService.DeleteContext] - [%s]  - Context deletion error',reqId,errDel);
                 callback(errDel,undefined);
             })

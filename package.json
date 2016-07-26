@@ -26,6 +26,7 @@
     "node-uuid": "^1.4.7",
     "pg": "^4.5.3",
     "pg-hstore": "^2.3.2",
+    "redis": "^2.6.2",
     "restify": "^4.0.4",
     "restify-jwt": "^0.4.0",
     "stringify": "^5.1.0",
