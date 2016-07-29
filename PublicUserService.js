@@ -10,6 +10,7 @@ var DbConn = require('dvp-dbmodels');
 var EndPoint=require('./EndpointManagement.js');
 var mysql = require('mysql');
 var config = require('config');
+var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
 
 var AddOrUpdateLbUser = function(reqId, usrInfo, callback)
 {
@@ -115,6 +116,7 @@ var UpdatePublicUser = function(reqId, publicUserInfo, companyId, tenantId, call
 
                         sipUsr.updateAttributes(publicUserInfo).then(function(updateResult)
                         {
+                            redisCacheHandler.addSipUserToCache(updateResult, companyId, tenantId);
                             logger.debug('[DVP-PBXService.UpdatePbxUserDB] - [%s] - PGSQL Update PBX User query success', reqId);
                             callback(undefined, true);
 
@@ -268,6 +270,8 @@ function AddPublicUser(req,Company,Tenant,reqId,callback)
 
                             SIPObject.save().then(function (resSave) {
 
+                                redisCacheHandler.addSipUserToCache(resSave, Company, Tenant);
+
                                 logger.debug('[DVP-SIPUserEndpointService.AddPublicUser] - [%s] - Public user added successfully ',reqId,req.SipUsername);
                                 callback(undefined,resSave);
 
@@ -386,6 +390,7 @@ function ActivatePublicUser(Usname,Pin,Company,Tenant,reqId,callback)
                         }
                     ).then(function(resValid)
                         {
+                            redisCacheHandler.addSipUserToCache(resValid, Company, Tenant);
 
                             logger.debug('[DVP-LimitHandler.ActivatePublicUser] - [%s] - [PGSQL]  - Valid PIN %s for User %s ',reqId,resUser.Pin,Usname);
                             callback(undefined, resValid);
@@ -567,6 +572,7 @@ function ResetAttempts(Usnm,Company,Tenant,reqId,callback)
 
             }).then(function(resUpdate)
             {
+                redisCacheHandler.addSipUserToCache(resUpdate, Company, Tenant);
                 logger.debug('[DVP-SIPUserEndpointService.ResetAttempts] - [%s] - [PGSQL] - Attempt resetting of %s Succeeded  ',reqId,Usnm);
                 callback(resUpdate,undefined);
             }).catch(function(errUpdate)
@@ -598,6 +604,8 @@ function ResetPin(Usnm,Pin,Company,Tenant,reqId,callback)
 
             }).then(function(resUpdate)
             {
+                redisCacheHandler.addSipUserToCache(resUpdate, Company, Tenant);
+
                 logger.debug('[DVP-SIPUserEndpointService.ResetPin] - [%s] - [PGSQL] - Pin resetting of %s Succeeded ',reqId,Usnm);
                 callback(resUpdate,undefined);
             }).catch(function(errUpdate)

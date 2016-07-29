@@ -4,12 +4,7 @@
 
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var DbConn = require('dvp-dbmodels');
-var redisHandler = require('./RedisHandler.js');
-
-var redisCallback = function(err, resp)
-{
-
-};
+var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
 
 
 function AddOrUpdateContext(company, tenant, ctxt, reqId, callback)
@@ -51,7 +46,7 @@ function AddOrUpdateContext(company, tenant, ctxt, reqId, callback)
 
                                         if(resSave)
                                         {
-                                            redisHandler.SetObject('CONTEXT:' + resSave.Context, JSON.stringify(resSave), redisCallback)
+                                            redisCacheHandler.addContextToCache(resSave.Context, resSave);
                                         }
 
                                         logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Context %s inserted successfully - Data %s',reqId, ctxt.Context,JSON.stringify(ctxt));
@@ -198,7 +193,7 @@ function UpdateContext(company,tenant,context,contextObj,reqId,callback)
 
                         if(resUpdate)
                         {
-                            redisHandler.SetObject('CONTEXT:' + resUpdate.Context, JSON.stringify(resUpdate), redisCallback)
+                            redisCacheHandler.addContextToCache(resUpdate.Context, resUpdate);
                         }
 
                         logger.debug('[DVP-SIPUserEndpointService.UpdateContext] - [%s]  - Context records updated',reqId);
@@ -263,7 +258,7 @@ function DeleteContext(company,tenant,context,reqId,callback)
             logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s]  - Context records found',reqId);
             resContext.destroy().then(function (resDel)
             {
-                redisHandler.DeleteObject('CONTEXT:' + context, redisCallback);
+                redisCacheHandler.removeContextFromCache(context);
                 logger.debug('[DVP-SIPUserEndpointService.DeleteContext] - [%s]  - Context deleted successfully',reqId);
                 callback(undefined,resDel);
             }).catch(function (errDel)

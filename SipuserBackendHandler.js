@@ -5,6 +5,7 @@ var DbConn = require('dvp-dbmodels');
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var nodeUuid = require('node-uuid');
+var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
 
 
 //Sipuser
@@ -176,11 +177,13 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                 logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping cloud %s and SipUser %s',reqId,JSON.stringify(resCloudUser),JSON.stringify(SIPObject));
                                                 resContext.addSipUACEndpoint(SIPObject).then(function (resMapCntx)
                                                 {
+                                                    redisCacheHandler.addSipUserToCache(SIPObject, Company, Tenant);
 
                                                     logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping context %s and SipUser %s',reqId,JSON.stringify(resContext),JSON.stringify(SIPObject));
                                                     callback(undefined,resMapCntx);
 
                                                 }).catch(function (errMapCntx) {
+                                                    redisCacheHandler.addSipUserToCache(SIPObject, Company, Tenant);
                                                     logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Error in Mapping context %s and SipUser %s',reqId,JSON.stringify(resContext),JSON.stringify(SIPObject),errMapCntx);
                                                     callback(new Error('Error in mapping Context & SipUAC'),undefined);
                                                 });
@@ -189,6 +192,7 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
 
 
                                             }).catch(function (errMapCldUser) {
+                                                redisCacheHandler.addSipUserToCache(SIPObject, Company, Tenant);
                                                 logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in mapping cloud %s and SipUser %s',reqId,JSON.stringify(resCloudUser),JSON.stringify(SIPObject),errMapCldUser);
                                                 callback(new Error('Error in mapping CEU & SipUAC'),undefined);
                                             });
@@ -415,6 +419,8 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,callback) {
 
                             resUser.updateAttributes(jobj).then(function (resUpdate) {
 
+                                redisCacheHandler.addSipUserToCache(resUpdate, Company, Tenant);
+
                                 logger.debug('[DVP-LimitHandler.UACManagement.UpdateUser] - [%s] - [PGSQL]  - Updating records of SipUser %s is succeeded ',reqId,Username);
                                 callback(undefined, resUpdate);
 
@@ -478,6 +484,8 @@ function UpdateUserStatus(Username,status,Company,Tenant,reqId,callback) {
 
 
                             resUser.updateAttributes(SipObj).then(function (resUpdate) {
+
+                                redisCacheHandler.addSipUserToCache(resUpdate, Company, Tenant);
 
                                 logger.debug('[DVP-LimitHandler.UACManagement.UpdateUserStatus] - [%s] - [PGSQL]  - Updating records of SipUser %s is succeeded ',reqId,Username);
                                 callback(undefined, resUpdate);
@@ -586,6 +594,8 @@ function CreateUserGroup(obj,Company,Tenant,reqId,callback) {
 
                             UserGroupobj.save().then(function (resGrpSave) {
 
+                                redisCacheHandler.addGroupToCache(resGrpSave, Company, Tenant);
+
                                 logger.debug('[DVP-SIPUserEndpointService.CreateUserGroup] - [%s] - [PGSQL]  - New user group insertion succeeded - Group %s', reqId, JSON.stringify(obj));
                                 callback(undefined, resGrpSave);
 
@@ -670,6 +680,8 @@ function UnAssignUserFromGroup(SID,GID,Company,Tenant,callback) {
                                         try {
                                             resGroup.removeSipUACEndpoint(resSip).then(function (resMapGroup) {
 
+                                                redisCacheHandler.addGroupToCache(resGroup, Company, Tenant);
+
                                                 callback(undefined, resMapGroup)
 
                                             }).catch(function (resMapGroup) {
@@ -750,6 +762,8 @@ function AssignUserToGroup(SID,GID,Company,Tenant,reqId,callback) {
                                     {
                                         try {
                                             resGroup.addSipUACEndpoint(resSip).then(function (resMapGroup) {
+
+                                                redisCacheHandler.addSipUserToCache(resSip, Company, Tenant);
 
                                                 callback(undefined, resMapGroup)
 
@@ -913,6 +927,8 @@ function UpdateUserGroup(GID,obj,Company,Tenant,reqId,callback) {
                         where: [{id: GID},{CompanyId:Company},{TenantId:Tenant}]
                     }
                 ).then(function (resGrpUpdate) {
+
+                        redisCacheHandler.addGroupToCache(resGrpUpdate, Company, Tenant);
                         logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [PGSQL]  - Updation succeeded -  Data - %s',reqId,JSON.stringify(obj));
 
                         callback(undefined,resGrpUpdate);
@@ -952,6 +968,7 @@ var DeleteGroupDB = function(reqId, grpId, companyId, tenantId, callback)
             {
                 grpRec.destroy().then(function (result)
                 {
+                    redisCacheHandler.removeGroupFromCache(grpId, companyId, tenantId);
                     callback(undefined, true);
 
                 }).catch(function(err)

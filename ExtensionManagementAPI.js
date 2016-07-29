@@ -4,7 +4,8 @@
 
 var DbConn = require('dvp-dbmodels');
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger
+var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
 
 
 
@@ -173,6 +174,8 @@ var SetDodNumberToExtDB = function(reqId, dodNumber, extId, companyId, tenantId,
 
                 ext.updateAttributes({DodActive: isActive, DodNumber: dodNumber}).then(function (updtRes)
                 {
+                    redisCacheHandler.addExtensionToCache(updtRes, companyId, tenantId);
+
                     logger.info('[DVP-SIPUserEndpointService.SetDodNumberToExtDB] PGSQL Update Dod Number query success');
                     callback(undefined, true);
 
@@ -215,6 +218,7 @@ var SetRecordingStatus = function(reqId, recordingEnabled, extension, companyId,
 
                 ext.updateAttributes({RecordingEnabled: recordingEnabled}).then(function (updtRes)
                 {
+                    redisCacheHandler.addExtensionToCache(updtRes, companyId, tenantId);
                     callback(undefined, true);
 
                 }).catch(function(err)
@@ -486,6 +490,8 @@ function ChangeUserAvailability(ext,st,Company,Tenant,reqId,callback) {
                         }
                     ).then(function (resUpdate) {
 
+                            redisCacheHandler.addExtensionToCache(resUpdate, Company, Tenant);
+
                             logger.debug('[DVP-SIPUserEndpointService.ChangeUserAvailability] - [%s] - [PGSQL]  - Updating status to %s of ExtensionRefId %s of Tenant %s is succeeded ',reqId,st,ext,tenant);
                             callback(undefined, resUpdate);
 
@@ -650,6 +656,8 @@ function UpdateExtension(ext,reqExt,Company,Tenant,reqId,callback) {
 
                         }).then(function (response) {
 
+                            redisCacheHandler.addExtensionToCache(response, Company, Tenant);
+
                             logger.debug('[DVP-SIPUserEndpointService.UpdateExtension] - [%s] - [PGSQL]  - Updating Extenstion  %s  is succeeded ',reqId,ext);
                             callback(undefined, response);
 
@@ -707,6 +715,7 @@ function DeleteExtension(ext,Company,Tenant,reqId,callback) {
             try {
                 DbConn.Extension.destroy({where: [{Extension: ext}, {CompanyId: Company},{TenantId:Tenant}]}).then(function (resExt)
                 {
+                    removeExtensionFromCache(ext, Company, Tenant);
 
                     if (!resExt) {
 
@@ -798,10 +807,14 @@ function AssignToSipUser(Ext,UAC,Company,Tenant,reqId,callback) {
 
 
 
-                                        resSipObj.updateAttributes({SipExtension: Ext}).then(function (resUpdate) {
+                                        resSipObj.updateAttributes({SipExtension: Ext}).then(function (resUpdate)
+                                        {
+                                            redisCacheHandler.addSipUserToCache(resUpdate, Company, Tenant);
                                             callback(undefined, resUpdate);
 
-                                        }).catch(function (errUpdate) {
+                                        }).catch(function (errUpdate)
+                                        {
+                                            redisCacheHandler.addSipUserToCache(resMap, Company, Tenant);
                                             callback(errUpdate, undefined);
                                         });
 
@@ -888,6 +901,7 @@ function AssignToGroup(Ext,Grp,Company,Tenant,reqId,callback)
                                 try {
                                     resGroupObject.setExtension(resExtObject).then(function (resMap)
                                     {
+                                        redisCacheHandler.addGroupToCache(resMap, Company, Tenant);
                                         logger.error('[DVP-SIPUserEndpointService.Extension.AssignToGroup] - [%s] - [PGSQL]  - Mapping Extension %s with Group %s is succeeded -  Data - %s',reqId,resExtObject.id,resGroupObject.id);
                                         callback(undefined, resMap);
 
@@ -987,6 +1001,7 @@ function SaveExtension(jobj,Company,Tenant,reqId,callback)
             }
         ).then(function (resExt)
             {
+                redisCacheHandler.addExtensionToCache(resExt, Company, Tenant);
                 logger.debug('[DVP-SIPUserEndpointService.CreateExtension] - [%s] - [PGSQL]  -  Extension %s insertion succeeded ',reqId,jobj.Extension);
                 callback(undefined,resExt);
 
