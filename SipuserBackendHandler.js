@@ -158,11 +158,13 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                 ObjCategory: "OBJCAT",
                                                 AddUser: jobj.AddUser,
                                                 UpdateUser: jobj.UpdateUser,
+                                                VoicemailAsEmail: jobj.VoicemailAsEmail,
                                                 TransInternalEnable:jobj.TransInternalEnable,
                                                 TransExternalEnable:jobj.TransExternalEnable,
                                                 TransConferenceEnable:jobj.TransConferenceEnable,
                                                 TransGroupEnable:jobj.TransGroupEnable,
-                                                ContextId: jobj.ContextId
+                                                ContextId: jobj.ContextId,
+                                                DenyOutboundFor: jobj.DenyOutboundFor
 
 
                                             }
@@ -909,34 +911,43 @@ function UpdateUserGroup(GID,obj,Company,Tenant,reqId,callback) {
         if(!isNaN(GID)&&GID)
         {
             try {
-                DbConn.UserGroup
-                    .update(
-                    {
-                        GroupName: obj.GroupName,
-                        Domain: obj.Domain,
-                        ExtraData: obj.ExtraData,
-                        ObjClass: "OBJCLZ",
-                        ObjType: "OBJTYP",
-                        ObjCategory: "OBJCAT",
-                        CompanyId: Company,
-                        TenantId: Tenant
 
 
-                    },
+                DbConn.UserGroup.find({where: [{id: GID},{CompanyId:Company},{TenantId:Tenant}]}).then(function (grp)
+                {
+                    if(grp)
                     {
-                        where: [{id: GID},{CompanyId:Company},{TenantId:Tenant}]
+                        grp.updateAttributes({GroupName: obj.GroupName,
+                            Domain: obj.Domain,
+                            ExtraData: obj.ExtraData,
+                            ObjClass: "OBJCLZ",
+                            ObjType: "OBJTYP",
+                            ObjCategory: "OBJCAT",
+                            CompanyId: Company,
+                            TenantId: Tenant}).then(function (resGrpUpdate)
+                        {
+
+                            redisCacheHandler.addGroupToCache(resGrpUpdate, Company, Tenant);
+                            logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [PGSQL]  - Updation succeeded -  Data - %s',reqId,JSON.stringify(obj));
+
+                            callback(undefined,resGrpUpdate);
+                        }).catch(function (errGrpUpdate) {
+                            logger.error('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [PGSQL]  - Updation failed -  Data - %s',reqId,JSON.stringify(obj),err);
+                            callback(errGrpUpdate,undefined);
+
+                        });
+
                     }
-                ).then(function (resGrpUpdate) {
+                    else
+                    {
+                        callback(new Error('Group record not found'), false);
+                    }
 
-                        redisCacheHandler.addGroupToCache(resGrpUpdate, Company, Tenant);
-                        logger.debug('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [PGSQL]  - Updation succeeded -  Data - %s',reqId,JSON.stringify(obj));
-
-                        callback(undefined,resGrpUpdate);
-                    }).catch(function (errGrpUpdate) {
-                        logger.error('[DVP-SIPUserEndpointService.UpdateSipUserGroup] - [%s] - [PGSQL]  - Updation failed -  Data - %s',reqId,JSON.stringify(obj),err);
-                        callback(errGrpUpdate,undefined);
-
-                    });
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-LimitHandler.UpdateMaxLimit] - [%s] - Get Extension PGSQL query failed', reqId, err);
+                    callback(err, false);
+                });
 
             }
             catch(ex)

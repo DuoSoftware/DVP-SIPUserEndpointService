@@ -4,7 +4,7 @@
 
 var DbConn = require('dvp-dbmodels');
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
 
 
@@ -38,6 +38,7 @@ var AddEmergencyNumberDB = function(reqId, emergencyNumInfo, companyId, tenantId
                         .save()
                         .then(function (saveRes)
                         {
+                            redisCacheHandler.addEmergencyNumberToCache(saveRes, companyId, tenantId);
 
                             logger.debug('[DVP-SIPUserEndpointService.AddEmergencyNumbersDB] - [%s] - PGSQL query success', reqId);
                             callback(undefined, true, emerNum.id);
@@ -76,6 +77,7 @@ var DeleteEmergencyNumberDB = function(reqId, emergencyNum, companyId, tenantId,
             {
                 eNumRec.destroy().then(function (result)
                 {
+                    redisCacheHandler.removeEmergencyNumberFromCache(emergencyNum, companyId, tenantId);
                     logger.debug('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success');
                     callback(undefined, true);
                 }).catch(function(err)
@@ -258,6 +260,7 @@ var DeleteDidNumberDB = function(reqId, didNumId, companyId, tenantId, callback)
             {
                 didRec.destroy().then(function (result)
                 {
+                    redisCacheHandler.removeDidNumberFromCache(didRec.DidNumber, companyId, tenantId);
                     logger.error('[DVP-SIPUserEndpointService.DeleteDidNumberDB] PGSQL Delete did number query success');
                     callback(undefined, true);
 
@@ -317,6 +320,7 @@ var AddDidNumberDB = function(reqId, didNumberInfo, companyId, tenantId, callbac
 
                 didNum.save().then(function (saveRes)
                     {
+                        redisCacheHandler.addDidNumberToCache(saveRes.DidNumber, companyId, tenantId, saveRes);
                         logger.debug('[DVP-SIPUserEndpointService.AddDidNumber] - [%s] - PGSQL query success', reqId);
                         callback(undefined, true, didNum.id);
 
@@ -387,6 +391,7 @@ var AssignDidNumberToExtDB = function(reqId, didNum, ext, companyId, tenantId, c
                                 logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Get didnumber query success', reqId);
                                 didNum.setExtension(extInf).then(function (result)
                                 {
+                                    redisCacheHandler.addDidNumberToCache(result.DidNumber, companyId, tenantId, result);
                                     logger.debug('[DVP-SIPUserEndpointService.AssignDidNumberToExtDB] - [%s] - PGSQL Update did number with extension query success', reqId);
                                     callback(undefined, true);
 
@@ -441,6 +446,7 @@ var SetDidNumberActiveStatusDB = function(reqId, didNum, companyId, tenantId, is
 
                 didRec.updateAttributes({DidActive: isActive.toString()}).then(function (upReslt)
                 {
+                    redisCacheHandler.addDidNumberToCache(upReslt.DidNumber, companyId, tenantId, upReslt);
                     logger.info('[DVP-SIPUserEndpointService.SetDidNumberActiveStatusDB] PGSQL Update Did Status query success');
                     callback(undefined, true);
 
@@ -715,7 +721,7 @@ function DeleteExtension(ext,Company,Tenant,reqId,callback) {
             try {
                 DbConn.Extension.destroy({where: [{Extension: ext}, {CompanyId: Company},{TenantId:Tenant}]}).then(function (resExt)
                 {
-                    removeExtensionFromCache(ext, Company, Tenant);
+                    redisCacheHandler.removeExtensionFromCache(ext, Company, Tenant);
 
                     if (!resExt) {
 
@@ -1180,6 +1186,7 @@ function AddTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
                         }
                     ).then(function (resCode)
                         {
+                            redisCacheHandler.addTransferCodeToCompanyObj(resCode, Tenant, Company);
                             logger.debug('[DVP-SIPUserEndpointService.SetTransferCode] - [%s] - [PGSQL]  -  Insertion succeeded for Company %d and Tenant %d',reqId,Company,Tenant);
                             callback(undefined,resCode);
 
@@ -1203,6 +1210,7 @@ function AddTransferCodes(Company,Tenant,Codeinfo,reqId,callback)
                 delete Codeinfo.id;
                 resTc.updateAttributes(Codeinfo).then(function (resUpdate)
                 {
+                    redisCacheHandler.addTransferCodeToCompanyObj(resUpdate, Tenant, Company);
 
                     logger.debug('[DVP-LimitHandler.UACManagement.UpdateTransferCodes] - [%s] - [PGSQL]  - Updating records of Company %s Tenant %s',reqId,Company,Tenant);
                     callback(undefined, resUpdate);
@@ -1255,6 +1263,8 @@ function UpdateTransferCodes(Company,Tenant,tID,Codeinfo,reqId,callback)
                         delete Codeinfo.id;
 
                         resTCodes.updateAttributes(Codeinfo).then(function (resUpdate) {
+
+                            redisCacheHandler.addTransferCodeToCompanyObj(resUpdate, Tenant, Company);
 
                             logger.debug('[DVP-LimitHandler.UACManagement.UpdateTransferCodes] - [%s] - [PGSQL]  - Updating records of Company %s Tenant %s',reqId,Company,Tenant);
                             callback(undefined, resUpdate);
@@ -1357,6 +1367,7 @@ function RemoveTransferCode (Company,Tenant,reqId,callback)
                     // callback(undefined,resTc);
 
                     resTc.destroy().then(function (resRemove) {
+                        redisCacheHandler.removeTransferCodeFromCompanyObj(Tenant, Company);
                         logger.debug('[DVP-SIPUserEndpointService.RemoveTransferCode] - [%s] - [PGSQL]  - TransferCode  Removed successfully ID %s ',reqId,tID);
                         callback(undefined,resRemove)
                     }).catch(function (errRemove) {

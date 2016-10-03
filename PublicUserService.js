@@ -155,6 +155,7 @@ var UpdatePublicUser = function(reqId, publicUserInfo, companyId, tenantId, call
                     Enabled: true,
                     ExtraData: publicUserInfo.ExtraData,
                     EmailAddress: publicUserInfo.EmailAddress,
+                    VoicemailAsEmail: publicUserInfo.VoicemailAsEmail,
                     GuRefId: publicUserInfo.GuRefId,
                     CompanyId: companyId,
                     TenantId: tenantId,
@@ -379,16 +380,7 @@ function ActivatePublicUser(Usname,Pin,Company,Tenant,reqId,callback)
                 if(Pin==resUser.Pin && resUser.TryCount<3)
                 {
 
-                    DbConn.SipUACEndpoint
-                        .update(
-                        {
-                            TryCount: 0,
-                            UsePublic: true
-                        },
-                        {
-                            where: [{SipUsername: Usname}, {Pin: resUser.Pin},{CompanyId: Company}, {TenantId: Tenant}]
-                        }
-                    ).then(function(resValid)
+                    resUser.updateAttributes({TryCount: 0, UsePublic: true}).then(function(resValid)
                         {
                             redisCacheHandler.addSipUserToCache(resValid, Company, Tenant);
 
