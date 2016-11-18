@@ -10,6 +10,7 @@
 // Transfer codes
 //
 var restify = require('restify');
+var crypto = require('crypto');
 var context=require('./SipcontextManager.js');
 var Extmgt=require('./ExtensionManagementAPI.js');
 var PublicUser=require('./PublicUserService.js');
@@ -43,6 +44,16 @@ RestServer.use(restify.bodyParser());
 RestServer.use(restify.acceptParser(RestServer.acceptable));
 RestServer.use(restify.queryParser());
 RestServer.use(cors());
+
+var encryptPass = config.Host.encryptionPassword;
+
+function encrypt(text)
+{
+    var cipher = crypto.createCipher('aes-256-ctr', encryptPass);
+    var crypted = cipher.update(text,'utf8','hex');
+    crypted += cipher.final('hex');
+    return crypted;
+}
 
 
 RestServer.post('/DVP/API/:version/SipUser/DidNumber', authorization({resource:"number", action:"write"}), function(req, res, next) {
@@ -966,6 +977,58 @@ RestServer.get('/DVP/API/'+version+'/SipUser/User/:Username',authorization({reso
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
         logger.debug('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - Request response : %s ',reqId,jsonString);
         res.end(jsonString);
+    }
+    return next();
+
+});
+
+RestServer.get('/DVP/API/'+version+'/SipUser/User/:username/Password',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
+
+    var reqId = uuid.v1();
+    try
+    {
+        logger.debug('[DVP-SIPUserEndpointService.RetrievePassword] - [%s] - HTTP Request Received', reqId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+        var username = req.params.username;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        SipbackendHandler.GetUserByUsername(reqId, username, companyId, tenantId, function (err, result)
+        {
+            if (err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Get password for user failed", false, null);
+                logger.debug('[DVP-SIPUserEndpointService.RetrievePassword] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var encryptedPass = null;
+                if(result)
+                {
+                    encryptedPass = encrypt(result.Password);
+
+                }
+                var jsonString = messageFormatter.FormatMessage(null, "Operation success", true, encryptedPass);
+                logger.debug('[DVP-SIPUserEndpointService.RetrievePassword] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+
+            }
+
+        })
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception occurred", false, null);
+        logger.debug('[DVP-SIPUserEndpointService.RetrievePassword] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
     }
     return next();
 
