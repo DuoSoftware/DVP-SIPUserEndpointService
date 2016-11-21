@@ -10,7 +10,7 @@
 // Transfer codes
 //
 var restify = require('restify');
-var crypto = require('crypto');
+var CryptoJS = require("crypto-js");
 var context=require('./SipcontextManager.js');
 var Extmgt=require('./ExtensionManagementAPI.js');
 var PublicUser=require('./PublicUserService.js');
@@ -49,10 +49,8 @@ var encryptPass = config.Host.encryptionPassword;
 
 function encrypt(text)
 {
-    var cipher = crypto.createCipher('aes-256-ctr', encryptPass);
-    var crypted = cipher.update(text,'utf8','hex');
-    crypted += cipher.final('hex');
-    return crypted;
+    var ciphertext = CryptoJS.AES.encrypt(text, encryptPass);
+    return ciphertext.toString();
 }
 
 
