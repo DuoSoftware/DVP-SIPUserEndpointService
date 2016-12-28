@@ -40,7 +40,8 @@ module.exports = {
     {
         "domain": "HOST_NAME",
         "port": "HOST_SIPUSERENDPOINTSERVICE_PORT",
-        "version": "HOST_VERSION"
+        "version": "HOST_VERSION",
+        "encryptionPassword": "HOST_SIPUSERENDPOINTSERVICE_ENCRYPTPASS"
     }
 };
 

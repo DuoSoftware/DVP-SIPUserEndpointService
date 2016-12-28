@@ -355,6 +355,28 @@ function  PickUserByName(Username,Company,Tenant,reqId, callback) {
 
 }
 
+var GetUserByUsername = function(reqId, username, companyId, tenantId, callback)
+{
+    try
+    {
+        DbConn.SipUACEndpoint.find({where: [{SipUsername: username},{TenantId: tenantId},{CompanyId: companyId}]})
+            .then(function (resp)
+            {
+                callback(null, resp);
+
+            }).catch(function(err)
+            {
+                callback(err, null);
+            });
+
+    }
+    catch(ex)
+    {
+        callback(ex, null);
+    }
+
+};
+
 function  PickAllUsers(Company,Tenant,reqId, callback) {
 
     logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Method Hit',reqId);
@@ -1240,4 +1262,5 @@ module.exports.PickUsersInGroup = PickUsersInGroup;
 
 module.exports.DeleteGroupDB = DeleteGroupDB;
 module.exports.UnAssignUserFromGroup = UnAssignUserFromGroup;
+module.exports.GetUserByUsername = GetUserByUsername;
 
