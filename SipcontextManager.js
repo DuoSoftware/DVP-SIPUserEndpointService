@@ -5,6 +5,7 @@
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var DbConn = require('dvp-dbmodels');
 var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
+var Promise = require('bluebird');
 
 
 function AddOrUpdateContext(company, tenant, ctxt, reqId, callback)
@@ -277,9 +278,143 @@ function DeleteContext(company,tenant,context,reqId,callback)
         });
 }
 
+var AddContextCodecPrefs = function(reqId, context1, context2, codecPreferences, companyId, tenantId)
+{
+    return new Promise(function(fulfill, reject)
+    {
+        try
+        {
+
+            DbConn.ContextCodecPref.find({where: [{TenantId: tenantId, CompanyId: companyId, Context1: context1, Context2: context2}]}).then(function (contextPrefs)
+            {
+                if(contextPrefs)
+                {
+                    contextPrefs.updateAttributes({Codecs: JSON.stringify(codecPreferences)}).then(function (resUpdate)
+                    {
+                        fulfill(resUpdate);
+
+                    }).catch(function (err)
+                    {
+                        reject(err);
+                    })
+                }
+                else
+                {
+                    //save ok
+                    var codecPref = DbConn.ContextCodecPref.build({
+
+                        Context1: context1,
+                        Context2: context2,
+                        CompanyId: companyId,
+                        TenantId: tenantId,
+                        Codecs: JSON.stringify(codecPreferences)
+                    });
+
+                    codecPref.save().then(function (saveRes)
+                    {
+                        fulfill(saveRes);
+
+                    }).catch(function(err)
+                    {
+                        reject(err);
+                    })
+                }
+
+            }).catch(function(err)
+            {
+                reject(err);
+            });
+
+
+        }
+        catch(ex)
+        {
+            reject(ex);
+        }
+    });
+
+};
+
+var RemoveContextCodecPrefs = function(reqId, prefId, companyId, tenantId)
+{
+    return new Promise(function(fulfill, reject)
+    {
+        try
+        {
+
+            DbConn.ContextCodecPref.find({where: [{id: prefId, TenantId: tenantId, CompanyId: companyId}]}).then(function (contextPrefs)
+            {
+                if(contextPrefs)
+                {
+
+                    contextPrefs.destroy().then(function (delRes)
+                    {
+                        fulfill(true);
+
+                    }).catch(function (err)
+                    {
+                        reject(err);
+                    })
+                }
+                else
+                {
+                    //save ok
+                    reject(new Error('No context preference found'));
+                }
+
+            }).catch(function(err)
+            {
+                reject(err);
+            });
+
+
+        }
+        catch(ex)
+        {
+            reject(ex);
+        }
+    });
+
+};
+
+var GetContextCodecPrefs = function(reqId, companyId, tenantId)
+{
+    return new Promise(function(fulfill, reject)
+    {
+        try
+        {
+
+            DbConn.ContextCodecPref.findAll({where: [{TenantId: tenantId, CompanyId: companyId}]}).then(function (contextPrefs)
+            {
+                var newContextPrefs = contextPrefs.map(function(item)
+                {
+                    item.Codecs = JSON.parse(item.Codecs);
+                    return item;
+                });
+
+                fulfill(newContextPrefs);
+
+            }).catch(function(err)
+            {
+                reject(err);
+            });
+
+
+        }
+        catch(ex)
+        {
+            reject(ex);
+        }
+    });
+
+};
+
 module.exports.AddOrUpdateContext = AddOrUpdateContext;
 module.exports.GetCompanyContextDetails = GetCompanyContextDetails;
 module.exports.PickAllContexts = PickAllContexts;
 module.exports.UpdateContext = UpdateContext;
 module.exports.PickContext = PickContext;
 module.exports.DeleteContext = DeleteContext;
+module.exports.AddContextCodecPrefs = AddContextCodecPrefs;
+module.exports.RemoveContextCodecPrefs = RemoveContextCodecPrefs;
+module.exports.GetContextCodecPrefs = GetContextCodecPrefs;

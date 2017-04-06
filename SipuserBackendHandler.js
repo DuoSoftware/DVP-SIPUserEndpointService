@@ -111,6 +111,11 @@ function CreateUser(req,Company,Tenant,reqId,callback) {
 
 }
 
+function GetEnabledSipUserCount(companyId, tenantId)
+{
+    return DbConn.SipUACEndpoint.aggregate('*', 'count', {where :[{CompanyId: companyId}, {TenantId: tenantId}, {Enabled: true}]});
+}
+
 
 function SaveUser(jobj,Company,Tenant,reqId,callback) {
 
@@ -1294,6 +1299,7 @@ module.exports.UpdateUser = UpdateUser;
 module.exports.PickCompanyUsers = PickCompanyUsers;
 module.exports.PickAllUsers = PickAllUsers;
 module.exports.UpdateUserStatus = UpdateUserStatus;
+module.exports.GetEnabledSipUserCount = GetEnabledSipUserCount;
 
 
 //Sip user group
