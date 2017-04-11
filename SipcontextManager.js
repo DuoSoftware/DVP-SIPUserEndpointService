@@ -289,14 +289,7 @@ var AddContextCodecPrefs = function(reqId, context1, context2, codecPreferences,
             {
                 if(contextPrefs)
                 {
-                    contextPrefs.updateAttributes({Codecs: JSON.stringify(codecPreferences)}).then(function (resUpdate)
-                    {
-                        fulfill(resUpdate);
-
-                    }).catch(function (err)
-                    {
-                        reject(err);
-                    })
+                    reject(new Error('Theres an exsisting codec configuration'));
                 }
                 else
                 {
@@ -318,6 +311,46 @@ var AddContextCodecPrefs = function(reqId, context1, context2, codecPreferences,
                     {
                         reject(err);
                     })
+                }
+
+            }).catch(function(err)
+            {
+                reject(err);
+            });
+
+
+        }
+        catch(ex)
+        {
+            reject(ex);
+        }
+    });
+
+};
+
+var UpdateContextCodecPrefs = function(reqId, context1, context2, codecPreferences, companyId, tenantId)
+{
+    return new Promise(function(fulfill, reject)
+    {
+        try
+        {
+
+            DbConn.ContextCodecPref.find({where: [{TenantId: tenantId, CompanyId: companyId, Context1: context1, Context2: context2}]}).then(function (contextPrefs)
+            {
+                if(contextPrefs)
+                {
+                    contextPrefs.updateAttributes({Codecs: JSON.stringify(codecPreferences)}).then(function (resUpdate)
+                    {
+                        fulfill(resUpdate);
+
+                    }).catch(function (err)
+                    {
+                        reject(err);
+                    })
+                }
+                else
+                {
+                    reject(new Error('No records found to update'));
                 }
 
             }).catch(function(err)
@@ -418,3 +451,4 @@ module.exports.DeleteContext = DeleteContext;
 module.exports.AddContextCodecPrefs = AddContextCodecPrefs;
 module.exports.RemoveContextCodecPrefs = RemoveContextCodecPrefs;
 module.exports.GetContextCodecPrefs = GetContextCodecPrefs;
+module.exports.UpdateContextCodecPrefs = UpdateContextCodecPrefs;
