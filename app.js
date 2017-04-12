@@ -12,6 +12,7 @@ var uuid = require('node-uuid');
 var cors = require('cors');
 var jwt = require('restify-jwt');
 var util = require('util');
+var _ = require('lodash');
 var secret = require('dvp-common/Authentication/Secret.js');
 var authorization = require('dvp-common/Authentication/Authorization.js');
 
@@ -3216,16 +3217,18 @@ RestServer.post('/DVP/API/'+version+'/SipUser/ContextCodecPreferences',authoriza
                 throw new Error("Invalid company or tenant");
             }
 
-            var tempSortArr = [];
+            var tempArr = [];
 
             if(reqBody.Context1 && reqBody.Context2 && reqBody.Codecs && Array.isArray(reqBody.Codecs))
             {
-                tempSortArr.push(reqBody.Context1, reqBody.Context2).sort();
+                tempArr.push(reqBody.Context1, reqBody.Context2);
 
-                context.AddContextCodecPrefs(reqId, tempSortArr[0], tempSortArr[1], reqBody.Codecs, companyId, tenantId)
-                    .then(function(res)
+                var sortedArr = tempArr.sort();
+
+                context.AddContextCodecPrefs(reqId, sortedArr[0], sortedArr[1], reqBody.Codecs, companyId, tenantId)
+                    .then(function(saveResp)
                     {
-                        var jsonString = messageFormatter.FormatMessage(null, "Add context preferences successful", true, res);
+                        var jsonString = messageFormatter.FormatMessage(null, "Add context preferences successful", true, saveResp);
                         logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
                         res.end(jsonString);
 
@@ -3287,16 +3290,18 @@ RestServer.put('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/Context1/:c
                 throw new Error("Invalid company or tenant");
             }
 
-            var tempSortArr = [];
+            var tempArr = [];
 
             if(req.params.context1 && req.params.context2 && reqBody.Codecs && Array.isArray(reqBody.Codecs))
             {
-                tempSortArr.push(req.params.context1, req.params.context2).sort();
+                tempArr.push(reqBody.Context1, reqBody.Context2);
 
-                context.UpdateContextCodecPrefs(reqId, tempSortArr[0], tempSortArr[1], reqBody.Codecs, companyId, tenantId)
-                    .then(function(res)
+                var sortedArr = tempArr.sort();
+
+                context.UpdateContextCodecPrefs(reqId, sortedArr[0], sortedArr[1], reqBody.Codecs, companyId, tenantId)
+                    .then(function(updateResp)
                     {
-                        var jsonString = messageFormatter.FormatMessage(null, "Update context preferences successful", true, res);
+                        var jsonString = messageFormatter.FormatMessage(null, "Update context preferences successful", true, updateResp);
                         logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
                         res.end(jsonString);
 
@@ -3344,59 +3349,32 @@ RestServer.del('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/:id',author
     var reqId = uuid.v1();
     try
     {
-        var reqBody = req.body;
         var recId = req.params.id;
 
-        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
+        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - HTTP Request Received', reqId);
 
-        if(reqBody)
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
         {
-            var companyId = req.user.company;
-            var tenantId = req.user.tenant;
+            throw new Error("Invalid company or tenant");
+        }
 
-            if (!companyId || !tenantId)
+        context.RemoveContextCodecPrefs(reqId, recId, companyId, tenantId)
+            .then(function(delResponse)
             {
-                throw new Error("Invalid company or tenant");
-            }
-
-            var tempSortArr = [];
-
-            if(reqBody.Context1 && reqBody.Context2 && reqBody.Codecs && Array.isArray(reqBody.Codecs))
-            {
-                tempSortArr.push(reqBody.Context1, reqBody.Context2).sort();
-
-                context.RemoveContextCodecPrefs(reqId, recId, companyId, tenantId)
-                    .then(function(res)
-                    {
-                        var jsonString = messageFormatter.FormatMessage(null, "Delete context preferences successful", true, res);
-                        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                        res.end(jsonString);
-
-                    }).catch(function(err)
-                    {
-                        var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
-                        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                        res.end(jsonString);
-
-                    });
-            }
-            else
-            {
-                var jsonString = messageFormatter.FormatMessage(new Error('Context or codecs not provided'), "Error occurred", false, null);
+                var jsonString = messageFormatter.FormatMessage(null, "Delete context preferences successful", true, delResponse);
                 logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - API RESPONSE : %s', reqId, jsonString);
                 res.end(jsonString);
-            }
 
+            }).catch(function(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+                logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
 
-
-        }
-        else
-        {
-            var jsonString = messageFormatter.FormatMessage(new Error('Empty request body'), "Empty request body", false, null);
-            logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - API RESPONSE : %s', reqId, jsonString);
-            res.end(jsonString);
-
-        }
+            });
 
 
     }
@@ -3427,9 +3405,9 @@ RestServer.get('/DVP/API/'+version+'/SipUser/ContextCodecPreferences',authorizat
         }
 
         context.GetContextCodecPrefs(reqId, companyId, tenantId)
-            .then(function(res)
+            .then(function(codecPrefs)
             {
-                var jsonString = messageFormatter.FormatMessage(null, "Get context preferences successful", true, res);
+                var jsonString = messageFormatter.FormatMessage(null, "Get context preferences successful", true, codecPrefs);
                 logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
                 res.end(jsonString);
 
