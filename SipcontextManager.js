@@ -442,6 +442,53 @@ var GetContextCodecPrefs = function(reqId, companyId, tenantId)
 
 };
 
+var GetContextCodecPrefsByContext = function(reqId, contextIn, extension, companyId, tenantId)
+{
+    return new Promise(function(fulfill, reject)
+    {
+        try
+        {
+            DbConn.Extension.find({where: [{TenantId: tenantId, CompanyId: companyId, Extension: extension}], include:[{model: DbConn.SipUACEndpoint, as: "SipUACEndpoint"}]}).then(function (extInfo)
+            {
+                if(extInfo && extInfo.SipUACEndpoint && extInfo.SipUACEndpoint.ContextId)
+                {
+                    var tempArr = [];
+                    tempArr.push(contextIn, extInfo.SipUACEndpoint.ContextId);
+
+                    var sortedArr = tempArr.sort();
+                    DbConn.ContextCodecPref.find({where :[{Context1: sortedArr[0], Context2: sortedArr[1], CompanyId: companyId, TenantId: tenantId}]}).then(function (contextPrefs)
+                    {
+                        var newContextPrefs = JSON.parse(contextPrefs.Codecs);
+
+                        fulfill(newContextPrefs);
+
+                    }).catch(function(err)
+                    {
+                        reject(err);
+                    });
+                }
+                else
+                {
+                    reject(new Error('No user found for the extension or context not set'));
+                }
+
+            }).catch(function(err)
+            {
+                reject(err);
+            });
+
+
+
+
+        }
+        catch(ex)
+        {
+            reject(ex);
+        }
+    });
+
+};
+
 module.exports.AddOrUpdateContext = AddOrUpdateContext;
 module.exports.GetCompanyContextDetails = GetCompanyContextDetails;
 module.exports.PickAllContexts = PickAllContexts;
@@ -452,3 +499,4 @@ module.exports.AddContextCodecPrefs = AddContextCodecPrefs;
 module.exports.RemoveContextCodecPrefs = RemoveContextCodecPrefs;
 module.exports.GetContextCodecPrefs = GetContextCodecPrefs;
 module.exports.UpdateContextCodecPrefs = UpdateContextCodecPrefs;
+module.exports.GetContextCodecPrefsByContext = GetContextCodecPrefsByContext;

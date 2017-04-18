@@ -3432,6 +3432,49 @@ RestServer.get('/DVP/API/'+version+'/SipUser/ContextCodecPreferences',authorizat
 
 });
 
+RestServer.get('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/ContextIn/:contextIn/Extension/:ext',authorization({resource:"context", action:"read"}),function(req,res,next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - HTTP Request Received', reqId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        context.GetContextCodecPrefsByContext(reqId, req.params.contextIn, req.params.ext, companyId, tenantId)
+            .then(function(codecPrefs)
+            {
+                var jsonString = messageFormatter.FormatMessage(null, "Get context preferences successful", true, codecPrefs);
+                logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+
+            }).catch(function(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+                logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+
+            });
+
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "Error occurred", false, null);
+        logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
 RestServer.post('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"context", action:"write"}),function(req,res,next)
 {
     var reqId='';
