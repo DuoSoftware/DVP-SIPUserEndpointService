@@ -2322,7 +2322,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/:SipID/RemoveFromGroup/:grpid',aut
         var Company=req.user.company;
         var Tenant=req.user.tenant;
 
-        SipbackendHandler.UnAssignUserFromGroup(req.params.SipID,req.params.grpid,Company,Tenant,reqId,function (err, resz) {
+        SipbackendHandler.UnAssignUserFromGroup(req.params.SipID,req.params.grpid,Company,Tenant,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
