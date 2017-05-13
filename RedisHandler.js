@@ -276,3 +276,4 @@ module.exports.GetObjectParseJson = GetObjectParseJson;
 module.exports.IncrementKey = IncrementKey;
 module.exports.AddToHash = AddToHash;
 module.exports.DeleteObject = DeleteObject;
+module.exports.redisClient = client;
