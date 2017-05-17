@@ -6,6 +6,10 @@ var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJ
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var nodeUuid = require('node-uuid');
 var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
+var organization = require('dvp-mongomodels/model/Organisation');
+var redisClient = require('./RedisHandler').redisClient;
+var lock = require("redis-lock")(redisClient);
+var _ = require('lodash');
 
 
 //Sipuser
@@ -16,12 +20,12 @@ function CreateUser(req,Company,Tenant,reqId,callback) {
 
     if(req.body)
     {
-        try {
+        try
+        {
             var SipObj = req.body;
-
-
         }
-        catch (ex) {
+        catch (ex)
+        {
 
             logger.error('[DVP-SIPUserEndpointService.CreateUser] - error occurred while getting request body for SipUACEndPoint  ',reqId,req.body,errUser);
             callback(ex,undefined);
@@ -30,38 +34,35 @@ function CreateUser(req,Company,Tenant,reqId,callback) {
         if(SipObj.SipUsername)
         {
 
-            try {
+            try
+            {
                 DbConn.SipUACEndpoint
                     .find({where: [{SipUsername: SipObj.SipUsername}, {CompanyId: Company}, {TenantId: Tenant}]})
                     .then(function (resUser) {
                         if(!resUser)
                         {
                             logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - No record found for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
-                            try {
-
-
-
-                                logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Saving new sip user %s',reqId,JSON.stringify(SipObj));
-
-                                SaveUser(SipObj,Company,Tenant,reqId,function (error, st) {
+                            try
+                            {
+                                SaveUser(SipObj,Company,Tenant,reqId,function (error, st)
+                                {
 
                                     if(error)
                                     {
-                                        callback(error,undefined);
+                                        callback(error, null);
                                     }
-                                    else {
+                                    else
+                                    {
+                                        if (st)
+                                        {
 
-                                        if (st) {
-
-                                            callback(undefined, st);
+                                            callback(null, st);
                                         }
                                         else
                                         {
-                                            callback(new Error("Error returns"), undefined);
+                                            callback(new Error("Error occurred"), null);
                                         }
                                     }
-
-
 
 
                                 });
@@ -71,20 +72,20 @@ function CreateUser(req,Company,Tenant,reqId,callback) {
                             catch (ex) {
 
                                 logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Exception in saving UAC records',reqId,ex);
-                                callback(ex,undefined);
-
+                                callback(ex, null);
 
                             }
                         }
                         else
                         {
                             logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [PGSQL] - Found sip user %s',reqId,resUser.SipUsername);
-                            callback(new Error("Cannot overwrite this record"),undefined);
+                            callback(new Error("Cannot overwrite this record"), null);
                         }
 
-                    }).catch(function (errUser) {
+                    }).catch(function (errUser)
+                    {
                         logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername,errUser);
-                        callback(errUser,undefined);
+                        callback(errUser, null);
                     });
 
 
@@ -93,18 +94,16 @@ function CreateUser(req,Company,Tenant,reqId,callback) {
             }
             catch (ex) {
                 logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [PGSQL] - Exception in starting : SaveSip of %s',reqId,SipObj.SipUsername,ex);
-                callback(ex,undefined);
+                callback(ex, null);
             }
         }
         else
         {
-            logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [PGSQL] - SipUsername value is undefined ');
-            callback(new Error("Undefined SipUsername"),undefined);
+            callback(new Error("Undefined SipUsername"), null);
         }
     }
     else
     {
-        logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - [PGSQL] - Empty request');
         callback(new Error("Empty request"),undefined)
     }
 
@@ -112,23 +111,28 @@ function CreateUser(req,Company,Tenant,reqId,callback) {
 
 }
 
+function GetEnabledSipUserCount(companyId, tenantId)
+{
+    return DbConn.SipUACEndpoint.aggregate('*', 'count', {where :[{CompanyId: companyId}, {TenantId: tenantId}, {Enabled: true}]});
+}
+
 
 function SaveUser(jobj,Company,Tenant,reqId,callback) {
 
 
-    if (jobj) {
+    if (jobj)
+    {
 
         logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s]  - Searching Records of CloudEndUser %s ',reqId,jobj.CloudEndUserId);
 
         if(!isNaN(jobj.CloudEndUserId))
         {
-            try{
+            try
+            {
                 DbConn.CloudEndUser.find({where: [{id: jobj.CloudEndUserId},{CompanyId:Company},{TenantId:Tenant}]}).then(function(resCloudUser)
                 {
-                    if (resCloudUser) {
-
-                        logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Record found for CloudEndUser %s and searching for Context %s',reqId,jobj.CloudEndUserId,jobj.ContextId);
-
+                    if (resCloudUser)
+                    {
 
                         if(jobj.ContextId)
                         {
@@ -170,73 +174,119 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                             }
                                         );
 
-                                        SIPObject.save().then(function (resSave) {
 
-                                            logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - SipUser record added successfully',reqId);
-
-                                            resCloudUser.addSipUACEndpoint(SIPObject).then(function (resMapCldUser)
+                                        lock(Tenant + '_' + Company + '_' + 'SIP_USER_LIMIT_LOCK', function(done)
+                                        {
+                                            try
                                             {
-                                                logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping cloud %s and SipUser %s',reqId,JSON.stringify(resCloudUser),JSON.stringify(SIPObject));
-                                                resContext.addSipUACEndpoint(SIPObject).then(function (resMapCntx)
+                                                organization.findOne({tenant: Tenant, id: Company}, function(err, org)
                                                 {
-                                                    redisCacheHandler.addSipUserToCache(SIPObject, Company, Tenant);
+                                                    if(err)
+                                                    {
+                                                        done();
+                                                        callback(err, null);
+                                                    }
+                                                    else
+                                                    {
+                                                        if(org && org.resourceAccessLimits)
+                                                        {
+                                                            var userLimits = _.find(org.resourceAccessLimits, {'scopeName': 'sipuser'});
 
-                                                    logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Successfully Mapping context %s and SipUser %s',reqId,JSON.stringify(resContext),JSON.stringify(SIPObject));
-                                                    callback(undefined,resMapCntx);
+                                                            if(userLimits)
+                                                            {
+                                                                //allow add user
+                                                                DbConn.SipUACEndpoint.aggregate('*', 'count', {where :[{CompanyId: Company}, {TenantId: Tenant}, {Enabled: true}]}).then(function(sipUserCount)
+                                                                {
+                                                                    if(userLimits.accessLimit > sipUserCount)
+                                                                    {
+                                                                        SIPObject.save().then(function (resSave)
+                                                                        {
+                                                                            done();
+                                                                            resCloudUser.addSipUACEndpoint(SIPObject).then(function (resMapCldUser)
+                                                                            {
+                                                                                resContext.addSipUACEndpoint(SIPObject).then(function (resMapCntx)
+                                                                                {
+                                                                                    redisCacheHandler.addSipUserToCache(SIPObject, Company, Tenant);
 
-                                                }).catch(function (errMapCntx) {
-                                                    redisCacheHandler.addSipUserToCache(SIPObject, Company, Tenant);
-                                                    logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Error in Mapping context %s and SipUser %s',reqId,JSON.stringify(resContext),JSON.stringify(SIPObject),errMapCntx);
-                                                    callback(new Error('Error in mapping Context & SipUAC'),undefined);
+                                                                                    callback(null, resMapCntx);
+
+                                                                                }).catch(function (errMapCntx)
+                                                                                {
+                                                                                    redisCacheHandler.addSipUserToCache(SIPObject, Company, Tenant);
+                                                                                    callback(new Error('Error in mapping Context & SipUAC'), null);
+                                                                                });
+
+                                                                            }).catch(function (errMapCldUser)
+                                                                            {
+                                                                                redisCacheHandler.addSipUserToCache(SIPObject, Company, Tenant);
+                                                                                callback(new Error('Error in mapping CEU & SipUAC'), null);
+                                                                            });
+
+
+                                                                        }).catch(function (errSave)
+                                                                        {
+                                                                            done();
+                                                                            callback(errSave, undefined);
+
+                                                                        });
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        callback(new Error('Sip user limit exceeded'), null);
+                                                                    }
+
+                                                                }).catch(function(ex)
+                                                                {
+                                                                    callback(ex, null);
+                                                                });
+
+                                                            }
+                                                            else
+                                                            {
+                                                                done();
+                                                                callback(new Error('Sip user limits not defined'), null);
+                                                            }
+
+                                                        }
+                                                        else
+                                                        {
+                                                            done();
+                                                            callback(new Error('Organization resource access limits not set'), null);
+                                                        }
+                                                    }
+
                                                 });
+                                            }
+                                            catch(ex)
+                                            {
+                                                done();
+                                            }
 
 
-
-
-                                            }).catch(function (errMapCldUser) {
-                                                redisCacheHandler.addSipUserToCache(SIPObject, Company, Tenant);
-                                                logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in mapping cloud %s and SipUser %s',reqId,JSON.stringify(resCloudUser),JSON.stringify(SIPObject),errMapCldUser);
-                                                callback(new Error('Error in mapping CEU & SipUAC'),undefined);
-                                            });
-
-
-
-
-
-
-                                        }).catch(function (errSave) {
-                                            logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] -Error in inserting Sip user records %s',reqId,JSON.stringify(jobj),errSave);
-                                            callback(errSave, undefined);
                                         });
 
 
-                                    }
-                                    else  {
-                                        logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - No record found for context %s',reqId,jobj.ContextId);
-                                        callback(new Error("No context Found"),undefined);
 
+
+                                    }
+                                    else
+                                    {
+                                        callback(new Error("No context Found"),undefined);
 
                                     }
                                 }).catch(function(errContext)
                                 {
-                                    logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in Searching Records of Context %s ',reqId,jobj.ContextId,errContext);
                                     callback(errContext,undefined);
                                 });
-
-
-
-
 
                             }
                             catch(ex)
                             {
-                                logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Exception in searching Context',ex);
                                 callback(ex,undefined);
                             }
                         }
                         else
                         {
-                            logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Context is Undefined');
                             callback(new Error("Context is Undefined"),undefined);
                         }
 
@@ -244,21 +294,12 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                     }
                     else
                     {
-
-
-                        logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - No record found for cloudEnduser %s',reqId,jobj.CloudEndUserId);
                         callback(new Error("No CloudEnduser found"),undefined);
                     }
                 }).catch(function(errCloudUser)
                 {
-                    logger.error('[DVP-SIPUserEndpointService.SaveUser] - [%s] - [PGSQL] - Error in Searching Records of CloudEndUser %s ',reqId,jobj.CloudEndUserId,errCloudUser);
-                    callback(err,undefined);
+                    callback(errCloudUser, undefined);
                 });
-
-
-
-
-
 
             }
             catch(ex)
@@ -438,6 +479,7 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,callback) {
 
                             delete jobj.SipUsername;
                             delete jobj.SipUserUuid;
+                            delete jobj.Enabled;
                             delete jobj.CompanyId;
                             delete jobj.TenantId;
 
@@ -494,42 +536,54 @@ function UpdateUserStatus(Username,status,Company,Tenant,reqId,callback) {
         {
             DbConn.SipUACEndpoint
                 .find({where: [{SipUsername: Username}, {CompanyId: Company}, {TenantId: Tenant}]})
-                .then(function (resUser) {
-
-                    if (!resUser) {
-
-                        logger.error('[DVP-SIPUserEndpointService.UpdateUserStatus] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,Username);
-                        callback(new Error("No SipUser record found"), undefined);
-
+                .then(function (resUser)
+                {
+                    if (!resUser)
+                    {
+                        callback(new Error("No SipUser record found"), null);
                     }
-                    else {
+                    else
+                    {
 
-                        try {
+                        try
+                        {
+                            lock(Tenant + '_' + Company + '_' + 'SIP_USER_LIMIT_LOCK', function(done)
+                            {
+                                try
+                                {
+                                    resUser.updateAttributes(SipObj).then(function (resUpdate)
+                                    {
+                                        done();
 
+                                        redisCacheHandler.addSipUserToCache(resUpdate, Company, Tenant);
 
-                            resUser.updateAttributes(SipObj).then(function (resUpdate) {
+                                        callback(null, resUpdate);
 
-                                redisCacheHandler.addSipUserToCache(resUpdate, Company, Tenant);
+                                    }).catch(function (errUpdate)
+                                    {
+                                        done();
+                                        callback(errUpdate, undefined);
 
-                                logger.debug('[DVP-LimitHandler.UACManagement.UpdateUserStatus] - [%s] - [PGSQL]  - Updating records of SipUser %s is succeeded ',reqId,Username);
-                                callback(undefined, resUpdate);
-
-                            }).catch(function (errUpdate) {
-
-                                console.log("Project update failed ! " + errUpdate);
-                                logger.error('[DVP-LimitHandler.UACManagement.UpdateUserStatus] - [%s] - [PGSQL]  - Updating records of SipUser %s is failed - Status %s ',reqId,Username,status,errUpdate);
-                                callback(errUpdate, undefined);
+                                    });
+                                }
+                                catch(ex)
+                                {
+                                    done();
+                                    callback(ex, null);
+                                }
 
                             });
 
                         }
-                        catch (ex) {
+                        catch (ex)
+                        {
                             logger.error('[DVP-SIPUserEndpointService.UpdateUserStatus] - [%s] - [PGSQL]  - Exception in updating SipUser %s ',reqId,Username,ex);
                             callback(ex, undefined);
                         }
                     }
 
-                }).catch(function (errUser) {
+                }).catch(function (errUser)
+                {
                     logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUserStatus] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,Username,errUser);
                     callback(errUser, undefined);
                 });
@@ -1245,6 +1299,7 @@ module.exports.UpdateUser = UpdateUser;
 module.exports.PickCompanyUsers = PickCompanyUsers;
 module.exports.PickAllUsers = PickAllUsers;
 module.exports.UpdateUserStatus = UpdateUserStatus;
+module.exports.GetEnabledSipUserCount = GetEnabledSipUserCount;
 
 
 //Sip user group

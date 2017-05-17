@@ -1,14 +1,3 @@
-/**
- * Created by pawan on 2/10/2015.
- */
-// TODO :- URL fixing (ex:- by Company)
-// in saving add pin to db :- done
-// update pin also :- done
-// update context of user
-// on get context was not sent
-
-// Transfer codes
-//
 var restify = require('restify');
 var CryptoJS = require("crypto-js");
 var context=require('./SipcontextManager.js');
@@ -22,6 +11,8 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var uuid = require('node-uuid');
 var cors = require('cors');
 var jwt = require('restify-jwt');
+var util = require('util');
+var _ = require('lodash');
 var secret = require('dvp-common/Authentication/Secret.js');
 var authorization = require('dvp-common/Authentication/Authorization.js');
 
@@ -44,6 +35,80 @@ RestServer.use(restify.bodyParser());
 RestServer.use(restify.acceptParser(RestServer.acceptable));
 RestServer.use(restify.queryParser());
 RestServer.use(cors());
+
+var mongoip=config.Mongo.ip;
+var mongoport=config.Mongo.port;
+var mongodb=config.Mongo.dbname;
+var mongouser=config.Mongo.user;
+var mongopass = config.Mongo.password;
+var mongoreplicaset= config.Mongo.replicaset;
+
+var mongoose = require('mongoose');
+var connectionstring = '';
+mongoip = mongoip.split(',');
+
+if(util.isArray(mongoip)){
+ if(mongoip.length > 1){    
+    mongoip.forEach(function(item){
+        connectionstring += util.format('%s:%d,',item,mongoport)
+    });
+
+    connectionstring = connectionstring.substring(0, connectionstring.length - 1);
+    connectionstring = util.format('mongodb://%s:%s@%s/%s',mongouser,mongopass,connectionstring,mongodb);
+
+    if(mongoreplicaset){
+        connectionstring = util.format('%s?replicaSet=%s',connectionstring,mongoreplicaset) ;
+    }
+ }
+    else
+    {
+         connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip[0],mongoport,mongodb);
+    }
+}else{
+
+    connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip,mongoport,mongodb);
+}
+
+
+console.log("ConnectionString ------------ "+connectionstring);
+
+mongoose.connect(connectionstring,{server:{auto_reconnect:true}});
+
+
+mongoose.connection.on('error', function (err) {
+    console.error( new Error(err));
+    mongoose.disconnect();
+
+});
+
+mongoose.connection.on('opening', function() {
+    console.log("reconnecting... %d", mongoose.connection.readyState);
+});
+
+
+mongoose.connection.on('disconnected', function() {
+    console.error( new Error('Could not connect to database'));
+    mongoose.connect(connectionstring,{server:{auto_reconnect:true}});
+});
+
+mongoose.connection.once('open', function() {
+    console.log("Connected to db");
+
+});
+
+
+mongoose.connection.on('reconnected', function () {
+    console.log('MongoDB reconnected!');
+});
+
+
+
+process.on('SIGINT', function() {
+    mongoose.connection.close(function () {
+        console.log('Mongoose default connection disconnected through app termination');
+        process.exit(0);
+    });
+});
 
 var encryptPass = config.Host.encryptionPassword;
 
@@ -764,6 +829,49 @@ RestServer.post('/DVP/API/'+version+'/SipUser/User',authorization({resource:"sip
     return next();
 });
 
+RestServer.get('/DVP/API/'+version+'/SipUser/EnableCount',authorization({resource:"sipuser", action:"read"}),function(req,res,next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        logger.debug('[DVP-SIPUserEndpointService.SipUserEnableCount] - [%s] - HTTP Request Received', reqId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        SipbackendHandler.GetEnabledSipUserCount(companyId, tenantId)
+            .then(function(count)
+            {
+                var jsonString = messageFormatter.FormatMessage(null, "Get sip user count successful", true, count);
+                logger.debug('[DVP-SIPUserEndpointService.SipUserEnableCount] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+
+            }).catch(function(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, 0);
+                logger.debug('[DVP-SIPUserEndpointService.SipUserEnableCount] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+
+            });
+
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "Error occurred", false, null);
+        logger.debug('[DVP-SIPUserEndpointService.SipUserEnableCount] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
 RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
     var reqId='';
 
@@ -817,7 +925,59 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',authorization({reso
 
 });
 
+RestServer.del('/DVP/API/'+version+'/SipUser/User/:Username',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
 
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.DeleteUser] - [%s] - [HTTP]  - Request received -  Data - Username %s Status %s ',reqId,req.params.Username,req.params.st);
+
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+
+        SipbackendHandler.UpdateUserStatus(req.params.Username,false,Company,Tenant,reqId,function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.DeleteUser] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.DeleteUser] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.DeleteUser] - [%s] - [HTTP]  - Exception in Request -  Data - Username %s Status %s ',reqId,req.params.Username,req.params.st,ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.DeleteUser] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
 
 // no swagger
 RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',authorization({resource:"sipuser", action:"write"}),function(req,res,next) {
@@ -2171,7 +2331,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/:SipID/RemoveFromGroup/:grpid',aut
         var Company=req.user.company;
         var Tenant=req.user.tenant;
 
-        SipbackendHandler.UnAssignUserFromGroup(req.params.SipID,req.params.grpid,Company,Tenant,reqId,function (err, resz) {
+        SipbackendHandler.UnAssignUserFromGroup(req.params.SipID,req.params.grpid,Company,Tenant,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -2939,6 +3099,57 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Contexts',authorization({resource:"
 
 });
 
+RestServer.get('/DVP/API/'+version+'/SipUser/Contexts/ClientCompany/:companyId',authorization({resource:"tenant", action:"read"}),function(req,res,next) {
+
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [HTTP]  - Request received ',reqId);
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        context.PickAllContexts(req.params.companyId,Tenant,reqId,function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - [HTTP]  - Exception in Request ',reqId,ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.PickAllContexts] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
 // no swagger
 RestServer.put('/DVP/API/'+version+'/SipUser/Context/:context',authorization({resource:"context", action:"write"}),function(req,res,next) {
     var reqId='';
@@ -3047,6 +3258,288 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Context/:context',authorization({re
 });
 
 // update swagger
+RestServer.post('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/ClientCompany/:companyId',authorization({resource:"tenant", action:"write"}),function(req,res,next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        var reqBody = req.body;
+
+        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
+
+        if(reqBody)
+        {
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
+
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            var tempArr = [];
+
+            if(reqBody.Context1 && reqBody.Context2 && reqBody.Codecs && Array.isArray(reqBody.Codecs))
+            {
+                tempArr.push(reqBody.Context1, reqBody.Context2);
+
+                var sortedArr = tempArr.sort();
+
+                context.AddContextCodecPrefs(reqId, sortedArr[0], sortedArr[1], reqBody.Codecs, req.params.companyId, tenantId)
+                    .then(function(saveResp)
+                    {
+                        var jsonString = messageFormatter.FormatMessage(null, "Add context preferences successful", true, saveResp);
+                        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+
+                    }).catch(function(err)
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+                        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+
+                    });
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(new Error('Context or codecs not provided'), "Error occurred", false, null);
+                logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
+
+
+
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error('Empty request body'), "Empty request body", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "Error occurred", false, null);
+        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
+RestServer.put('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/Context1/:context1/Context2/:context2/ClientCompany/:companyId',authorization({resource:"tenant", action:"write"}),function(req,res,next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        var reqBody = req.body;
+
+        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - HTTP Request Received - Req Body : ', reqId, reqBody);
+
+        if(reqBody)
+        {
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
+
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            var tempArr = [];
+
+            if(req.params.context1 && req.params.context2 && reqBody.Codecs && Array.isArray(reqBody.Codecs))
+            {
+                tempArr.push(reqBody.Context1, reqBody.Context2);
+
+                var sortedArr = tempArr.sort();
+
+                context.UpdateContextCodecPrefs(reqId, sortedArr[0], sortedArr[1], reqBody.Codecs, req.params.companyId, tenantId)
+                    .then(function(updateResp)
+                    {
+                        var jsonString = messageFormatter.FormatMessage(null, "Update context preferences successful", true, updateResp);
+                        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+
+                    }).catch(function(err)
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+                        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+
+                    });
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(new Error('Context or codecs not provided'), "Error occurred", false, null);
+                logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
+
+
+
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error('Empty request body'), "Empty request body", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "Error occurred", false, null);
+        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
+RestServer.del('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/:id/ClientCompany/:companyId',authorization({resource:"tenant", action:"delete"}),function(req,res,next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        var recId = req.params.id;
+        var clientCompany = req.params.companyId;
+
+        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - HTTP Request Received', reqId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        context.RemoveContextCodecPrefs(reqId, recId, clientCompany, tenantId)
+            .then(function(delResponse)
+            {
+                var jsonString = messageFormatter.FormatMessage(null, "Delete context preferences successful", true, delResponse);
+                logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+
+            }).catch(function(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+                logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+
+            });
+
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "Error occurred", false, null);
+        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
+RestServer.get('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/ClientCompany/:companyId',authorization({resource:"tenant", action:"read"}),function(req,res,next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - HTTP Request Received', reqId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var clientComp = req.params.companyId;
+
+        context.GetContextCodecPrefs(reqId, clientComp, tenantId)
+            .then(function(codecPrefs)
+            {
+                var jsonString = messageFormatter.FormatMessage(null, "Get context preferences successful", true, codecPrefs);
+                logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+
+            }).catch(function(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+                logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+
+            });
+
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "Error occurred", false, null);
+        logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
+RestServer.get('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/ContextIn/:contextIn/Extension/:ext/ClientCompany/:companyId',authorization({resource:"tenant", action:"read"}),function(req,res,next)
+{
+    var reqId = uuid.v1();
+    try
+    {
+        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - HTTP Request Received', reqId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        var clientCompany = req.params.companyId;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        context.GetContextCodecPrefsByContext(reqId, req.params.contextIn, req.params.ext, clientCompany, tenantId)
+            .then(function(codecPrefs)
+            {
+                var jsonString = messageFormatter.FormatMessage(null, "Get context preferences successful", true, codecPrefs);
+                logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+
+            }).catch(function(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+                logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+
+            });
+
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "Error occurred", false, null);
+        logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+
+    }
+    return next();
+
+});
+
 RestServer.post('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"context", action:"write"}),function(req,res,next)
 {
     var reqId='';
@@ -3061,9 +3554,10 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"
     }
 
 
-    try {
+    try
+    {
 
-        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId,JSON.stringify(req.body));
+        logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
 
         if (!req.user.company || !req.user.tenant)
         {
