@@ -27,6 +27,12 @@ function AddOrUpdateContext(company, tenant, ctxt, reqId, callback)
 
                             try
                             {
+                                var recEnabled = false;
+
+                                if(ctxt.RecordingEnabled === true || ctxt.RecordingEnabled === false)
+                                {
+                                    recEnabled = ctxt.RecordingEnabled;
+                                }
 
                                 logger.debug('[DVP-SIPUserEndpointService.AddOrUpdateContext] - [%s] - [PGSQL] - Creating new record of Context %s ',reqId, ctxt.Context);
                                 DbConn.Context
@@ -39,7 +45,8 @@ function AddOrUpdateContext(company, tenant, ctxt, reqId, callback)
                                         ObjType: ctxt.ObjClass,
                                         ObjCategory: ctxt.ObjCategory,
                                         CompanyId: company,
-                                        TenantId: tenant
+                                        TenantId: tenant,
+                                        RecordingEnabled: recEnabled
 
                                     }
                                 ).then(function (resSave)
@@ -181,6 +188,11 @@ function UpdateContext(company,tenant,context,contextObj,reqId,callback)
         delete contextObj.Context;
         delete contextObj.CompanyId;
         delete contextObj.TenantId;
+
+        if(contextObj.RecordingEnabled !== true && contextObj.RecordingEnabled !== false)
+        {
+            contextObj.RecordingEnabled = false;
+        }
 
         DbConn.Context
             .find({where: [{Context: context},{CompanyId:company},{TenantId:tenant}]})
