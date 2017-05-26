@@ -168,8 +168,8 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                 TransConferenceEnable:jobj.TransConferenceEnable,
                                                 TransGroupEnable:jobj.TransGroupEnable,
                                                 ContextId: jobj.ContextId,
-                                                DenyOutboundFor: jobj.DenyOutboundFor
-
+                                                DenyOutboundFor: jobj.DenyOutboundFor,
+                                                RecordingEnabled: jobj.RecordingEnabled
 
                                             }
                                         );
