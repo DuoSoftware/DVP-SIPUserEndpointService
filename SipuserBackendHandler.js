@@ -158,8 +158,8 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                 CompanyId: Company,
                                                 TenantId: Tenant,
                                                 ObjClass: "OBJCLZ",
-                                                ObjType: "OBJTYP",
-                                                ObjCategory: "OBJCAT",
+                                                ObjType: "CALL",
+                                                ObjCategory: jobj.ObjCategory,
                                                 AddUser: jobj.AddUser,
                                                 UpdateUser: jobj.UpdateUser,
                                                 VoicemailAsEmail: jobj.VoicemailAsEmail,
@@ -168,8 +168,8 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                 TransConferenceEnable:jobj.TransConferenceEnable,
                                                 TransGroupEnable:jobj.TransGroupEnable,
                                                 ContextId: jobj.ContextId,
-                                                DenyOutboundFor: jobj.DenyOutboundFor
-
+                                                DenyOutboundFor: jobj.DenyOutboundFor,
+                                                RecordingEnabled: jobj.RecordingEnabled
 
                                             }
                                         );
