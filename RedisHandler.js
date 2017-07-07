@@ -131,18 +131,10 @@ var PublishToRedis = function(pattern, message, callback)
 {
     try
     {
-        if(client.connected)
-        {
-            var result = client.publish(pattern, message);
+        var result = client.publish(pattern, message);
             logger.debug('[DVP-SIPUserEndpointService.SetObjectWithExpire] - REDIS SUCCESS');
             callback(undefined, true);
-        }
-        else
-        {
-            callback(new Error('REDIS CLIENT DISCONNECTED'), false);
-        }
-
-
+       
     }
     catch(ex)
     {
@@ -154,9 +146,7 @@ var GetFromSet = function(setName, callback)
 {
     try
     {
-        if(client.connected)
-        {
-            client.smembers(setName).keys("*", function (err, setValues)
+       client.smembers(setName).keys("*", function (err, setValues)
             {
                 if(err)
                 {
@@ -164,12 +154,6 @@ var GetFromSet = function(setName, callback)
                 }
                 callback(err, setValues);
             });
-        }
-        else
-        {
-            callback(new Error('REDIS CLIENT DISCONNECTED'), undefined);
-        }
-
 
     }
     catch(ex)
@@ -182,9 +166,7 @@ var IncrementKey = function(key, callback)
 {
     try
     {
-        if(client.connected)
-        {
-            client.incr(key, function (err, reply)
+         client.incr(key, function (err, reply)
             {
                 if(err)
                 {
@@ -192,8 +174,6 @@ var IncrementKey = function(key, callback)
                 }
 
             });
-        }
-
     }
     catch(ex)
     {
@@ -205,9 +185,7 @@ var AddChannelIdToSet = function(uuid, setName)
 {
     try
     {
-        if(client.connected)
-        {
-            client.sismember(setName, uuid, function (err, reply)
+       client.sismember(setName, uuid, function (err, reply)
             {
                 if(err)
                 {
@@ -224,8 +202,6 @@ var AddChannelIdToSet = function(uuid, setName)
 
 
             });
-        }
-
 
     }
     catch(ex)
@@ -240,9 +216,7 @@ var AddToHash = function(hashId, key, value, callback)
 {
     try
     {
-        if(client.connected)
-        {
-            client.hset(hashId, key, value, function (err, reply)
+        client.hset(hashId, key, value, function (err, reply)
             {
                 if(err)
                 {
@@ -252,7 +226,6 @@ var AddToHash = function(hashId, key, value, callback)
                 callback(err, reply);
 
             });
-        }
 
     }
     catch(ex)
