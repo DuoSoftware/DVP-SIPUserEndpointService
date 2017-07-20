@@ -8,6 +8,7 @@
     "chance": "^1.0.1",
     "config": "^1.20.1",
     "cors": "^2.7.1",
+    "crypto": "0.0.3",
     "crypto-js": "^3.1.8",
     "dvp-common": "^0.8.4",
     "dvp-dbmodels": "1.2.6",

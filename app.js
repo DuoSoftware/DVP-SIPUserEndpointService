@@ -1,5 +1,6 @@
 var restify = require('restify');
 var CryptoJS = require("crypto-js");
+var crypto = require('crypto');
 var context=require('./SipcontextManager.js');
 var Extmgt=require('./ExtensionManagementAPI.js');
 var PublicUser=require('./PublicUserService.js');
@@ -110,13 +111,40 @@ process.on('SIGINT', function() {
     });
 });
 
+
+
+
 var encryptPass = config.Host.encryptionPassword;
 
-function encrypt(text)
+function encryptTest(text)
 {
-    var ciphertext = CryptoJS.AES.encrypt(text, encryptPass);
-    return ciphertext.toString();
+    try{
+        var key = '00000000000000000000000000000000'; //replace with your key
+        var iv = '0000000000000000'; //replace with your IV
+
+        var cipher = crypto.createCipheriv('aes256', key, iv);
+        var crypted = cipher.update("DuoS123456789", 'utf8', 'base64');
+        crypted += cipher.final('base64');
+        console.log(crypted);
+
+
+        var decipher = crypto.createDecipher('aes256', key,iv);
+        var decrypted = decipher.update(crypted, 'utf8', 'base64');
+        decrypted += decipher.final('base64');
+        console.log(decrypted);
+
+        return crypted;
+    }
+    catch (ex){
+        console.log(ex)
+    }
+
+
+
+    /*var ciphertext = CryptoJS.AES.encrypt(text, encryptPass);
+    return ciphertext.toString();*/
 }
+
 
 
 RestServer.post('/DVP/API/:version/SipUser/DidNumber', authorization({resource:"number", action:"write"}), function(req, res, next) {
@@ -1156,6 +1184,32 @@ RestServer.get('/DVP/API/'+version+'/SipUser/User/:username/Password',authorizat
             throw new Error("Invalid company or tenant");
         }
 
+        var key = 'DuoS1230000000000000000000000000'; //replace with your key
+        var iv = '0000000000000000'; //replace with your IV
+
+        var encryptPass = config.Host.encryptionPassword;
+
+        function encrypt(text)
+        {
+            var ciphertext = CryptoJS.AES.encrypt(text, encryptPass);
+            return ciphertext.toString();
+        }
+
+        function encryptiv(key, data) {
+            var cipher = crypto.createCipheriv('aes256', key, iv);
+            var crypted = cipher.update(data, 'utf8', 'base64');
+            crypted += cipher.final('base64');
+            return crypted;
+        }
+
+        function decryptiv(key, data) {
+            var decipher = crypto.createDecipheriv('aes256', key,iv);
+            var decrypted = decipher.update(data, 'base64', 'utf8');
+            decrypted += decipher.final('utf8');
+
+            return decrypted;
+        }
+
         SipbackendHandler.GetUserByUsername(reqId, username, companyId, tenantId, function (err, result)
         {
             if (err)
@@ -1169,8 +1223,17 @@ RestServer.get('/DVP/API/'+version+'/SipUser/User/:username/Password',authorizat
                 var encryptedPass = null;
                 if(result)
                 {
-                    encryptedPass = encrypt(result.Password);
 
+                    if(req.params.iv || req.params.iv==="") {
+
+                        var encryptedPass = encryptiv(key, result.Password);
+                        console.log("Encrypted Text: " + encryptedPass);
+                        /*var decryptedText = decrypt(key, encryptedText);
+                         console.log("Decrypted Text: " + decryptedText);*/
+                    }
+                    else {
+                        encryptedPass = encrypt(result.Password);
+                    }
                 }
                 var jsonString = messageFormatter.FormatMessage(null, "Operation success", true, encryptedPass);
                 logger.debug('[DVP-SIPUserEndpointService.RetrievePassword] - [%s] - API RESPONSE : %s', reqId, jsonString);
