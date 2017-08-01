@@ -15,6 +15,7 @@ module.exports = {
         "port": "SYS_REDIS_PORT",
         "password": "SYS_REDIS_PASSWORD",
         "db": "SYS_REDIS_DB_CONFIG",
+        "mode":"SYS_REDIS_MODE",
         "sentinels":{
             "hosts": "SYS_REDIS_SENTINEL_HOSTS",
             "port":"SYS_REDIS_SENTINEL_PORT",
@@ -29,6 +30,7 @@ module.exports = {
         "port": "SYS_REDIS_PORT",
         "user": "SYS_REDIS_USER",
         "password": "SYS_REDIS_PASSWORD",
+        "mode":"SYS_REDIS_MODE",
         "sentinels":{
             "hosts": "SYS_REDIS_SENTINEL_HOSTS",
             "port":"SYS_REDIS_SENTINEL_PORT",
