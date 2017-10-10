@@ -2,6 +2,7 @@ var restify = require('restify');
 var CryptoJS = require("crypto-js");
 var crypto = require('crypto');
 var context=require('./SipcontextManager.js');
+var ipPhoneDBAction = require('./IPphoneDBActions.js');
 var Extmgt=require('./ExtensionManagementAPI.js');
 var PublicUser=require('./PublicUserService.js');
 var EndPoint=require('./EndpointManagement.js');
@@ -16,6 +17,9 @@ var util = require('util');
 var _ = require('lodash');
 var secret = require('dvp-common/Authentication/Secret.js');
 var authorization = require('dvp-common/Authentication/Authorization.js');
+//var tftp = require('tftp');
+var fs = require("fs");
+
 
 
 var port = config.Host.port || 3000;
@@ -49,21 +53,21 @@ var connectionstring = '';
 mongoip = mongoip.split(',');
 
 if(util.isArray(mongoip)){
- if(mongoip.length > 1){    
-    mongoip.forEach(function(item){
-        connectionstring += util.format('%s:%d,',item,mongoport)
-    });
+    if(mongoip.length > 1){
+        mongoip.forEach(function(item){
+            connectionstring += util.format('%s:%d,',item,mongoport)
+        });
 
-    connectionstring = connectionstring.substring(0, connectionstring.length - 1);
-    connectionstring = util.format('mongodb://%s:%s@%s/%s',mongouser,mongopass,connectionstring,mongodb);
+        connectionstring = connectionstring.substring(0, connectionstring.length - 1);
+        connectionstring = util.format('mongodb://%s:%s@%s/%s',mongouser,mongopass,connectionstring,mongodb);
 
-    if(mongoreplicaset){
-        connectionstring = util.format('%s?replicaSet=%s',connectionstring,mongoreplicaset) ;
+        if(mongoreplicaset){
+            connectionstring = util.format('%s?replicaSet=%s',connectionstring,mongoreplicaset) ;
+        }
     }
- }
     else
     {
-         connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip[0],mongoport,mongodb);
+        connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip[0],mongoport,mongodb);
     }
 }else{
 
@@ -479,7 +483,6 @@ RestServer.del('/DVP/API/:version/SipUser/DidNumber/:id', authorization({resourc
                 }
 
             })
-
         }
         else
         {
@@ -880,12 +883,12 @@ RestServer.get('/DVP/API/'+version+'/SipUser/EnableCount',authorization({resourc
                 res.end(jsonString);
 
             }).catch(function(err)
-            {
-                var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, 0);
-                logger.debug('[DVP-SIPUserEndpointService.SipUserEnableCount] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                res.end(jsonString);
+        {
+            var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, 0);
+            logger.debug('[DVP-SIPUserEndpointService.SipUserEnableCount] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
 
-            });
+        });
 
 
     }
@@ -3356,12 +3359,12 @@ RestServer.post('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/ClientComp
                         res.end(jsonString);
 
                     }).catch(function(err)
-                    {
-                        var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
-                        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                        res.end(jsonString);
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+                    logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
 
-                    });
+                });
             }
             else
             {
@@ -3429,12 +3432,12 @@ RestServer.put('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/Context1/:c
                         res.end(jsonString);
 
                     }).catch(function(err)
-                    {
-                        var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
-                        logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                        res.end(jsonString);
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+                    logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
 
-                    });
+                });
             }
             else
             {
@@ -3493,12 +3496,12 @@ RestServer.del('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/:id/ClientC
                 res.end(jsonString);
 
             }).catch(function(err)
-            {
-                var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
-                logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                res.end(jsonString);
+        {
+            var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.ContextCodecPreferencesDelete] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
 
-            });
+        });
 
 
     }
@@ -3538,12 +3541,12 @@ RestServer.get('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/ClientCompa
                 res.end(jsonString);
 
             }).catch(function(err)
-            {
-                var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
-                logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                res.end(jsonString);
+        {
+            var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
 
-            });
+        });
 
 
     }
@@ -3583,12 +3586,12 @@ RestServer.get('/DVP/API/'+version+'/SipUser/ContextCodecPreferences/ContextIn/:
                 res.end(jsonString);
 
             }).catch(function(err)
-            {
-                var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
-                logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                res.end(jsonString);
+        {
+            var jsonString = messageFormatter.FormatMessage(err, "Error occurred", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.GetContextCodecPreferences] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
 
-            });
+        });
 
 
     }
@@ -3725,6 +3728,174 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Context/:context',authorization({re
 
 });
 
+
+RestServer.get('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
+    var reqId = uuid.v1();
+    logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneConfig] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.getPhoneConfig(req.params.mac,reqId, function(err, data) {
+        if(err){
+            var jsonString = messageFormatter.FormatMessage(err, "Exception", false, undefined);
+            logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, data);
+            logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+
+    });
+    return next();
+});
+RestServer.get('/DVP/API/:version/IPPhone/Configs', authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
+    var reqId = uuid.v1();
+    logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneConfigs] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.getPhoneConfigs(reqId, function(err, data) {
+        if(err){
+            var jsonString = messageFormatter.FormatMessage(err, "Exception", false, undefined);
+            logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneConfigs] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, data);
+            logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneConfigs] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+
+    });
+    return next();
+});
+RestServer.get('/DVP/API/:version/IPPhone/Template/:model',authorization({resource:"ipphone", action:"read"}),  function(req, res, next) {
+    var reqId = uuid.v1();
+    logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneTemplate] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.getPhoneTemplate(req.params.model,reqId, function(err, data) {
+        if(err){
+            var jsonString = messageFormatter.FormatMessage(err, "Exception", false, undefined);
+            logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneTemplate] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, data);
+            logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneTemplate] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+
+    });
+    return next();
+});
+RestServer.get('/DVP/API/:version/IPPhone/Templates', authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
+    var reqId = uuid.v1();
+    logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneTemplates] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.getPhoneTemplates(reqId, function(err, data) {
+        if(err){
+            var jsonString = messageFormatter.FormatMessage(err, "Exception", false, undefined);
+            logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneTemplates] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, data);
+            logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneTemplates] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+
+    });
+    return next();
+});
+RestServer.post('/DVP/API/:version/IPPhone/Config',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+    var reqId = uuid.v1();
+
+    fs.filere
+    logger.debug('[DVP-SIPUserEndpointService.SaveIPPhoneConfig] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.SetIPPhoneConfig(reqId,req.body,function (error,reult) {
+        if(error){
+            var jsonString = messageFormatter.FormatMessage(error, "Exception", false, undefined);
+            logger.debug('[DVP-SIPUserEndpointService.SaveIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, reult);
+            logger.debug('[DVP-SIPUserEndpointService.SaveIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+    });
+    return next();
+});
+RestServer.post('/DVP/API/:version/IPPhone/Template', authorization({resource:"ipphone", action:"write"}), function(req, res, next) {
+    var reqId = uuid.v1();
+    logger.debug('[DVP-SIPUserEndpointService.SaveIPPhoneTemplate] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.SetIPPhoneTemplate(reqId,req.body,function (error,reult) {
+        if(error){
+            var jsonString = messageFormatter.FormatMessage(error, "Exception", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.SaveIPPhoneTemplate] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(null, "Success", true, reult);
+            logger.debug('[DVP-SIPUserEndpointService.SaveIPPhoneTemplate] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+    });
+    return next();
+});
+RestServer.put('/DVP/API/:version/IPPhone/Config',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+    var reqId = uuid.v1();
+    logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.updateIPPhoneConfig(reqId,req.body,function (error,reult) {
+        if(error){
+            var jsonString = messageFormatter.FormatMessage(error, "Exception", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(null, "Success", true, reult);
+            logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+    });
+    return next();
+});
+RestServer.put('/DVP/API/:version/IPPhone/Template', authorization({resource:"ipphone", action:"write"}), function(req, res, next) {
+    var reqId = uuid.v1();
+    logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneTemplate] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.updateIPPhoneTemplate(reqId,req.body,function (error,reult) {
+        if(error){
+            var jsonString = messageFormatter.FormatMessage(error, "Exception", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneTemplate] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(null, "Success", true, reult);
+            logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneTemplate] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+    });
+    return next();
+});
+RestServer.del('/DVP/API/:version/IPPhone/Config/:mac', authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+    var reqId = uuid.v1();
+    logger.debug('[DVP-SIPUserEndpointService.deleteIPPhoneConfig] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.deleteIPPhoneConfig(reqId,req.params.mac,function (error,reult) {
+        if(error){
+            var jsonString = messageFormatter.FormatMessage(error, "Exception", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.deleteIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(error, "Success", true, reult);
+            logger.debug('[DVP-SIPUserEndpointService.deleteIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+    });
+    return next();
+});
+RestServer.del('/DVP/API/:version/IPPhone/Template/:model', authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+    var reqId = uuid.v1();
+    logger.debug('[DVP-SIPUserEndpointService.deleteIPPhoneTemplate] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.deleteIPPhoneTemplate(reqId,req.params.model,function (error,reult) {
+        if(error){
+            var jsonString = messageFormatter.FormatMessage(error, "Exception", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.deleteIPPhoneTemplate] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(null, "Success", true, reult);
+            logger.debug('[DVP-SIPUserEndpointService.deleteIPPhoneTemplate] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+    });
+    return next();
+});
+
 function Crossdomain(req,res,next){
 
 
@@ -3751,8 +3922,10 @@ function Clientaccesspolicy(req,res,next){
 
 }
 
+
 RestServer.get("/crossdomain.xml",Crossdomain);
 RestServer.get("/clientaccesspolicy.xml",Clientaccesspolicy);
+
 
 RestServer.listen(port, function () {
     console.log('%s listening at %s', RestServer.name, RestServer.url);
