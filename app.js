@@ -29,7 +29,7 @@ var version=config.Host.version;
 
 var RestServer = restify.createServer({
     name: "myapp",
-    version: '1.0.0'
+    version: '1.0.1'
 });
 
 restify.CORS.ALLOW_HEADERS.push('authorization');
