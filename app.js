@@ -3895,6 +3895,40 @@ RestServer.del('/DVP/API/:version/IPPhone/Template/:model', authorization({resou
     });
     return next();
 });
+RestServer.post('/DVP/API/:version/IPPhone/UploadPhoneList', authorization({resource:"context", action:"write"}), function(req, res, next) {
+    var reqId = uuid.v1();
+    logger.debug('[DVP-SIPUserEndpointService.UploadPhoneList] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.UploadPhoneList(reqId,req.body,function (error,reult) {
+        if(error){
+            var jsonString = messageFormatter.FormatMessage(error, "Exception", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.UploadPhoneList] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(null, "Success", true, reult);
+            logger.debug('[DVP-SIPUserEndpointService.UploadPhoneList] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+    });
+    return next();
+});
+RestServer.get('/DVP/API/:version/IPPhone/getAllPhoneList/:company', authorization({resource:"context", action:"read"}), function(req, res, next) {
+    var reqId = uuid.v1();
+    logger.debug('[DVP-SIPUserEndpointService.getAllPhoneList] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+
+    ipPhoneDBAction.getAllPhoneList(reqId,req.params.company, function(err, data) {
+        if(err){
+            var jsonString = messageFormatter.FormatMessage(err, "Exception", false, undefined);
+            logger.debug('[DVP-SIPUserEndpointService.getAllPhoneList] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, data);
+            logger.debug('[DVP-SIPUserEndpointService.getAllPhoneList] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+
+    });
+    return next();
+});
 
 function Crossdomain(req,res,next){
 
