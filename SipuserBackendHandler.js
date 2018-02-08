@@ -208,7 +208,7 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                                                 {
                                                                                     redisCacheHandler.addSipUserToCache(SIPObject, Company, Tenant);
 
-                                                                                    callback(null, resMapCntx);
+                                                                                    callback(null, resSave);
 
                                                                                 }).catch(function (errMapCntx)
                                                                                 {
