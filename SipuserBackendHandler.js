@@ -8,8 +8,26 @@ var nodeUuid = require('node-uuid');
 var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
 var organization = require('dvp-mongomodels/model/Organisation');
 var redisClient = require('./RedisHandler').redisClient;
-var lock = require("redis-lock")(redisClient);
+var Redlock = require('redlock');
 var _ = require('lodash');
+
+var rlock = new Redlock(
+        [redisClient],
+    {
+        driftFactor: 0.01,
+
+        retryCount: 10000,
+
+        retryDelay: 200
+
+    }
+);
+
+rlock.on('clientError', function(err)
+{
+    logger.error('[DVP-Common.AcquireLock] - [%s] - REDIS LOCK FAILED', err);
+
+});
 
 
 //Sipuser
@@ -174,8 +192,11 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                             }
                                         );
 
+                                        var lockKey = Tenant + '_' + Company + '_' + 'SIPUSER_LIMIT_LOCK';
+                                        var ttl = 2000;
 
-                                        lock(Tenant + '_' + Company + '_' + 'SIP_USER_LIMIT_LOCK', function(done)
+
+                                        rlock.lock(lockKey, ttl).then(function(lock)
                                         {
                                             try
                                             {
@@ -183,7 +204,11 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                 {
                                                     if(err)
                                                     {
-                                                        done();
+                                                        lock.unlock()
+                                                            .catch(function (err)
+                                                            {
+                                                                logger.error('[DVP-Common.addClusterToCache] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                                                            });
                                                         callback(err, null);
                                                     }
                                                     else
@@ -201,7 +226,11 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                                     {
                                                                         SIPObject.save().then(function (resSave)
                                                                         {
-                                                                            done();
+                                                                            lock.unlock()
+                                                                                .catch(function (err)
+                                                                                {
+                                                                                    logger.error('[DVP-Common.addClusterToCache] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                                                                                });
                                                                             resCloudUser.addSipUACEndpoint(SIPObject).then(function (resMapCldUser)
                                                                             {
                                                                                 resContext.addSipUACEndpoint(SIPObject).then(function (resMapCntx)
@@ -225,7 +254,11 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
 
                                                                         }).catch(function (errSave)
                                                                         {
-                                                                            done();
+                                                                            lock.unlock()
+                                                                                .catch(function (err)
+                                                                                {
+                                                                                    logger.error('[DVP-Common.addClusterToCache] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                                                                                });
                                                                             callback(errSave, undefined);
 
                                                                         });
@@ -243,14 +276,22 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                             }
                                                             else
                                                             {
-                                                                done();
+                                                                lock.unlock()
+                                                                    .catch(function (err)
+                                                                    {
+                                                                        logger.error('[DVP-Common.addClusterToCache] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                                                                    });
                                                                 callback(new Error('Sip user limits not defined'), null);
                                                             }
 
                                                         }
                                                         else
                                                         {
-                                                            done();
+                                                            lock.unlock()
+                                                                .catch(function (err)
+                                                                {
+                                                                    logger.error('[DVP-Common.addClusterToCache] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                                                                });
                                                             callback(new Error('Organization resource access limits not set'), null);
                                                         }
                                                     }
@@ -259,7 +300,11 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                             }
                                             catch(ex)
                                             {
-                                                done();
+                                                lock.unlock()
+                                                    .catch(function (err)
+                                                    {
+                                                        logger.error('[DVP-Common.addClusterToCache] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                                                    });
                                             }
 
 
