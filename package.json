@@ -19,7 +19,7 @@
     "mysql": "^2.10.2",
     "node-uuid": "^1.4.7",
     "redis": "^2.6.2",
-    "restify": "^4.0.4",
+    "restify": "^4.0.3",
     "restify-jwt": "^0.4.0",
     "stringify": "^5.1.0",
     "winston": "^2.2.0"
