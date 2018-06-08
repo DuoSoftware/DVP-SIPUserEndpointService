@@ -3731,8 +3731,13 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Context/:context',authorization({re
 
 RestServer.get('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
     var reqId = uuid.v1();
+
+
+    var companyId = req.user.company;
+    var tenantId = req.user.tenant;
+
     logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneConfig] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
-    ipPhoneDBAction.getPhoneConfig(req.params.mac,reqId, function(err, data) {
+    ipPhoneDBAction.getPhoneConfig(tenantId, companyId, req.params.mac,reqId, function(err, data) {
         if(err){
             var jsonString = messageFormatter.FormatMessage(err, "Exception", false, undefined);
             logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
@@ -3746,10 +3751,15 @@ RestServer.get('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"
     });
     return next();
 });
+
 RestServer.get('/DVP/API/:version/IPPhone/Configs', authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
     var reqId = uuid.v1();
+
+    var companyId = req.user.company;
+    var tenantId = req.user.tenant;
+
     logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneConfigs] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
-    ipPhoneDBAction.getPhoneConfigs(reqId, function(err, data) {
+    ipPhoneDBAction.getPhoneConfigs(tenantId,companyId,reqId, function(err, data) {
         if(err){
             var jsonString = messageFormatter.FormatMessage(err, "Exception", false, undefined);
             logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneConfigs] - [%s] - Request response : %s ',reqId,jsonString);
@@ -3800,9 +3810,11 @@ RestServer.get('/DVP/API/:version/IPPhone/Templates', authorization({resource:"i
 RestServer.post('/DVP/API/:version/IPPhone/Config',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
     var reqId = uuid.v1();
 
-    fs.filere
+    var companyId = req.user.company;
+    var tenantId = req.user.tenant;
+
     logger.debug('[DVP-SIPUserEndpointService.SaveIPPhoneConfig] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
-    ipPhoneDBAction.SetIPPhoneConfig(reqId,req.body,function (error,reult) {
+    ipPhoneDBAction.SetIPPhoneConfig(tenantId, companyId, reqId,req.body,function (error,reult) {
         if(error){
             var jsonString = messageFormatter.FormatMessage(error, "Exception", false, undefined);
             logger.debug('[DVP-SIPUserEndpointService.SaveIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
@@ -3831,10 +3843,13 @@ RestServer.post('/DVP/API/:version/IPPhone/Template', authorization({resource:"i
     });
     return next();
 });
-RestServer.put('/DVP/API/:version/IPPhone/Config',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+RestServer.put('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
     var reqId = uuid.v1();
+    var companyId = req.user.company;
+    var tenantId = req.user.tenant;
+    var mac = req.params.mac;
     logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
-    ipPhoneDBAction.updateIPPhoneConfig(reqId,req.body,function (error,reult) {
+    ipPhoneDBAction.updateIPPhoneConfig(tenantId, companyId,reqId,req.body,mac,function (error,reult) {
         if(error){
             var jsonString = messageFormatter.FormatMessage(error, "Exception", false, null);
             logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
@@ -3847,6 +3862,33 @@ RestServer.put('/DVP/API/:version/IPPhone/Config',authorization({resource:"ippho
     });
     return next();
 });
+
+RestServer.put('/DVP/API/:version/IPPhone/Config/:mac/uac/:user',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+    var reqId = uuid.v1();
+    var companyId = req.user.company;
+    var tenantId = req.user.tenant;
+    var mac = req.params.mac;
+    var user = req.params.user;
+    logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.updateIPPhoneSipAccounts(tenantId, companyId,reqId,req.body,mac,user,function (error,reult) {
+        if(error){
+            var jsonString = messageFormatter.FormatMessage(error, "Exception", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(null, "Success", true, reult);
+            logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+    });
+    return next();
+});
+
+
+
+
+
+
 RestServer.put('/DVP/API/:version/IPPhone/Template', authorization({resource:"ipphone", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneTemplate] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
@@ -3865,8 +3907,11 @@ RestServer.put('/DVP/API/:version/IPPhone/Template', authorization({resource:"ip
 });
 RestServer.del('/DVP/API/:version/IPPhone/Config/:mac', authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
     var reqId = uuid.v1();
+    var companyId = req.user.company;
+    var tenantId = req.user.tenant;
+
     logger.debug('[DVP-SIPUserEndpointService.deleteIPPhoneConfig] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
-    ipPhoneDBAction.deleteIPPhoneConfig(reqId,req.params.mac,function (error,reult) {
+    ipPhoneDBAction.deleteIPPhoneConfig(tenantId, companyId,reqId,req.params.mac,function (error,reult) {
         if(error){
             var jsonString = messageFormatter.FormatMessage(error, "Exception", false, null);
             logger.debug('[DVP-SIPUserEndpointService.deleteIPPhoneConfig] - [%s] - Request response : %s ',reqId,jsonString);
