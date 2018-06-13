@@ -273,8 +273,8 @@ function UploadPhoneList(reqId, data, company, tenant, callback) {
     var resultlist = [];
     for (var key in data) {
         var PhoneDetailsData = {
-            company: company,
-            tenant: tenant,
+            CompanyId: company,
+            TenantId: tenant,
             mac: data[key].mac,
             model: data[key].model
         };
@@ -294,8 +294,8 @@ function UploadPhoneList(reqId, data, company, tenant, callback) {
 
 }
 function getAllPhoneList(reqId,teant, company,callback) {
-    if(data){
-        DbConn.CompanyHardPhone.findAll({where: {tenant: teant, company: company}})
+    if(teant&&company){
+        DbConn.IPPhoneConfig.findAll({where: {TenantId: teant, CompanyId: company}})
             .then(function (all_recode) {
                 callback(null, all_recode);
             })
@@ -303,7 +303,7 @@ function getAllPhoneList(reqId,teant, company,callback) {
                 callback(error, false);
             });
     }else{
-        DbConn.CompanyHardPhone.findAll()
+        DbConn.IPPhoneConfig.findAll()
             .then(function (all_recode) {
                 callback(null, all_recode);
             })
