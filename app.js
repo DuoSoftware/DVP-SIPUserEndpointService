@@ -3673,7 +3673,6 @@ RestServer.post('/DVP/API/'+version+'/SipUser/Context',authorization({resource:"
     return next();
 
 });
-
 // no swagger
 RestServer.del('/DVP/API/'+version+'/SipUser/Context/:context',authorization({resource:"context", action:"write"}),function(req,res,next) {
     var reqId='';
@@ -3729,6 +3728,10 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Context/:context',authorization({re
 });
 
 
+
+
+
+
 RestServer.get('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
     var reqId = uuid.v1();
 
@@ -3751,7 +3754,6 @@ RestServer.get('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"
     });
     return next();
 });
-
 RestServer.get('/DVP/API/:version/IPPhone/Configs', authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
     var reqId = uuid.v1();
 
@@ -3862,7 +3864,6 @@ RestServer.put('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"
     });
     return next();
 });
-
 RestServer.put('/DVP/API/:version/IPPhone/Config/:mac/uac/:user',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
     var reqId = uuid.v1();
     var companyId = req.user.company;
@@ -3883,12 +3884,26 @@ RestServer.put('/DVP/API/:version/IPPhone/Config/:mac/uac/:user',authorization({
     });
     return next();
 });
-
-
-
-
-
-
+RestServer.put('/DVP/API/:version/IPPhone/Config/:mac/reassign',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+    var reqId = uuid.v1();
+    var companyId = req.user.company;
+    var tenantId = req.user.tenant;
+    var mac = req.params.mac;
+    var user = req.params.user;
+    logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneReassignCompany] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
+    ipPhoneDBAction.updateIPPhoneReassignCompany(tenantId, companyId,reqId,req.body,mac,user,function (error,reult) {
+        if(error){
+            var jsonString = messageFormatter.FormatMessage(error, "Exception", false, null);
+            logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneReassignCompany] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }else{
+            var jsonString = messageFormatter.FormatMessage(null, "Success", true, reult);
+            logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneReassignCompany] - [%s] - Request response : %s ',reqId,jsonString);
+            res.end(jsonString);
+        }
+    });
+    return next();
+});
 RestServer.put('/DVP/API/:version/IPPhone/Template', authorization({resource:"ipphone", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneTemplate] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
@@ -3940,10 +3955,12 @@ RestServer.del('/DVP/API/:version/IPPhone/Template/:model', authorization({resou
     });
     return next();
 });
-RestServer.post('/DVP/API/:version/IPPhone/UploadPhoneList', authorization({resource:"context", action:"write"}), function(req, res, next) {
+RestServer.post('/DVP/API/:version/IPPhone/Configs', authorization({resource:"ipphone", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
+    var companyId = req.user.company;
+    var tenantId = req.user.tenant;
     logger.debug('[DVP-SIPUserEndpointService.UploadPhoneList] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
-    ipPhoneDBAction.UploadPhoneList(reqId,req.body,function (error,reult) {
+    ipPhoneDBAction.UploadPhoneList(reqId,req.body,companyId,tenantId,function (error,reult) {
         if(error){
             var jsonString = messageFormatter.FormatMessage(error, "Exception", false, null);
             logger.debug('[DVP-SIPUserEndpointService.UploadPhoneList] - [%s] - Request response : %s ',reqId,jsonString);
@@ -3956,11 +3973,14 @@ RestServer.post('/DVP/API/:version/IPPhone/UploadPhoneList', authorization({reso
     });
     return next();
 });
-RestServer.get('/DVP/API/:version/IPPhone/getAllPhoneList/:company', authorization({resource:"context", action:"read"}), function(req, res, next) {
+RestServer.get('/DVP/API/:version/IPPhone/Configs/company/:company/tenant/:tenant', authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
     var reqId = uuid.v1();
+    var companyId = req.params.company;
+    var tenantId = req.params.tenant;
+
     logger.debug('[DVP-SIPUserEndpointService.getAllPhoneList] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
 
-    ipPhoneDBAction.getAllPhoneList(reqId,req.params.company, function(err, data) {
+    ipPhoneDBAction.getAllPhoneList(reqId,tenantId, companyId, function(err, data) {
         if(err){
             var jsonString = messageFormatter.FormatMessage(err, "Exception", false, undefined);
             logger.debug('[DVP-SIPUserEndpointService.getAllPhoneList] - [%s] - Request response : %s ',reqId,jsonString);

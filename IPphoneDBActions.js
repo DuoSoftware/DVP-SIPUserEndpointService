@@ -84,7 +84,7 @@ function SetIPPhoneTemplate(reqId, data, callback) {
     DbConn.IPPhoneTemplate.find({where: [{model: data['model']}, {make: data['make']}]})
         .then(function (available_recode) {
             if (available_recode) {
-                logger.debug('[DVP-SIPUserEndpointService.SetIPPhoneTemplate] - [%s] - [PGSQL]  - Template available %s phone model for %s ', reqId, data['type'].toUpperCase(), data['model'].toUpperCase());
+                logger.debug('[DVP-SIPUserEndpointService.SetIPPhoneTemplate] - [%s] - [PGSQL]  - Template available %s phone model for %s ', reqId, data['type'], data['model']);
                 callback(new Error("Template Available "), undefined);
             } else {
                 var config_data_set = DbConn.IPPhoneTemplate.build({
@@ -131,9 +131,6 @@ function updateIPPhoneConfig(tenant, company,reqId, mac, data, callback) {
             callback(ex, undefined);
         });
 }
-
-
-
 function updateIPPhoneSipAccounts(tenant, company,reqId, data, mac, user, callback) {
     DbConn.IPPhoneConfig.find({where: {TenantId:tenant,CompanyId:company,mac: mac}})
         .then(function (available_recode) {
@@ -181,6 +178,39 @@ function updateIPPhoneSipAccounts(tenant, company,reqId, data, mac, user, callba
             callback(ex, undefined);
         });
 }
+
+function updateIPPhoneReassignCompany(tenant, company,reqId, data, mac, callback) {
+
+    var newCompany = data.company;
+    var newTenant = data.Tenant;
+    DbConn.IPPhoneConfig.update({comapny: newCompany, tenant: newTenant}, {
+        where: {
+            TenantId: tenant,
+            CompanyId: company,
+            mac: mac
+        }
+    })
+        .then(function (available_recode) {
+            if (available_recode) {
+
+
+                logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneReassignCompany] - [%s] - [PGSQL]  - config update succeeded -  %s', reqId, JSON.stringify(result));
+                callback(undefined, available_recode);
+
+
+            } else {
+                logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneReassignCompany] - [%s] - [PGSQL]  - Record Not Found  in DB  %s', reqId, data);
+                callback(new Error("Config Alrady In DB"), undefined);
+            }
+        })
+        .catch(function (ex) {
+            logger.error('[DVP-SIPUserEndpointService.updateIPPhoneReassignCompany] - [%s] - [PGSQL]  - config insertion  -  %s', reqId, JSON.stringify(data), ex);
+            callback(ex, undefined);
+        });
+}
+
+
+
 
 
 
@@ -239,18 +269,18 @@ function deleteIPPhoneTemplate(reqId, data, callback) {
             callback(ex, undefined);
         });
 }
-function UploadPhoneList(reqId, data, callback) {
+function UploadPhoneList(reqId, data, company, tenant, callback) {
     var resultlist = [];
-    for (var key in data.phonedetails) {
+    for (var key in data) {
         var PhoneDetailsData = {
-            company: data.company,
-            mac: data.phonedetails[key].mac,
-            manufacturer: data.phonedetails[key].manufacturer,
-            model: data.phonedetails[key].model
+            company: company,
+            tenant: tenant,
+            mac: data[key].mac,
+            model: data[key].model
         };
         resultlist.push(PhoneDetailsData);
     }
-    DbConn.CompanyHardPhone.bulkCreate(
+    DbConn.IPPhoneConfig.bulkCreate(
         resultlist, {validate: false, individualHooks: true}
     ).then(function (result) {
         logger.debug('[DVP-SIPUserEndpointService.UploadPhoneList] - [%s] - [PGSQL]  - PhoneDetailsData insertion succeeded -  %s', reqId, JSON.stringify(result));
@@ -263,9 +293,9 @@ function UploadPhoneList(reqId, data, callback) {
     });
 
 }
-function getAllPhoneList(reqId,data,callback) {
+function getAllPhoneList(reqId,teant, company,callback) {
     if(data){
-        DbConn.CompanyHardPhone.findAll({where: {company: data}})
+        DbConn.CompanyHardPhone.findAll({where: {tenant: teant, company: company}})
             .then(function (all_recode) {
                 callback(null, all_recode);
             })
@@ -282,6 +312,8 @@ function getAllPhoneList(reqId,data,callback) {
             });
     }
 }
+
+
 module.exports.getPhoneConfig = getPhoneConfig;
 module.exports.getPhoneConfigs = getPhoneConfigs;
 module.exports.getPhoneTemplate = getPhoneTemplate;
@@ -295,4 +327,5 @@ module.exports.deleteIPPhoneTemplate = deleteIPPhoneTemplate;
 module.exports.UploadPhoneList = UploadPhoneList;
 module.exports.getAllPhoneList = getAllPhoneList;
 module.exports.updateIPPhoneSipAccounts = updateIPPhoneSipAccounts;
+module.exports.updateIPPhoneReassignCompany = updateIPPhoneReassignCompany;
 
