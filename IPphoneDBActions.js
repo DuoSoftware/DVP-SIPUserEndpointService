@@ -179,11 +179,10 @@ function updateIPPhoneSipAccounts(tenant, company,reqId, data, mac, user, callba
         });
 }
 
-function updateIPPhoneReassignCompany(tenant, company,reqId, data, mac, callback) {
+function updateIPPhoneReassignCompany(tenant, company,reqId, data, mac,user, callback) {
 
     var newCompany = data.company;
-    var newTenant = data.Tenant;
-    DbConn.IPPhoneConfig.update({comapny: newCompany, tenant: newTenant}, {
+    DbConn.IPPhoneConfig.update({CompanyId: newCompany}, {
         where: {
             TenantId: tenant,
             CompanyId: company,
@@ -194,13 +193,13 @@ function updateIPPhoneReassignCompany(tenant, company,reqId, data, mac, callback
             if (available_recode) {
 
 
-                logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneReassignCompany] - [%s] - [PGSQL]  - config update succeeded -  %s', reqId, JSON.stringify(result));
+                logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneReassignCompany] - [%s] - [PGSQL]  - config update succeeded -  %s', reqId, JSON.stringify(available_recode));
                 callback(undefined, available_recode);
 
 
             } else {
                 logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneReassignCompany] - [%s] - [PGSQL]  - Record Not Found  in DB  %s', reqId, data);
-                callback(new Error("Config Alrady In DB"), undefined);
+                callback(new Error("Config Already In DB"), undefined);
             }
         })
         .catch(function (ex) {
