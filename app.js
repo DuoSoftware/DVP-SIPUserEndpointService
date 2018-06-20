@@ -3732,7 +3732,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/Context/:context',authorization({re
 
 
 
-RestServer.get('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
+RestServer.get('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"context", action:"read"}), function(req, res, next) {
     var reqId = uuid.v1();
 
 
@@ -3754,7 +3754,7 @@ RestServer.get('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"
     });
     return next();
 });
-RestServer.get('/DVP/API/:version/IPPhone/Configs', authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
+RestServer.get('/DVP/API/:version/IPPhone/Configs', authorization({resource:"context", action:"read"}), function(req, res, next) {
     var reqId = uuid.v1();
 
     var companyId = req.user.company;
@@ -3775,7 +3775,7 @@ RestServer.get('/DVP/API/:version/IPPhone/Configs', authorization({resource:"ipp
     });
     return next();
 });
-RestServer.get('/DVP/API/:version/IPPhone/Template/:model',authorization({resource:"ipphone", action:"read"}),  function(req, res, next) {
+RestServer.get('/DVP/API/:version/IPPhone/Template/:model',authorization({resource:"context", action:"read"}),  function(req, res, next) {
     var reqId = uuid.v1();
     logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneTemplate] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
     ipPhoneDBAction.getPhoneTemplate(req.params.model,reqId, function(err, data) {
@@ -3792,7 +3792,7 @@ RestServer.get('/DVP/API/:version/IPPhone/Template/:model',authorization({resour
     });
     return next();
 });
-RestServer.get('/DVP/API/:version/IPPhone/Templates', authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
+RestServer.get('/DVP/API/:version/IPPhone/Templates', authorization({resource:"context", action:"read"}), function(req, res, next) {
     var reqId = uuid.v1();
     logger.debug('[DVP-SIPUserEndpointService.GetIPPhoneTemplates] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
     ipPhoneDBAction.getPhoneTemplates(reqId, function(err, data) {
@@ -3809,7 +3809,7 @@ RestServer.get('/DVP/API/:version/IPPhone/Templates', authorization({resource:"i
     });
     return next();
 });
-RestServer.post('/DVP/API/:version/IPPhone/Config',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+RestServer.post('/DVP/API/:version/IPPhone/Config',authorization({resource:"context", action:"write"}),  function(req, res, next) {
     var reqId = uuid.v1();
 
     var companyId = req.user.company;
@@ -3829,7 +3829,7 @@ RestServer.post('/DVP/API/:version/IPPhone/Config',authorization({resource:"ipph
     });
     return next();
 });
-RestServer.post('/DVP/API/:version/IPPhone/Template', authorization({resource:"ipphone", action:"write"}), function(req, res, next) {
+RestServer.post('/DVP/API/:version/IPPhone/Template', authorization({resource:"context", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     logger.debug('[DVP-SIPUserEndpointService.SaveIPPhoneTemplate] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
     ipPhoneDBAction.SetIPPhoneTemplate(reqId,req.body,function (error,reult) {
@@ -3845,7 +3845,7 @@ RestServer.post('/DVP/API/:version/IPPhone/Template', authorization({resource:"i
     });
     return next();
 });
-RestServer.put('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+RestServer.put('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"context", action:"write"}),  function(req, res, next) {
     var reqId = uuid.v1();
     var companyId = req.user.company;
     var tenantId = req.user.tenant;
@@ -3864,7 +3864,7 @@ RestServer.put('/DVP/API/:version/IPPhone/Config/:mac',authorization({resource:"
     });
     return next();
 });
-RestServer.put('/DVP/API/:version/IPPhone/Config/:mac/uac/:user',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+RestServer.put('/DVP/API/:version/IPPhone/Config/:mac/uac/:user',authorization({resource:"context", action:"write"}),  function(req, res, next) {
     var reqId = uuid.v1();
     var companyId = req.user.company;
     var tenantId = req.user.tenant;
@@ -3884,7 +3884,7 @@ RestServer.put('/DVP/API/:version/IPPhone/Config/:mac/uac/:user',authorization({
     });
     return next();
 });
-RestServer.put('/DVP/API/:version/IPPhone/Config/:mac/reassign',authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+RestServer.put('/DVP/API/:version/IPPhone/Config/:mac/reassign',authorization({resource:"context", action:"write"}),  function(req, res, next) {
     var reqId = uuid.v1();
     var companyId = req.user.company;
     var tenantId = req.user.tenant;
@@ -3904,7 +3904,7 @@ RestServer.put('/DVP/API/:version/IPPhone/Config/:mac/reassign',authorization({r
     });
     return next();
 });
-RestServer.put('/DVP/API/:version/IPPhone/Template', authorization({resource:"ipphone", action:"write"}), function(req, res, next) {
+RestServer.put('/DVP/API/:version/IPPhone/Template', authorization({resource:"context", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneTemplate] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
     ipPhoneDBAction.updateIPPhoneTemplate(reqId,req.body,function (error,reult) {
@@ -3920,7 +3920,7 @@ RestServer.put('/DVP/API/:version/IPPhone/Template', authorization({resource:"ip
     });
     return next();
 });
-RestServer.del('/DVP/API/:version/IPPhone/Config/:mac', authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+RestServer.del('/DVP/API/:version/IPPhone/Config/:mac', authorization({resource:"context", action:"write"}),  function(req, res, next) {
     var reqId = uuid.v1();
     var companyId = req.user.company;
     var tenantId = req.user.tenant;
@@ -3939,7 +3939,7 @@ RestServer.del('/DVP/API/:version/IPPhone/Config/:mac', authorization({resource:
     });
     return next();
 });
-RestServer.del('/DVP/API/:version/IPPhone/Template/:model', authorization({resource:"ipphone", action:"write"}),  function(req, res, next) {
+RestServer.del('/DVP/API/:version/IPPhone/Template/:model', authorization({resource:"context", action:"write"}),  function(req, res, next) {
     var reqId = uuid.v1();
     logger.debug('[DVP-SIPUserEndpointService.deleteIPPhoneTemplate] - [%s] - [HTTP]  - Request received -  Data - %s ',reqId, JSON.stringify(req.body));
     ipPhoneDBAction.deleteIPPhoneTemplate(reqId,req.params.model,function (error,reult) {
@@ -3955,7 +3955,7 @@ RestServer.del('/DVP/API/:version/IPPhone/Template/:model', authorization({resou
     });
     return next();
 });
-RestServer.post('/DVP/API/:version/IPPhone/Configs', authorization({resource:"ipphone", action:"write"}), function(req, res, next) {
+RestServer.post('/DVP/API/:version/IPPhone/Configs', authorization({resource:"context", action:"write"}), function(req, res, next) {
     var reqId = uuid.v1();
     var companyId = req.user.company;
     var tenantId = req.user.tenant;
@@ -3973,7 +3973,7 @@ RestServer.post('/DVP/API/:version/IPPhone/Configs', authorization({resource:"ip
     });
     return next();
 });
-RestServer.get('/DVP/API/:version/IPPhone/Configs/company/:company/tenant/:tenant', authorization({resource:"ipphone", action:"read"}), function(req, res, next) {
+RestServer.get('/DVP/API/:version/IPPhone/Configs/company/:company/tenant/:tenant', authorization({resource:"context", action:"read"}), function(req, res, next) {
     var reqId = uuid.v1();
     var companyId = req.params.company;
     var tenantId = req.params.tenant;

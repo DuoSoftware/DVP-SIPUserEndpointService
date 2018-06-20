@@ -3,19 +3,21 @@ var DbConn = require('dvp-dbmodels');
 var fs = require("fs");
 
 function getPhoneConfig(tenant, company, data, reqId, callback) {
-  DbConn.IPPhoneConfig.find({
-      where: {
-          TenantId:tenant,
-          CompanyId:company,
-          mac: data},
-      include: [{
-          model: DbConn.SipUACEndpoint,
-          as: "SipUACEndpoint",
-          include: {
-              model: DbConn.CloudEndUser,
-              as: "CloudEndUser"
-          }
-      }]})
+    DbConn.IPPhoneConfig.find({
+        where: {
+            TenantId: tenant,
+            CompanyId: company,
+            mac: data
+        },
+        include: [{
+            model: DbConn.SipUACEndpoint,
+            as: "SipUACEndpoint",
+            include: {
+                model: DbConn.CloudEndUser,
+                as: "CloudEndUser"
+            }
+        }]
+    })
         .then(function (all_recode) {
             callback(null, all_recode);
         })
@@ -23,8 +25,9 @@ function getPhoneConfig(tenant, company, data, reqId, callback) {
             callback(error, false);
         });
 }
-function getPhoneConfigs(tenant, company,reqId, callback) {
-    DbConn.IPPhoneConfig.findAll({where: {TenantId:tenant,CompanyId:company}})
+
+function getPhoneConfigs(tenant, company, reqId, callback) {
+    DbConn.IPPhoneConfig.findAll({where: {TenantId: tenant, CompanyId: company}})
         .then(function (all_recode) {
             callback(null, all_recode);
         })
@@ -32,6 +35,7 @@ function getPhoneConfigs(tenant, company,reqId, callback) {
             callback(error, false);
         });
 }
+
 function getPhoneTemplate(data, reqId, callback) {
     DbConn.IPPhoneTemplate.find({where: {model: data}})
         .then(function (all_recode) {
@@ -41,6 +45,7 @@ function getPhoneTemplate(data, reqId, callback) {
             callback(error, false);
         });
 }
+
 function getPhoneTemplates(reqId, callback) {
     DbConn.IPPhoneTemplate.findAll()
         .then(function (all_recode) {
@@ -50,8 +55,9 @@ function getPhoneTemplates(reqId, callback) {
             callback(error, false);
         });
 }
-function SetIPPhoneConfig(tenant, company,reqId, data, callback) {
-    DbConn.IPPhoneConfig.find({where: {TenantId:tenant,CompanyId:company,mac: data['mac']}})
+
+function SetIPPhoneConfig(tenant, company, reqId, data, callback) {
+    DbConn.IPPhoneConfig.find({where: {TenantId: tenant, CompanyId: company, mac: data['mac']}})
         .then(function (available_recode) {
             if (available_recode) {
                 logger.debug('[DVP-SIPUserEndpointService.SetIPPhoneConfig] - [%s] - [PGSQL]  - Already in DB  %s', reqId, data);
@@ -80,6 +86,7 @@ function SetIPPhoneConfig(tenant, company,reqId, data, callback) {
             callback(ex, null);
         });
 }
+
 function SetIPPhoneTemplate(reqId, data, callback) {
     DbConn.IPPhoneTemplate.find({where: [{model: data['model']}, {make: data['make']}]})
         .then(function (available_recode) {
@@ -90,7 +97,7 @@ function SetIPPhoneTemplate(reqId, data, callback) {
                 var config_data_set = DbConn.IPPhoneTemplate.build({
                     model: data['model'],
                     make: data['make'],
-                    template:data['template']
+                    template: data['template']
                 });
                 config_data_set.save()
                     .then(function (result) {
@@ -108,8 +115,9 @@ function SetIPPhoneTemplate(reqId, data, callback) {
             callback(ex, undefined);
         });
 }
-function updateIPPhoneConfig(tenant, company,reqId, mac, data, callback) {
-    DbConn.IPPhoneConfig.find({where: {TenantId:tenant,CompanyId:company,mac: mac}})
+
+function updateIPPhoneConfig(tenant, company, reqId, data, mac, callback) {
+    DbConn.IPPhoneConfig.find({where: {TenantId: tenant, CompanyId: company, mac: mac}})
         .then(function (available_recode) {
             if (available_recode) {
                 available_recode.updateAttributes({configdata: data})
@@ -131,39 +139,42 @@ function updateIPPhoneConfig(tenant, company,reqId, mac, data, callback) {
             callback(ex, undefined);
         });
 }
-function updateIPPhoneSipAccounts(tenant, company,reqId, data, mac, user, callback) {
-    DbConn.IPPhoneConfig.find({where: {TenantId:tenant,CompanyId:company,mac: mac}})
+
+function updateIPPhoneSipAccounts(tenant, company, reqId, data, mac, user, callback) {
+    DbConn.IPPhoneConfig.find({where: {TenantId: tenant, CompanyId: company, mac: mac}})
         .then(function (available_recode) {
             if (available_recode) {
 
 
                 DbConn.SipUACEndpoint.find({
-                    where:[{
+                    where: [{
                         SipUsername: user,
                         Enabled: true,
                         CompanyId: company,
-                        TenantId: tenant}]}).then(function(sipUsr){
+                        TenantId: tenant
+                    }]
+                }).then(function (sipUsr) {
 
-                            if(sipUsr) {
+                    if (sipUsr) {
 
-                                available_recode.updateAttributes({Id:sipUsr.id})
-                                    .then(function (result) {
-                                        logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - [PGSQL]  - config update succeeded -  %s', reqId, JSON.stringify(result));
-                                        callback(undefined, result);
-                                    })
-                                    .catch(function (error) {
-                                        logger.error('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - [PGSQL]  - config update failed -  %s', reqId, JSON.stringify(data), error);
-                                        callback(error, undefined);
-                                    })
+                        available_recode.updateAttributes({Id: sipUsr.id})
+                            .then(function (result) {
+                                logger.debug('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - [PGSQL]  - config update succeeded -  %s', reqId, JSON.stringify(result));
+                                callback(undefined, result);
+                            })
+                            .catch(function (error) {
+                                logger.error('[DVP-SIPUserEndpointService.updateIPPhoneConfig] - [%s] - [PGSQL]  - config update failed -  %s', reqId, JSON.stringify(data), error);
+                                callback(error, undefined);
+                            })
 
-                            }else{
+                    } else {
 
-                                logger.error('[DVP-SIPUserEndpointService.updateIPPhoneSipAccounts] Error occurred', err);
-                                callback(err, undefined);
-                            }
+                        logger.error('[DVP-SIPUserEndpointService.updateIPPhoneSipAccounts] Error occurred', err);
+                        callback(err, undefined);
+                    }
 
 
-                }).catch(function(err) {
+                }).catch(function (err) {
                     logger.error('[DVP-SIPUserEndpointService.updateIPPhoneSipAccounts] Error occurred', err);
                     callback(err, undefined);
                 })
@@ -179,7 +190,7 @@ function updateIPPhoneSipAccounts(tenant, company,reqId, data, mac, user, callba
         });
 }
 
-function updateIPPhoneReassignCompany(tenant, company,reqId, data, mac,user, callback) {
+function updateIPPhoneReassignCompany(tenant, company, reqId, data, mac, user, callback) {
 
     var newCompany = data.company;
     DbConn.IPPhoneConfig.update({CompanyId: newCompany}, {
@@ -209,10 +220,6 @@ function updateIPPhoneReassignCompany(tenant, company,reqId, data, mac,user, cal
 }
 
 
-
-
-
-
 function updateIPPhoneTemplate(reqId, data, callback) {
     DbConn.IPPhoneTemplate.find({where: {model: data['model']}})
         .then(function (available_recode) {
@@ -236,8 +243,9 @@ function updateIPPhoneTemplate(reqId, data, callback) {
             callback(ex, undefined);
         });
 }
-function deleteIPPhoneConfig(tenant, company,reqId, data, callback) {
-    DbConn.IPPhoneConfig.destroy({where: {TenantId:tenant,CompanyId:company,mac: data}})
+
+function deleteIPPhoneConfig(tenant, company, reqId, data, callback) {
+    DbConn.IPPhoneConfig.destroy({where: {TenantId: tenant, CompanyId: company, mac: data}})
         .then(function (available_recode) {
             if (available_recode) {
                 logger.debug('[DVP-SIPUserEndpointService.deleteIPPhoneConfig] - [%s] - [PGSQL]  - config delete succeeded -  %s', reqId, JSON.stringify("config delete succeeded"));
@@ -252,6 +260,7 @@ function deleteIPPhoneConfig(tenant, company,reqId, data, callback) {
             callback(ex, undefined);
         });
 }
+
 function deleteIPPhoneTemplate(reqId, data, callback) {
     DbConn.IPPhoneTemplate.destroy({where: {model: data}})
         .then(function (available_recode) {
@@ -268,32 +277,33 @@ function deleteIPPhoneTemplate(reqId, data, callback) {
             callback(ex, undefined);
         });
 }
+
 function UploadPhoneList(reqId, data, company, tenant, callback) {
-    var resultlist = [];
-    for (var key in data) {
-        var PhoneDetailsData = {
-            CompanyId: company,
-            TenantId: tenant,
-            mac: data[key].mac,
-            model: data[key].model
-        };
-        resultlist.push(PhoneDetailsData);
+    if (data && data.phonedetails && data.phonedetails.length > 0) {
+        var configData = data.phonedetails.map(function (item) {
+            item.TenantId = tenant;
+            return item;
+        });
+        DbConn.IPPhoneConfig.bulkCreate(
+            configData, {validate: false, individualHooks: true}
+        ).then(function (result) {
+            logger.debug('[DVP-SIPUserEndpointService.UploadPhoneList] - [%s] - [PGSQL]  - PhoneDetailsData insertion succeeded -  %s', reqId, JSON.stringify(result));
+            callback(undefined, result);
+        }).catch(function (error) {
+            logger.error('[DVP-SIPUserEndpointService.UploadPhoneList] - [%s] - [PGSQL]  - PhoneDetailsData insertion failed -  %s', reqId, JSON.stringify(data), error);
+            callback(error, undefined);
+        }).finally(function () {
+            logger.info('UploadContacts - %s - %s ms Done.');
+        });
+    } else {
+        callback(new Error("Nodata"), undefined);
     }
-    DbConn.IPPhoneConfig.bulkCreate(
-        resultlist, {validate: false, individualHooks: true}
-    ).then(function (result) {
-        logger.debug('[DVP-SIPUserEndpointService.UploadPhoneList] - [%s] - [PGSQL]  - PhoneDetailsData insertion succeeded -  %s', reqId, JSON.stringify(result));
-        callback(undefined, result);
-    }).catch(function (error) {
-        logger.error('[DVP-SIPUserEndpointService.UploadPhoneList] - [%s] - [PGSQL]  - PhoneDetailsData insertion failed -  %s', reqId, JSON.stringify(data), error);
-        callback(error, undefined);
-    }).finally(function () {
-        logger.info('UploadContacts - %s - %s ms Done.');
-    });
+
 
 }
-function getAllPhoneList(reqId,teant, company,callback) {
-    if(teant&&company){
+
+function getAllPhoneList(reqId, teant, company, callback) {
+    if (teant && company) {
         DbConn.IPPhoneConfig.findAll({where: {TenantId: teant, CompanyId: company}})
             .then(function (all_recode) {
                 callback(null, all_recode);
@@ -301,7 +311,7 @@ function getAllPhoneList(reqId,teant, company,callback) {
             .catch(function (error) {
                 callback(error, false);
             });
-    }else{
+    } else {
         DbConn.IPPhoneConfig.findAll()
             .then(function (all_recode) {
                 callback(null, all_recode);
