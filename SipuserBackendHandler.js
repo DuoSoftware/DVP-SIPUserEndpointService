@@ -12,7 +12,7 @@ var Redlock = require('redlock');
 var _ = require('lodash');
 
 var rlock = new Redlock(
-        [redisClient],
+    [redisClient],
     {
         driftFactor: 0.01,
 
@@ -101,10 +101,10 @@ function CreateUser(req,Company,Tenant,reqId,callback) {
                         }
 
                     }).catch(function (errUser)
-                    {
-                        logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername,errUser);
-                        callback(errUser, null);
-                    });
+                {
+                    logger.error('[DVP-SIPUserEndpointService.CreateUser] - [%s] - error occurred while searching for SipUACEndPoint %s ',reqId,SipObj.SipUsername,errUser);
+                    callback(errUser, null);
+                });
 
 
 
@@ -164,33 +164,33 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                         logger.debug('[DVP-SIPUserEndpointService.SaveUser] - [%s] - Record found for Context %s and saving SipUser',reqId,jobj.ContextId);
                                         var SIPObject = DbConn.SipUACEndpoint
                                             .build(
-                                            {
-                                                SipUserUuid: sipUserUuid,
-                                                SipUsername: jobj.SipUsername,
-                                                Password: jobj.Password,
-                                                Enabled: jobj.Enabled,
-                                                ExtraData: jobj.ExtraData,
-                                                EmailAddress: jobj.EmailAddress,
-                                                GuRefId: jobj.GuRefId,
-                                                Pin:jobj.Pin,
-                                                CompanyId: Company,
-                                                TenantId: Tenant,
-                                                ObjClass: "OBJCLZ",
-                                                ObjType: "CALL",
-                                                ObjCategory: jobj.ObjCategory,
-                                                AddUser: jobj.AddUser,
-                                                UpdateUser: jobj.UpdateUser,
-                                                VoicemailAsEmail: jobj.VoicemailAsEmail,
-                                                TransInternalEnable:jobj.TransInternalEnable,
-                                                TransExternalEnable:jobj.TransExternalEnable,
-                                                TransConferenceEnable:jobj.TransConferenceEnable,
-                                                TransGroupEnable:jobj.TransGroupEnable,
-                                                ContextId: jobj.ContextId,
-                                                DenyOutboundFor: jobj.DenyOutboundFor,
-                                                RecordingEnabled: jobj.RecordingEnabled
+                                                {
+                                                    SipUserUuid: sipUserUuid,
+                                                    SipUsername: jobj.SipUsername,
+                                                    Password: jobj.Password,
+                                                    Enabled: jobj.Enabled,
+                                                    ExtraData: jobj.ExtraData,
+                                                    EmailAddress: jobj.EmailAddress,
+                                                    GuRefId: jobj.GuRefId,
+                                                    Pin:jobj.Pin,
+                                                    CompanyId: Company,
+                                                    TenantId: Tenant,
+                                                    ObjClass: "OBJCLZ",
+                                                    ObjType: "CALL",
+                                                    ObjCategory: jobj.ObjCategory,
+                                                    AddUser: jobj.AddUser,
+                                                    UpdateUser: jobj.UpdateUser,
+                                                    VoicemailAsEmail: jobj.VoicemailAsEmail,
+                                                    TransInternalEnable:jobj.TransInternalEnable,
+                                                    TransExternalEnable:jobj.TransExternalEnable,
+                                                    TransConferenceEnable:jobj.TransConferenceEnable,
+                                                    TransGroupEnable:jobj.TransGroupEnable,
+                                                    ContextId: jobj.ContextId,
+                                                    DenyOutboundFor: jobj.DenyOutboundFor,
+                                                    RecordingEnabled: jobj.RecordingEnabled
 
-                                            }
-                                        );
+                                                }
+                                            );
 
                                         var lockKey = Tenant + '_' + Company + '_' + 'SIPUSER_LIMIT_LOCK';
                                         var ttl = 2000;
@@ -383,9 +383,9 @@ function  PickUserByUUID(reqId, uuid, companyId, tenantId, callback) {
 
                 }).catch(function (errSip) {
 
-                    logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query failed',reqId, errSip);
-                    callback(errSip, undefined);
-                });
+                logger.error('[DVP-SIPUserEndpointService.PickUserByUUID] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                callback(errSip, undefined);
+            });
 
 
 
@@ -419,10 +419,10 @@ function  PickUserByName(Username,Company,Tenant,reqId, callback) {
 
                 }).catch(function (errSip) {
 
-                    logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Query failed',reqId, errSip);
-                    callback(errSip, undefined);
+                logger.error('[DVP-SIPUserEndpointService.PickUserByName] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                callback(errSip, undefined);
 
-                });
+            });
 
 
 
@@ -451,9 +451,9 @@ var GetUserByUsername = function(reqId, username, companyId, tenantId, callback)
                 callback(null, resp);
 
             }).catch(function(err)
-            {
-                callback(err, null);
-            });
+        {
+            callback(err, null);
+        });
 
     }
     catch(ex)
@@ -463,24 +463,62 @@ var GetUserByUsername = function(reqId, username, companyId, tenantId, callback)
 
 };
 
-function  PickAllUsers(Company,Tenant,reqId, callback) {
+function  PickAllUsers(Company,Tenant,reqId,req, callback) {
 
     logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Method Hit',reqId);
 
+
     try
     {
-        DbConn.SipUACEndpoint.findAll({where: [{CompanyId: Company},{TenantId: Tenant},{Enabled:"TRUE"}], include:[{model: DbConn.Extension, as:"Extension"},{model: DbConn.CloudEndUser, as:"CloudEndUser"}]})
-            .then(function (resSip) {
+        var pageNo =0;
+        var rowCount =0;
+        var isPaging =false;
 
-                logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query completed successfully',reqId);
-                callback(undefined, resSip);
 
-            }).catch(function (errSip) {
+        if(req && req.query && req.query.page && req.query.size)
+        {
+            pageNo = req.params.page;
+            rowCount = req.params.size;
+            isPaging=true;
+        }
+
+
+        if(isPaging)
+        {
+            DbConn.SipUACEndpoint.findAll({where: [{CompanyId: Company},{TenantId: Tenant},{Enabled:"TRUE"}],
+                include:[{model: DbConn.Extension, as:"Extension"},
+                    {model: DbConn.CloudEndUser, as:"CloudEndUser"}],
+                offset: ((pageNo - 1) * rowCount),
+                limit: rowCount})
+                .then(function (resSip) {
+
+                    logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                    callback(undefined, resSip);
+
+                }).catch(function (errSip) {
 
                 logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query failed',reqId, errSip);
                 callback(errSip, undefined);
 
             });
+        }
+        else
+        {
+            DbConn.SipUACEndpoint.findAll({where: [{CompanyId: Company},{TenantId: Tenant},{Enabled:"TRUE"}], include:[{model: DbConn.Extension, as:"Extension"},{model: DbConn.CloudEndUser, as:"CloudEndUser"}]})
+                .then(function (resSip) {
+
+                    logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                    callback(undefined, resSip);
+
+                }).catch(function (errSip) {
+
+                logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+                callback(errSip, undefined);
+
+            });
+        }
+
+
 
 
 
@@ -488,6 +526,38 @@ function  PickAllUsers(Company,Tenant,reqId, callback) {
     catch(ex)
     {
         logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - Method call failed ',reqId, ex);
+        callback(ex, undefined);
+    }
+
+
+
+}
+
+function  PickAllUserCount(Company,Tenant,reqId, callback) {
+
+    logger.debug('[DVP-SIPUserEndpointService.PickAllUserCount] - [%s] - [PGSQL] - Method Hit',reqId);
+
+    try
+    {
+        DbConn.SipUACEndpoint.count({where: [{CompanyId: Company},{TenantId: Tenant},{Enabled:"TRUE"}], include:[{model: DbConn.Extension, as:"Extension"},{model: DbConn.CloudEndUser, as:"CloudEndUser"}]})
+            .then(function (resSip) {
+
+                logger.debug('[DVP-SIPUserEndpointService.PickAllUserCount] - [%s] - [PGSQL] - Query completed successfully',reqId);
+                callback(undefined, resSip);
+
+            }).catch(function (errSip) {
+
+            logger.error('[DVP-SIPUserEndpointService.PickAllUserCount] - [%s] - [PGSQL] - Query failed',reqId, errSip);
+            callback(errSip, 0);
+
+        });
+
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickAllUserCount] - [%s] - Method call failed ',reqId, ex);
         callback(ex, undefined);
     }
 
@@ -551,9 +621,9 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,callback) {
                     }
 
                 }).catch(function (errUser) {
-                    logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUser] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,Username,errUser);
-                    callback(errUser, undefined);
-                });
+                logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUser] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,Username,errUser);
+                callback(errUser, undefined);
+            });
         }
         catch(ex)
         {
@@ -628,10 +698,10 @@ function UpdateUserStatus(Username,status,Company,Tenant,reqId,callback) {
                     }
 
                 }).catch(function (errUser)
-                {
-                    logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUserStatus] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,Username,errUser);
-                    callback(errUser, undefined);
-                });
+            {
+                logger.error('[DVP-LimitSIPUserEndpointServiceHandler.UpdateUserStatus] - [%s] - [PGSQL]  - Error in searching SipUser %s',reqId,Username,errUser);
+                callback(errUser, undefined);
+            });
         }
         catch(ex)
         {
@@ -657,14 +727,14 @@ function PickCompanyUsers(Company,Tenant,reqId,callback) {
                 .findAll({where:[{CompanyId: Company},{TenantId:Tenant}]})
                 .then(function (resSip) {
 
-                        logger.debug('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [PGSQL]  - %s Record found for Context %s ',reqId,resSip.length,Company);
-                        callback(undefined, resSip);
+                    logger.debug('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [PGSQL]  - %s Record found for Context %s ',reqId,resSip.length,Company);
+                    callback(undefined, resSip);
 
 
                 }).catch(function (errSip) {
-                    logger.error('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [PGSQL]  - Error in searching SipUser of Company %s ',reqId,Company,errSip);
-                    callback(errSip, undefined);
-                });
+                logger.error('[DVP-SIPUserEndpointService.PickCompanyUsers] - [%s] - [PGSQL]  - Error in searching SipUser of Company %s ',reqId,Company,errSip);
+                callback(errSip, undefined);
+            });
 
         }
         catch(ex)
@@ -700,20 +770,20 @@ function CreateUserGroup(obj,Company,Tenant,reqId,callback) {
 
                             var UserGroupobj = DbConn.UserGroup
                                 .build(
-                                {
+                                    {
 
-                                    GroupName: obj.GroupName,
-                                    Domain: obj.Domain,
-                                    ExtraData: obj.ExtraData,
-                                    ObjClass: "OBJCLZ",
-                                    ObjType: "OBJTYP",
-                                    ObjCategory: "OBJCAT",
-                                    CompanyId:Company,
-                                    TenantId: Tenant
+                                        GroupName: obj.GroupName,
+                                        Domain: obj.Domain,
+                                        ExtraData: obj.ExtraData,
+                                        ObjClass: "OBJCLZ",
+                                        ObjType: "OBJTYP",
+                                        ObjCategory: "OBJCAT",
+                                        CompanyId:Company,
+                                        TenantId: Tenant
 
 
-                                }
-                            );
+                                    }
+                                );
 
                             UserGroupobj.save().then(function (resGrpSave) {
 
@@ -1135,28 +1205,28 @@ function PickUserGroup(GroupID,Company,Tenant,reqId,callback) {
         try {
             DbConn.UserGroup
                 .find({
-                    where: [{id: GroupID},{CompanyId:Company},{TenantId:Tenant}], include:[{model: DbConn.Extension, as: "Extension"}]
-                }
-            ).then(function (resGrp) {
-
-                    if (!resGrp) {
-
-                        logger.error('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [PGSQL]  - No record found for Group %s ',reqId,GroupID);
-
-                        callback(new Error("No group record found"), undefined);
-
-                    } else {
-
-                        logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [PGSQL]  - Record found for Group %s ',reqId,GroupID);
-                        callback(undefined, resGrp);
-
+                        where: [{id: GroupID},{CompanyId:Company},{TenantId:Tenant}], include:[{model: DbConn.Extension, as: "Extension"}]
                     }
+                ).then(function (resGrp) {
 
-                }).catch(function (errGrp) {
+                if (!resGrp) {
 
-                    logger.error('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [PGSQL]  - Error in searching Group %s ',reqId,GroupID,errGrp);
-                    callback(errGrp, undefined);
-                });
+                    logger.error('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [PGSQL]  - No record found for Group %s ',reqId,GroupID);
+
+                    callback(new Error("No group record found"), undefined);
+
+                } else {
+
+                    logger.debug('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [PGSQL]  - Record found for Group %s ',reqId,GroupID);
+                    callback(undefined, resGrp);
+
+                }
+
+            }).catch(function (errGrp) {
+
+                logger.error('[DVP-SIPUserEndpointService.PickUserGroup] - [%s] - [PGSQL]  - Error in searching Group %s ',reqId,GroupID,errGrp);
+                callback(errGrp, undefined);
+            });
 
         }
         catch(ex)
@@ -1176,27 +1246,27 @@ function GetGroupEndpoints(obj,Company,Tenant,reqId,callback) {
     try {
         DbConn.UsrGrp
             .findAll({
-                where: {CSDBUserGroupId: obj}
-            }
-        ).then(function (resUsrGrp) {
-
-                if (!resUsrGrp) {
-                    logger.error('[DVP-SIPUserEndpointService.GroupEndPoints] - [%s] - [PGSQL]  - No record found for GroupEndpoints of CSDBUserGroupId %s ',reqId,obj);
-                    callback("No group record found", undefined);
-
-                } else {
-
-                    logger.debug('[DVP-SIPUserEndpointService.GroupEndPoints] - [%s] - [PGSQL]  - Record found for GroupEndpoints of CSDBUserGroupId %s _ result %s',reqId,obj,JSON.stringify(resUsrGrp));
-                    callback(undefined, resUsrGrp);
-
-
+                    where: {CSDBUserGroupId: obj}
                 }
+            ).then(function (resUsrGrp) {
+
+            if (!resUsrGrp) {
+                logger.error('[DVP-SIPUserEndpointService.GroupEndPoints] - [%s] - [PGSQL]  - No record found for GroupEndpoints of CSDBUserGroupId %s ',reqId,obj);
+                callback("No group record found", undefined);
+
+            } else {
+
+                logger.debug('[DVP-SIPUserEndpointService.GroupEndPoints] - [%s] - [PGSQL]  - Record found for GroupEndpoints of CSDBUserGroupId %s _ result %s',reqId,obj,JSON.stringify(resUsrGrp));
+                callback(undefined, resUsrGrp);
 
 
-            }).catch(function (errUsrGrp) {
-                logger.error('[DVP-SIPUserEndpointService.GroupEndPoints] - [%s] - [PGSQL]  - Error in searching GroupEndpoints of CSDBUserGroupId %s ',reqId,obj,errUsrGrp);
-                callback(errUsrGrp, undefined);
-            });
+            }
+
+
+        }).catch(function (errUsrGrp) {
+            logger.error('[DVP-SIPUserEndpointService.GroupEndPoints] - [%s] - [PGSQL]  - Error in searching GroupEndpoints of CSDBUserGroupId %s ',reqId,obj,errUsrGrp);
+            callback(errUsrGrp, undefined);
+        });
 
 
 
@@ -1237,9 +1307,9 @@ function PickUsersGroup(SipID,Company,Tenant,reqId,callback) {
                     }
 
                 }).catch(function (errSip) {
-                    logger.error('[DVP-SIPUserEndpointService.PickUsersGroup] - [%s] - [PGSQL]  - Error in searching UsrGrp records of SipUACEndpoint %s ',reqId,SipID,errSip);
-                    callback(errSip, undefined);
-                });
+                logger.error('[DVP-SIPUserEndpointService.PickUsersGroup] - [%s] - [PGSQL]  - Error in searching UsrGrp records of SipUACEndpoint %s ',reqId,SipID,errSip);
+                callback(errSip, undefined);
+            });
 
 
 
@@ -1266,16 +1336,16 @@ function PickCompayGroups(Company,Tenant,reqId,callback) {
         try{
             DbConn.UserGroup
                 .findAll({where : [{CompanyId:Company},{TenantId:Tenant}], include:[{model: DbConn.Extension, as: "Extension"}]
-                }
-            ).then(function(resGroup)
-                {
-                        logger.debug('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - %s Records found for company %s ',reqId,resGroup.length,Company);
-                        callback(undefined, resGroup);
+                    }
+                ).then(function(resGroup)
+            {
+                logger.debug('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - %s Records found for company %s ',reqId,resGroup.length,Company);
+                callback(undefined, resGroup);
 
-                }).catch(function (errGroup) {
-                    logger.error('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - Error in searching Group records of company %s ',reqId,Company,errGroup);
-                    callback(errGroup, undefined);
-                });
+            }).catch(function (errGroup) {
+                logger.error('[DVP-SIPUserEndpointService.PickCompayGroups] - [%s] - [PGSQL]  - Error in searching Group records of company %s ',reqId,Company,errGroup);
+                callback(errGroup, undefined);
+            });
 
 
         }
@@ -1313,9 +1383,9 @@ function PickUsersInGroup(GroupId,Company,Tenant,reqId,callback) {
                     }
 
                 }).catch(function (errGroup) {
-                    logger.error('[DVP-SIPUserEndpointService.PickUsersInGroup] - [%s] - [PGSQL]  - Error in searching Users of Group %s ',reqId,GroupId,errGroup);
-                    callback(errGroup, undefined);
-                });
+                logger.error('[DVP-SIPUserEndpointService.PickUsersInGroup] - [%s] - [PGSQL]  - Error in searching Users of Group %s ',reqId,GroupId,errGroup);
+                callback(errGroup, undefined);
+            });
 
         }
         catch(ex)
@@ -1363,4 +1433,6 @@ module.exports.PickUsersInGroup = PickUsersInGroup;
 module.exports.DeleteGroupDB = DeleteGroupDB;
 module.exports.UnAssignUserFromGroup = UnAssignUserFromGroup;
 module.exports.GetUserByUsername = GetUserByUsername;
+
+module.exports.PickAllUserCount = PickAllUserCount;
 
