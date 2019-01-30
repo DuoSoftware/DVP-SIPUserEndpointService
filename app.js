@@ -1091,7 +1091,60 @@ RestServer.get('/DVP/API/'+version+'/SipUser/Users',authorization({resource:"sip
         var Company=req.user.company;
         var Tenant=req.user.tenant;
 
-        SipbackendHandler.PickAllUsers(Company,Tenant,reqId,function (err, resz) {
+        SipbackendHandler.PickAllUsers(Company,Tenant,reqId,req,function (err, resz) {
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
+                logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Success", true, resz);
+                logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - Request response : %s ',reqId,jsonString);
+                res.end(jsonString);
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [HTTP]  - Exception in Request -  Data - Username %s Body %s ',reqId,req.params.Username,JSON.stringify(req.body),ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - Request response : %s ',reqId,jsonString);
+        res.end(jsonString);
+    }
+    return next();
+
+});
+
+
+RestServer.get('/DVP/API/'+version+'/SipUser/Users/Count',authorization({resource:"sipuser", action:"read"}),function(req,res,next) {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+
+    try {
+
+        logger.debug('[DVP-SIPUserEndpointService.PickAllUsers] - [%s] - [HTTP]  - Request received -  Data - Body %s ',reqId,JSON.stringify(req.body));
+
+        if (!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        SipbackendHandler.PickAllUserCount(Company,Tenant,reqId,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
