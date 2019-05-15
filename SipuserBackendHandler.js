@@ -10,6 +10,7 @@ var organization = require('dvp-mongomodels/model/Organisation');
 var redisClient = require('./RedisHandler').redisClient;
 var Redlock = require('redlock');
 var _ = require('lodash');
+var auditTrailsHandler = require('dvp-common/AuditTrail/AuditTrailsHandler.js');
 
 var rlock = new Redlock(
     [redisClient],
@@ -30,8 +31,38 @@ rlock.on('clientError', function(err)
 });
 
 
+function addAuditTrail(tenantId, companyId, iss, auditData) {
+    /*var auditData =  {
+     KeyProperty: keyProperty,
+     OldValue: auditTrails.OldValue,
+     NewValue: auditTrails.NewValue,
+     Description: auditTrails.Description,
+     Author: auditTrails.Author,
+     User: iss,
+     OtherData: auditTrails.OtherData,
+     ObjectType: auditTrails.ObjectType,
+     Action: auditTrails.Action,
+     Application: auditTrails.Application,
+     TenantId: tenantId,
+     CompanyId: companyId
+     }*/
+
+    try {
+        auditTrailsHandler.CreateAuditTrails(tenantId, companyId, iss, auditData, function (err, obj) {
+            if (err) {
+                var jsonString = messageFormatter.FormatMessage(err, "Fail", false, auditData);
+                logger.error('addAuditTrail -  Fail To Save Audit trail-[%s]', jsonString);
+            }
+        });
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "Fail", false, auditData);
+        logger.error('addAuditTrail -  insertion  failed-[%s]', jsonString);
+    }
+}
+
 //Sipuser
-function CreateUser(req,Company,Tenant,reqId,callback) {
+function CreateUser(req,Company,Tenant,reqId,iss,callback) {
 
 
     logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - Searching for SipUACEndPoint %s ',reqId,req.SipUsername);
@@ -62,7 +93,7 @@ function CreateUser(req,Company,Tenant,reqId,callback) {
                             logger.debug('[DVP-SIPUserEndpointService.CreateUser] - [%s] - No record found for SipUACEndPoint %s ',reqId,SipObj.SipUsername);
                             try
                             {
-                                SaveUser(SipObj,Company,Tenant,reqId,function (error, st)
+                                SaveUser(SipObj,Company,Tenant,reqId,req.user.iss,function (error, st)
                                 {
 
                                     if(error)
@@ -135,7 +166,7 @@ function GetEnabledSipUserCount(companyId, tenantId)
 }
 
 
-function SaveUser(jobj,Company,Tenant,reqId,callback) {
+function SaveUser(jobj,Company,Tenant,reqId,iss,callback) {
 
 
     if (jobj)
@@ -233,6 +264,24 @@ function SaveUser(jobj,Company,Tenant,reqId,callback) {
                                                                                 });
                                                                             resCloudUser.addSipUACEndpoint(SIPObject).then(function (resMapCldUser)
                                                                             {
+
+
+                                                                                var auditData = {
+                                                                                    KeyProperty: "SIPUserEndpoint",
+                                                                                    OldValue: {},
+                                                                                    NewValue: SIPObject,
+                                                                                    Description: "New SIPUser Created.",
+                                                                                    Author: iss,
+                                                                                    User: iss,
+                                                                                    ObjectType: "SipUACEndpoint",
+                                                                                    Action: "SAVE",
+                                                                                    Application: "SIP User Endpoint Service"
+                                                                                };
+                                                                                addAuditTrail(Tenant, Company, iss, auditData);
+
+
+
+
                                                                                 resContext.addSipUACEndpoint(SIPObject).then(function (resMapCntx)
                                                                                 {
                                                                                     redisCacheHandler.addSipUserToCache(SIPObject, Company, Tenant);
@@ -566,7 +615,7 @@ function  PickAllUserCount(Company,Tenant,reqId, callback) {
 }
 
 
-function UpdateUser(Username,jobj,Company,Tenant,reqId,callback) {
+function UpdateUser(Username,jobj,Company,Tenant,reqId,iss,callback) {
 
     if(Username && jobj)
     {
@@ -599,6 +648,19 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,callback) {
                             delete jobj.TenantId;
 
                             resUser.updateAttributes(jobj).then(function (resUpdate) {
+
+                                var auditData = {
+                                    KeyProperty: "SIPUserEndpoint",
+                                    OldValue: {},
+                                    NewValue: resUser,
+                                    Description: "SIP USer Updated.",
+                                    Author: iss,
+                                    User: iss,
+                                    ObjectType: "SipUACEndpoint",
+                                    Action: "UPDATE",
+                                    Application: "SIP User Endpoint Service"
+                                };
+                                addAuditTrail(Tenant, Company, iss, auditData);
 
                                 redisCacheHandler.addSipUserToCache(resUpdate, Company, Tenant);
 
@@ -639,7 +701,7 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,callback) {
 
 }
 
-function UpdateUserStatus(Username,status,Company,Tenant,reqId,callback) {
+function UpdateUserStatus(Username,status,Company,Tenant,reqId,iss,callback) {
 
     if(Username)
     {
@@ -668,6 +730,20 @@ function UpdateUserStatus(Username,status,Company,Tenant,reqId,callback) {
                                 {
                                     resUser.updateAttributes(SipObj).then(function (resUpdate)
                                     {
+
+                                        var auditData = {
+                                            KeyProperty: "SIPUserEndpoint",
+                                            OldValue: resUser,
+                                            NewValue: SipObj,
+                                            Description: "SIP USer Updated.",
+                                            Author: iss,
+                                            User: iss,
+                                            ObjectType: "SipUACEndpoint",
+                                            Action: "UPDATE",
+                                            Application: "SIP User Endpoint Service"
+                                        };
+                                        addAuditTrail(Tenant, Company, iss, auditData);
+
                                         done();
 
                                         redisCacheHandler.addSipUserToCache(resUpdate, Company, Tenant);
