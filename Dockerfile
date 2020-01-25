@@ -7,12 +7,22 @@
 
 #EXPOSE 8814
 
-FROM node:9.9.0
-ARG VERSION_TAG
-RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-SIPUserEndpointService.git /usr/local/src/sipuserendpointservice
-RUN cd /usr/local/src/sipuserendpointservice;
+# FROM node:9.9.0
+# ARG VERSION_TAG
+# RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-SIPUserEndpointService.git /usr/local/src/sipuserendpointservice
+# RUN cd /usr/local/src/sipuserendpointservice;
+# WORKDIR /usr/local/src/sipuserendpointservice
+# RUN npm install
+# EXPOSE 8814
+# CMD [ "node", "/usr/local/src/sipuserendpointservice/app.js" ]
+
+
+FROM node:10-alpine
 WORKDIR /usr/local/src/sipuserendpointservice
+COPY package*.json ./
 RUN npm install
+COPY . .
 EXPOSE 8814
-CMD [ "node", "/usr/local/src/sipuserendpointservice/app.js" ]
+CMD [ "node", "app.js" ]
+
 
