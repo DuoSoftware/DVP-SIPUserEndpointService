@@ -39,15 +39,14 @@ module.exports = {
             }
         },
 
-    "Mongo":
-        {
-            "ip": "",
-            "port": "27017",
-            "dbname": "",
-            "password": "",
-            "user": "",
-            "replicaset": ""
-        },
+    "Mongo":{
+        ip: "",
+        port: "",
+        dbname: "",
+        password: "",
+        user: "",
+        type: "mongodb+srv",
+    },
 
     "Kamailio":
         {

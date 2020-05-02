@@ -12,7 +12,7 @@
     "crypto-js": "^3.1.8",
     "dvp-common": "1.1.0",
     "dvp-dbmodels": "^3.0.2",
-    "dvp-mongomodels": "^4.7.2",
+    "dvp-mongomodels": "^6.1.0",
     "ioredis": "^3.2.2",
     "lodash": "^4.17.4",
     "mysql": "^2.10.2",
