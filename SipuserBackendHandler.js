@@ -2,8 +2,8 @@
  * Created by Pawan on 11/9/2015.
  */
 var DbConn = require('dvp-dbmodels');
-var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var messageFormatter = require('dvp-common-lite/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var logger = require('dvp-common-lite/LogHandler/CommonLogHandler.js').logger;
 var nodeUuid = require('node-uuid');
 var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
 var organization = require('dvp-mongomodels/model/Organisation');

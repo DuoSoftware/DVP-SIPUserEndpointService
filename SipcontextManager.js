@@ -2,7 +2,7 @@
  * Created by Pawan on 11/9/2015.
  */
 
-var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var logger = require('dvp-common-lite/LogHandler/CommonLogHandler.js').logger;
 var DbConn = require('dvp-dbmodels');
 var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
 var Promise = require('bluebird');
