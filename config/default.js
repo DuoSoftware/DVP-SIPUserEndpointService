@@ -62,6 +62,6 @@ module.exports = {
             "domain": "0.0.0.0",
             "port": 8086,
             "version": "1.0.0.0",
-            "encryptionPassword": ""
+            "encryptionPassword": "DuoS123"
         }
 };
