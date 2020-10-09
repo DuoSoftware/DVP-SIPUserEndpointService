@@ -651,11 +651,11 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,iss,callback) {
 
                                 var auditData = {
                                     KeyProperty: "SIPUserEndpoint",
-                                    OldValue: {},
-                                    NewValue: resUser,
+                                    OldValue: resUser,
+                                    NewValue: resUpdate,
                                     Description: "SIP USer Updated.",
                                     Author: iss,
-                                    User: iss,
+                                    User: Username,
                                     ObjectType: "SipUACEndpoint",
                                     Action: "UPDATE",
                                     Application: "SIP User Endpoint Service"
