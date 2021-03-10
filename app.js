@@ -834,7 +834,7 @@ RestServer.post('/DVP/API/'+version+'/SipUser/User',authorization({resource:"sip
         var Company=req.user.company;
         var Tenant=req.user.tenant;
 
-        SipbackendHandler.CreateUser(req,Company,Tenant,reqId,function (err,resz) {
+        SipbackendHandler.CreateUser(req,Company,Tenant,reqId,req.user.iss,function (err,resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR/Exception", false, undefined);
@@ -929,7 +929,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username',authorization({reso
         var Company=req.user.company;
         var Tenant=req.user.tenant;
 
-        SipbackendHandler.UpdateUser(req.params.Username,req.body,Company,Tenant,reqId,function (err, resz) {
+        SipbackendHandler.UpdateUser(req.params.Username,req.body,Company,Tenant,reqId,req.user.iss,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
@@ -983,7 +983,7 @@ RestServer.del('/DVP/API/'+version+'/SipUser/User/:Username',authorization({reso
         var Tenant=req.user.tenant;
 
 
-        SipbackendHandler.UpdateUserStatus(req.params.Username,false,Company,Tenant,reqId,function (err, resz) {
+        SipbackendHandler.UpdateUserStatus(req.params.Username,false,Company,Tenant,reqId,req.user.iss,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
@@ -1038,7 +1038,7 @@ RestServer.put('/DVP/API/'+version+'/SipUser/User/:Username/Status/:st',authoriz
         var Tenant=req.user.tenant;
 
 
-        SipbackendHandler.UpdateUserStatus(req.params.Username,req.params.st,Company,Tenant,reqId,function (err, resz) {
+        SipbackendHandler.UpdateUserStatus(req.params.Username,req.params.st,Company,Tenant,reqId,req.user.iss,function (err, resz) {
             if(err)
             {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false,undefined);
