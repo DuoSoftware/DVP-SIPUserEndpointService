@@ -631,6 +631,50 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,iss,callback) {
                 .find({where: [{SipUsername: Username}, {CompanyId: Company}, {TenantId: Tenant}]})
                 .then(function (resUser) {
 
+                    var oldObj = {
+                        SipUsername : resUser.SipUsername,
+                        Password : resUser.Password,
+                        EmailAddress : resUser.EmailAddress,
+                        VoicemailAsEmail : resUser.VoicemailAsEmail,
+                        SipExtension : resUser.SipExtension,
+                        Pin : resUser.Pin,
+                        TransInternalEnable : resUser.TransInternalEnable,
+                        TransExternalEnable : resUser.TransExternalEnable,
+                        TransGroupEnable : resUser.TransGroupEnable,
+                        TransIVREnable : resUser.TransIVREnable,
+                        DenyOutboundFor : resUser.DenyOutboundFor,
+                        RecordingEnabled : resUser.RecordingEnabled,
+                        ContextId : resUser.ContextId
+                    };
+
+                    var newObj = {
+                        SipUsername : jobj.SipUsername,
+                        Password : jobj.Password,
+                        EmailAddress : jobj.EmailAddress,
+                        VoicemailAsEmail : jobj.VoicemailAsEmail,
+                        SipExtension : jobj.SipExtension,
+                        Pin : jobj.Pin,
+                        TransInternalEnable : jobj.TransInternalEnable,
+                        TransExternalEnable : jobj.TransExternalEnable,
+                        TransGroupEnable : jobj.TransGroupEnable,
+                        TransIVREnable : jobj.TransIVREnable,
+                        DenyOutboundFor : jobj.DenyOutboundFor,
+                        RecordingEnabled : jobj.RecordingEnabled,
+                        ContextId : jobj.ContextId
+                    };
+
+                    var auditData = {
+                        KeyProperty: "SIPUserEndpoint",
+                        OldValue: oldObj,
+                        NewValue: newObj,
+                        Description: "SIP USer Updated.",
+                        Author: iss,
+                        User: jobj.SipUsername,
+                        ObjectType: "SipUACEndpoint",
+                        Action: "UPDATE",
+                        Application: "SIP User Endpoint Service"
+                    };
+
                     if (!resUser) {
 
                         logger.error('[DVP-SIPUserEndpointService.UpdateUser] - [%s] - [PGSQL]  - No record found for SipUser %s ',reqId,Username);
@@ -649,17 +693,6 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,iss,callback) {
 
                             resUser.updateAttributes(jobj).then(function (resUpdate) {
 
-                                var auditData = {
-                                    KeyProperty: "SIPUserEndpoint",
-                                    OldValue: {},
-                                    NewValue: resUser,
-                                    Description: "SIP USer Updated.",
-                                    Author: iss,
-                                    User: iss,
-                                    ObjectType: "SipUACEndpoint",
-                                    Action: "UPDATE",
-                                    Application: "SIP User Endpoint Service"
-                                };
                                 addAuditTrail(Tenant, Company, iss, auditData);
 
                                 redisCacheHandler.addSipUserToCache(resUpdate, Company, Tenant);
