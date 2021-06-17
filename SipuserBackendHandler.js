@@ -663,11 +663,13 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,iss,callback) {
                         ContextId : jobj.ContextId
                     };
 
+             
+
                     var auditData = {
-                        KeyProperty: "SIPUserEndpoint",
+                        KeyProperty: "SIP User",
                         OldValue: oldObj,
                         NewValue: newObj,
-                        Description: "SIP USer Updated.",
+                        Description: "SIP User Updated.",
                         Author: iss,
                         User: jobj.SipUsername,
                         ObjectType: "SipUACEndpoint",
@@ -693,7 +695,16 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,iss,callback) {
 
                             resUser.updateAttributes(jobj).then(function (resUpdate) {
 
-                                addAuditTrail(Tenant, Company, iss, auditData);
+
+                          
+
+                                if( (_.isEqual(oldObj, newObj))==false) {
+                                    addAuditTrail(Tenant, Company, Username, auditData);
+                                }
+                              
+                          
+
+                          
 
                                 redisCacheHandler.addSipUserToCache(resUpdate, Company, Tenant);
 
