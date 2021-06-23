@@ -671,7 +671,7 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,iss,callback) {
                         NewValue: newObj,
                         Description: "SIP User Updated.",
                         Author: iss,
-                        User: jobj.SipUsername,
+                        User: Username,
                         ObjectType: "SipUACEndpoint",
                         Action: "UPDATE",
                         Application: "SIP User Endpoint Service"
@@ -699,7 +699,7 @@ function UpdateUser(Username,jobj,Company,Tenant,reqId,iss,callback) {
                           
 
                                 if( (_.isEqual(oldObj, newObj))==false) {
-                                    addAuditTrail(Tenant, Company, Username, auditData);
+                                    addAuditTrail(Tenant, Company, iss, auditData);
                                 }
                               
                           
