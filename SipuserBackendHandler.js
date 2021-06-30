@@ -267,12 +267,12 @@ function SaveUser(jobj,Company,Tenant,reqId,iss,callback) {
 
 
                                                                                 var auditData = {
-                                                                                    KeyProperty: "SIPUserEndpoint",
+                                                                                    KeyProperty: "SIP User",
                                                                                     OldValue: {},
                                                                                     NewValue: SIPObject,
-                                                                                    Description: "New SIPUser Created.",
+                                                                                    Description: "New SIP User Created.",
                                                                                     Author: iss,
-                                                                                    User: iss,
+                                                                                    User: jobj.SipUsername,
                                                                                     ObjectType: "SipUACEndpoint",
                                                                                     Action: "SAVE",
                                                                                     Application: "SIP User Endpoint Service"
@@ -776,15 +776,15 @@ function UpdateUserStatus(Username,status,Company,Tenant,reqId,iss,callback) {
                                     {
 
                                         var auditData = {
-                                            KeyProperty: "SIPUserEndpoint",
+                                            KeyProperty: "SIP User",
                                             OldValue: resUser,
                                             NewValue: SipObj,
-                                            Description: "SIP USer Updated.",
+                                            Description: "SIP User Updated.",
                                             Author: iss,
-                                            User: iss,
+                                            User: Username,
                                             ObjectType: "SipUACEndpoint",
                                             Action: "UPDATE",
-                                            Application: "SIP User Endpoint Service"
+                                            Application: "SIPUserEndpoint Service"
                                         };
                                         addAuditTrail(Tenant, Company, iss, auditData);
 
